@@ -37,9 +37,14 @@ export const GET = requireAuth(
         );
       }
 
-      // 1. 查询当前用户的 UsageLog
+      // 1. 查询当前用户的 UsageLog（关联 Workflow 获取 cozeWorkflowId）
       const usageLog = await prisma.usageLog.findUnique({
         where: { id: logId },
+        include: {
+          workflow: {
+            select: { cozeWorkflowId: true },
+          },
+        },
       });
 
       // 2. 不存在或不属于当前用户
@@ -80,7 +85,10 @@ export const GET = requireAuth(
 
       let cozeResult: CozeTaskResult;
       try {
-        cozeResult = await getTaskStatus(usageLog.taskId);
+        cozeResult = await getTaskStatus(
+          usageLog.taskId,
+          usageLog.workflow.cozeWorkflowId,
+        );
       } catch (error) {
         // Coze 查询失败：保持原状态，返回错误信息但不修改数据库
         console.error("查询 Coze 任务状态失败:", error);

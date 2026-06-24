@@ -101,15 +101,18 @@ function throwCozeError(response: CozeApiResponse, fallback: string): never {
 /**
  * 提交 Coze 工作流异步任务
  *
+ * 使用 /v1/workflow/run 接口 + is_async=true 实现异步执行
+ * 返回 execute_id 供后续查询使用
+ *
  * @param workflowId Coze 工作流 ID
  * @param parameters 工作流参数（如 { input: imageUrl }）
- * @returns { taskId } Coze 任务 ID
+ * @returns { executeId } Coze 执行 ID
  */
 export async function submitWorkflowTask(
   workflowId: string,
   parameters: Record<string, unknown>,
-): Promise<{ taskId: string }> {
-  const url = `${getBaseUrl()}/v1/workflow/async_run`;
+): Promise<{ executeId: string }> {
+  const url = `${getBaseUrl()}/v1/workflow/run`;
 
   let response: CozeApiResponse<CozeAsyncRunData>;
   try {
@@ -119,13 +122,13 @@ export async function submitWorkflowTask(
       body: JSON.stringify({
         workflow_id: workflowId,
         parameters,
+        is_async: true,
       }),
     });
     response = (await res.json()) as CozeApiResponse<CozeAsyncRunData>;
   } catch (error) {
-    // 网络或解析错误
     throw new Error(
-      `调用 Coze async_run 接口失败：${error instanceof Error ? error.message : String(error)}`,
+      `调用 Coze workflow/run 接口失败：${error instanceof Error ? error.message : String(error)}`,
     );
   }
 
@@ -134,12 +137,12 @@ export async function submitWorkflowTask(
     throwCozeError(response, "提交 Coze 工作流任务失败");
   }
 
-  const taskId = response.data.task_id || response.data.execute_id;
-  if (!taskId) {
-    throw new Error("Coze 响应中未包含 task_id 或 execute_id");
+  const executeId = response.data.execute_id || response.data.task_id;
+  if (!executeId) {
+    throw new Error("Coze 响应中未包含 execute_id");
   }
 
-  return { taskId };
+  return { executeId };
 }
 
 /**
@@ -219,7 +222,7 @@ function mapStatus(rawStatus: string | undefined): CozeTaskStatus {
   if (lower === "success" || lower === "completed") {
     return "completed";
   }
-  if (lower === "failed" || lower === "error") {
+  if (lower === "fail" || lower === "failed" || lower === "error") {
     return "failed";
   }
   if (lower === "queued" || lower === "pending") {
@@ -232,24 +235,39 @@ function mapStatus(rawStatus: string | undefined): CozeTaskStatus {
 /**
  * 查询 Coze 任务状态
  *
- * @param taskId Coze 任务 ID
+ * 使用 /v1/workflows/:workflow_id/run_histories/:execute_id 接口
+ * 查询异步工作流的执行结果
+ *
+ * @param executeId Coze 执行 ID（提交任务时返回的 execute_id）
+ * @param workflowId Coze 工作流 ID
  * @returns 任务状态、输出（视频URL）、Token 消耗、错误信息
  */
 export async function getTaskStatus(
-  taskId: string,
+  executeId: string,
+  workflowId: string,
 ): Promise<CozeTaskResult> {
-  const url = `${getBaseUrl()}/v1/workflow/task/${taskId}`;
+  const url = `${getBaseUrl()}/v1/workflows/${workflowId}/run_histories/${executeId}`;
 
-  let response: CozeApiResponse<CozeTaskData>;
+  interface HistoryItem {
+    execute_status?: string;
+    output?: string;
+    error_message?: string;
+    usage?: {
+      token_count?: number;
+      tokens?: number;
+    };
+  }
+
+  let response: CozeApiResponse<HistoryItem[]>;
   try {
     const res = await fetch(url, {
       method: "GET",
       headers: buildHeaders(),
     });
-    response = (await res.json()) as CozeApiResponse<CozeTaskData>;
+    response = (await res.json()) as CozeApiResponse<HistoryItem[]>;
   } catch (error) {
     throw new Error(
-      `调用 Coze task 查询接口失败：${error instanceof Error ? error.message : String(error)}`,
+      `调用 Coze run_histories 接口失败：${error instanceof Error ? error.message : String(error)}`,
     );
   }
 
@@ -258,26 +276,30 @@ export async function getTaskStatus(
     throwCozeError(response, "查询 Coze 任务状态失败");
   }
 
-  const data = response.data;
-  const status = mapStatus(data.status);
+  // data 是数组，取第一个元素
+  const item = response.data[0];
+  if (!item) {
+    return { status: "running" };
+  }
 
+  const status = mapStatus(item.execute_status);
   const result: CozeTaskResult = { status };
 
-  // 提取视频 URL（仅 completed 时有意义，但其他状态也尝试提取）
-  const videoUrl = extractVideoUrl(data.output);
+  // 提取视频 URL
+  const videoUrl = extractVideoUrl(item.output);
   if (videoUrl) {
     result.output = videoUrl;
   }
 
   // 提取 Token 消耗
-  const tokensUsed = data.token ?? data.tokens;
+  const tokensUsed = item.usage?.token_count ?? item.usage?.tokens;
   if (typeof tokensUsed === "number") {
     result.tokensUsed = tokensUsed;
   }
 
   // 提取错误信息
   if (status === "failed") {
-    result.errorMessage = data.error || data.error_message || "任务执行失败";
+    result.errorMessage = item.error_message || "任务执行失败";
   }
 
   return result;

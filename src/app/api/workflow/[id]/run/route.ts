@@ -143,16 +143,16 @@ export const POST = requireAuth(
 
       // 4. 调用 Coze 异步接口提交任务
       try {
-        const { taskId: cozeTaskId } = await submitWorkflowTask(
+        const { executeId: cozeExecuteId } = await submitWorkflowTask(
           workflow.cozeWorkflowId,
-          { input: imageUrl },
+          { yuansitu: imageUrl },
         );
 
         // 5. 更新 UsageLog：taskId、status=running
         await prisma.usageLog.update({
           where: { id: usageLog.id },
           data: {
-            taskId: cozeTaskId,
+            taskId: cozeExecuteId,
             status: "running",
           },
         });
@@ -160,7 +160,7 @@ export const POST = requireAuth(
         // 6. 返回 usageLog.id 供前端轮询
         return NextResponse.json({
           taskId: usageLog.id,
-          cozeTaskId,
+          cozeTaskId: cozeExecuteId,
           status: "running",
         });
       } catch (error) {
