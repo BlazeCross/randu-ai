@@ -134,7 +134,14 @@ export async function submitWorkflowTask(
 
   // Coze 约定 code === 0 表示成功
   if (response.code !== 0 || !response.data) {
-    throwCozeError(response, "提交 Coze 工作流任务失败");
+    console.error("[Coze] 提交任务失败，完整响应:", JSON.stringify(response, null, 2));
+    const message =
+      response.msg ||
+      response.message ||
+      response.detail?.reason ||
+      JSON.stringify(response) ||
+      "提交 Coze 工作流任务失败";
+    throw new Error(message);
   }
 
   const executeId = response.data.execute_id || response.data.task_id;
