@@ -178,8 +178,8 @@ function extractVideoUrl(output: string | undefined | null): string | undefined 
   // output 为字符串
   const trimmed = output.trim();
 
-  // 情况1：output 本身就是视频 URL
-  if (/^https?:\/\//i.test(trimmed) && /\.(mp4|mov|avi|mkv|webm|m4v)/i.test(trimmed)) {
+  // 情况1：output 本身就是 URL（含或不含视频扩展名）
+  if (/^https?:\/\//i.test(trimmed)) {
     return trimmed;
   }
 
@@ -188,8 +188,8 @@ function extractVideoUrl(output: string | undefined | null): string | undefined 
     const parsed = JSON.parse(trimmed);
     return extractFromObject(parsed);
   } catch {
-    // 解析失败，尝试从字符串中匹配视频 URL
-    const match = trimmed.match(/https?:\/\/[^\s"'<>]+\.(mp4|mov|avi|mkv|webm|m4v)/i);
+    // 解析失败，尝试从字符串中匹配任何 URL
+    const match = trimmed.match(/https?:\/\/[^\s"'<>]+/i);
     if (match) return match[0];
   }
 
@@ -204,19 +204,16 @@ function extractFromObject(obj: unknown): string | undefined {
 
   const record = obj as Record<string, unknown>;
 
-  // 常见字段名
-  const urlKeys = ["video", "url", "output", "video_url", "videoUrl", "result", "data"];
+  // 常见字段名（优先级高）
+  const urlKeys = ["video", "url", "output", "video_url", "videoUrl", "result", "data", "file", "file_url", "download_url"];
   for (const key of urlKeys) {
     const value = record[key];
     if (typeof value === "string" && /^https?:\/\//i.test(value)) {
       return value;
     }
-    if (typeof value === "string" && /\.(mp4|mov|avi|mkv|webm|m4v)/i.test(value)) {
-      return value;
-    }
   }
 
-  // 递归查找一层
+  // 递归查找
   for (const key of Object.keys(record)) {
     const value = record[key];
     if (value && typeof value === "object") {
@@ -282,6 +279,8 @@ export async function getTaskStatus(
       headers: buildHeaders(),
     });
     response = (await res.json()) as CozeApiResponse<HistoryItem[]>;
+    // 打印完整响应用于调试
+    console.error("[Coze] run_histories 完整响应:", JSON.stringify(response, null, 2));
   } catch (error) {
     throw new Error(
       `调用 Coze run_histories 接口失败：${error instanceof Error ? error.message : String(error)}`,
@@ -289,12 +288,20 @@ export async function getTaskStatus(
   }
 
   // Coze 约定 code === 0 表示成功
-  if (response.code !== 0 || !response.data) {
+  // 注意：data 可能在顶层或 data 字段中（与 submit 接口类似）
+  if (response.code !== 0) {
+    console.error("[Coze] 查询任务状态失败，完整响应:", JSON.stringify(response, null, 2));
     throwCozeError(response, "查询 Coze 任务状态失败");
   }
 
-  // data 是数组，取第一个元素
-  const item = response.data[0];
+  // data 可能在 data 字段或顶层
+  const historyData: HistoryItem[] =
+    response.data ||
+    (response as unknown as HistoryItem[]);
+
+  // 如果 data 不是数组，尝试包装
+  const items = Array.isArray(historyData) ? historyData : [historyData];
+  const item = items[0];
   if (!item) {
     return { status: "running" };
   }
