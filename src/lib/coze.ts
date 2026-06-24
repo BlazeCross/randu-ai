@@ -19,6 +19,7 @@ export interface CozeTaskResult {
   output?: string; // 视频URL
   tokensUsed?: number; // 消耗Token
   errorMessage?: string;
+  rawOutput?: unknown; // 原始 output 数据（调试用）
 }
 
 // Coze API 响应通用结构
@@ -165,32 +166,41 @@ export async function submitWorkflowTask(
 /**
  * 从 Coze 任务输出中提取视频 URL
  *
- * Coze 的 output 字段通常是 JSON 字符串，可能包含：
- * - 直接的视频 URL 字符串
- * - { video: "url" } / { url: "url" } / { output: "url" } 等结构
+ * Coze 的 output 字段可能是：
+ * - 字符串 URL
+ * - JSON 字符串（如 {"output": "url"} / {"video": "url"}）
+ * - 对象（已被 JSON 解析）
  *
  * @param output Coze 返回的 output 字段
  * @returns 视频 URL 字符串，未找到返回 undefined
  */
-function extractVideoUrl(output: string | undefined | null): string | undefined {
+function extractVideoUrl(output: unknown): string | undefined {
   if (!output) return undefined;
 
   // output 为字符串
-  const trimmed = output.trim();
+  if (typeof output === "string") {
+    const trimmed = output.trim();
 
-  // 情况1：output 本身就是 URL（含或不含视频扩展名）
-  if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed;
+    // 情况1：output 本身就是 URL
+    if (/^https?:\/\//i.test(trimmed)) {
+      return trimmed;
+    }
+
+    // 情况2：尝试 JSON 解析
+    try {
+      const parsed = JSON.parse(trimmed);
+      return extractFromObject(parsed);
+    } catch {
+      // 解析失败，尝试从字符串中匹配任何 URL
+      const match = trimmed.match(/https?:\/\/[^\s"'<>]+/i);
+      if (match) return match[0];
+    }
+    return undefined;
   }
 
-  // 情况2：尝试 JSON 解析
-  try {
-    const parsed = JSON.parse(trimmed);
-    return extractFromObject(parsed);
-  } catch {
-    // 解析失败，尝试从字符串中匹配任何 URL
-    const match = trimmed.match(/https?:\/\/[^\s"'<>]+/i);
-    if (match) return match[0];
+  // output 为对象或数组
+  if (typeof output === "object") {
+    return extractFromObject(output);
   }
 
   return undefined;
@@ -205,7 +215,12 @@ function extractFromObject(obj: unknown): string | undefined {
   const record = obj as Record<string, unknown>;
 
   // 常见字段名（优先级高）
-  const urlKeys = ["video", "url", "output", "video_url", "videoUrl", "result", "data", "file", "file_url", "download_url"];
+  const urlKeys = [
+    "video", "url", "output", "video_url", "videoUrl",
+    "result", "data", "file", "file_url", "download_url",
+    "video_link", "videoLink", "link", "src", "source",
+    "media", "media_url", "mediaUrl",
+  ];
   for (const key of urlKeys) {
     const value = record[key];
     if (typeof value === "string" && /^https?:\/\//i.test(value)) {
@@ -264,12 +279,13 @@ export async function getTaskStatus(
 
   interface HistoryItem {
     execute_status?: string;
-    output?: string;
+    output?: unknown;
     error_message?: string;
     usage?: {
       token_count?: number;
       tokens?: number;
     };
+    [key: string]: unknown;
   }
 
   let response: CozeApiResponse<HistoryItem[]>;
@@ -309,8 +325,16 @@ export async function getTaskStatus(
   const status = mapStatus(item.execute_status);
   const result: CozeTaskResult = { status };
 
-  // 提取视频 URL
-  const videoUrl = extractVideoUrl(item.output);
+  // 保存原始 output 用于调试
+  result.rawOutput = item.output;
+
+  // 提取视频 URL：优先从 output 字段提取
+  let videoUrl = extractVideoUrl(item.output);
+
+  // 如果 output 字段提取失败，尝试从整个 item 对象中查找
+  if (!videoUrl) {
+    videoUrl = extractFromObject(item);
+  }
   if (videoUrl) {
     result.output = videoUrl;
   }

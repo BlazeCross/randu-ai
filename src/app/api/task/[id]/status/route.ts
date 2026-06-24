@@ -105,15 +105,18 @@ export const GET = requireAuth(
 
       // 5. 根据 Coze 返回更新 UsageLog
       if (cozeResult.status === "completed") {
-        await prisma.usageLog.update({
-          where: { id: usageLog.id },
-          data: {
-            status: "completed",
-            outputUrl: cozeResult.output ?? null,
-            tokensUsed: cozeResult.tokensUsed ?? 0,
-            completedAt: new Date(),
-          },
-        });
+        // 如果提取到视频 URL，更新数据库
+        if (cozeResult.output) {
+          await prisma.usageLog.update({
+            where: { id: usageLog.id },
+            data: {
+              status: "completed",
+              outputUrl: cozeResult.output,
+              tokensUsed: cozeResult.tokensUsed ?? 0,
+              completedAt: new Date(),
+            },
+          });
+        }
 
         return NextResponse.json({
           status: "completed",
@@ -122,6 +125,13 @@ export const GET = requireAuth(
           tokensUsed: cozeResult.tokensUsed ?? 0,
           createdAt: usageLog.createdAt,
           completedAt: new Date(),
+          // 调试信息：当 outputUrl 为空时，返回原始 output 便于排查
+          ...(cozeResult.output ? {} : {
+            _debug: {
+              rawOutput: cozeResult.rawOutput,
+              message: "视频 URL 提取失败，请将此信息提供给开发者",
+            },
+          }),
         });
       }
 

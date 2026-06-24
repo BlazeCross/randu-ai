@@ -120,6 +120,7 @@ export default function WorkflowUsePage() {
     isPolling,
     isTimeout,
     reset: resetPolling,
+    debugInfo,
   } = useTaskPolling(taskId, { timeout: 300000 });
 
   /**
@@ -691,6 +692,17 @@ export default function WorkflowUsePage() {
                       <p className="mb-4 text-sm text-red-700">
                         结果获取失败，请重试
                       </p>
+                      {/* 调试信息：显示 Coze 返回的原始 output */}
+                      {debugInfo && (
+                        <details className="mb-4 rounded-lg border border-neutral-300 bg-neutral-50 p-3">
+                          <summary className="cursor-pointer text-xs font-medium text-neutral-600">
+                            调试信息（请截图发给开发者）
+                          </summary>
+                          <pre className="mt-2 max-h-60 overflow-auto text-xs text-neutral-700">
+                            {JSON.stringify(debugInfo, null, 2)}
+                          </pre>
+                        </details>
+                      )}
                       <button
                         type="button"
                         onClick={handleReset}

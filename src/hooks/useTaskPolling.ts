@@ -21,6 +21,10 @@ interface TaskStatusResponse {
   tokensUsed: number;
   createdAt: string;
   completedAt: string | null;
+  _debug?: {
+    rawOutput: unknown;
+    message: string;
+  };
 }
 
 // useTaskPolling 选项
@@ -40,6 +44,7 @@ interface UseTaskPollingResult {
   isPolling: boolean;
   isTimeout: boolean;
   reset: () => void;
+  debugInfo?: { rawOutput: unknown; message: string };
 }
 
 /**
@@ -70,6 +75,9 @@ export function useTaskPolling(
   const [tokensUsed, setTokensUsed] = useState<number>(0);
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [isTimeout, setIsTimeout] = useState<boolean>(false);
+  const [debugInfo, setDebugInfo] = useState<
+    { rawOutput: unknown; message: string } | undefined
+  >(undefined);
 
   // 定时器与起始时间引用
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -100,6 +108,7 @@ export function useTaskPolling(
     setTokensUsed(0);
     setIsPolling(false);
     setIsTimeout(false);
+    setDebugInfo(undefined);
     startTimeRef.current = 0;
   }, [clearTimer]);
 
@@ -156,6 +165,7 @@ export function useTaskPolling(
         setOutputUrl(data.outputUrl);
         setErrorMessage(data.errorMessage);
         setTokensUsed(data.tokensUsed ?? 0);
+        setDebugInfo(data._debug);
 
         // 终态：停止轮询
         if (nextStatus === "completed" || nextStatus === "failed") {
@@ -263,5 +273,6 @@ export function useTaskPolling(
     isPolling,
     isTimeout,
     reset,
+    debugInfo,
   };
 }
