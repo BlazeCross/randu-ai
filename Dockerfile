@@ -1,71 +1,93 @@
-# syntax=docker/dockerfile:1.7
+# =============================================================================
+# 燃渡AI - Dockerfile（多阶段构建）
+# =============================================================================
+# 阶段说明：
+# 1. deps：安装依赖（利用缓存层）
+# 2. builder：生成 Prisma Client + 构建 Next.js
+# 3. runner：最终运行镜像（体积小，仅含必要文件）
+# =============================================================================
 
-# =============================================================================
-# 阶段 1: 依赖安装（deps）
-# =============================================================================
+# ---------- 阶段1：安装依赖 ----------
 FROM node:20-alpine AS deps
 
+# 安装 OpenSSL（Prisma 运行时依赖）
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
-# 仅复制 package.json 和 lockfile，利用 Docker 缓存层
+# 先复制 package.json 和 lock 文件，利用 Docker 缓存层
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma/
 
 # 安装所有依赖（含 devDependencies，构建需要）
-RUN npm ci --include=dev
+RUN npm ci
 
-# =============================================================================
-# 阶段 2: 构建（builder）
-# =============================================================================
+# ---------- 阶段2：构建应用 ----------
 FROM node:20-alpine AS builder
+
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
+# 从 deps 阶段复制 node_modules
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
 
-# 构建时所需的环境变量（Next.js 会将 NEXT_PUBLIC_* 内联到客户端代码）
-# 真实密钥在运行时通过环境变量注入，不写入镜像
-ARG NEXT_PUBLIC_APP_URL
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL \
-    NEXT_TELEMETRY_DISABLED=1
+# 复制源代码
+COPY . .
 
 # 生成 Prisma Client
 RUN npx prisma generate
 
-# 构建 Next.js 应用
+# 构建 Next.js（standalone 模式）
+ARG NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN npm run build
 
-# =============================================================================
-# 阶段 3: 运行时（runner）- 最小化镜像
-# =============================================================================
+# ---------- 阶段3：运行镜像 ----------
 FROM node:20-alpine AS runner
+
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# 关闭 Next.js 遥测
-ENV NODE_ENV=production \
-    NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000 \
-    HOSTNAME=0.0.0.0
-
-# 创建非 root 用户运行应用
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs
-
-# 复制构建产物
+# 复制 standalone 构建产物
+COPY --from=builder /app/.next/standalone ./
+# 复制静态资源（standalone 不含这些）
+COPY --from=builder /app/.next/static ./.next/static
+# 复制 public 目录（如果存在）
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+# 复制 Prisma 相关文件（运行迁移需要）
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/next.config.ts ./next.config.ts
+# 复制 Prisma Client 和 CLI
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
+# 创建启动脚本（先同步数据库 schema，再启动应用）
+# 项目使用 prisma db push 而非 migrate，直接同步 schema
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'npx prisma db push --accept-data-loss' >> /app/start.sh && \
+    echo 'node server.js' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
+# 创建非 root 用户运行应用（安全最佳实践）
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    chown -R nextjs:nodejs /app
+
+# 切换到非 root 用户
 USER nextjs
 
+# 暴露端口
 EXPOSE 3000
 
-# 健康检查
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD node -e "fetch('http://localhost:3000/api/workflow/list').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+# 设置环境变量
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV=production
 
-CMD ["npm", "start"]
+# 启动应用（先迁移数据库，再启动）
+CMD ["/app/start.sh"]

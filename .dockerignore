@@ -1,56 +1,43 @@
-# 版本控制
+# Docker 构建时忽略的文件（减少构建上下文体积，加速构建）
+
+# 依赖与构建产物
+node_modules
+.next
+out
+dist
+
+# Git
 .git
 .gitignore
 
-# 依赖
-node_modules
-.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# Next.js 构建产物
-.next
-out
-build
-
-# 环境变量（构建时通过 ARG/ENV 注入，运行时通过 docker run -e 注入）
+# 环境变量文件（敏感信息，不进入镜像）
 .env
 .env.local
+.env.production
 .env.*.local
 
-# Vercel
-.vercel
+# Docker 相关
+Dockerfile
+docker-compose.yml
+.dockerignore
 
-# IDE & 系统
-.DS_Store
-*.pem
+# 备份
+backups
+
+# IDE 与编辑器
 .vscode
 .idea
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
 
 # 日志
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-logs
 *.log
+npm-debug.log*
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# 测试
-coverage
-
-# Docker 自身（避免递归构建）
-Dockerfile
-.dockerignore
-docker-compose.yml
-
-# 部署配置
-ecosystem.config.cjs
-DEPLOY.md
+# Trae / 其他工具
+.trae
+AGENTS.md
