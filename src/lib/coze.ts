@@ -164,11 +164,50 @@ export async function submitWorkflowTask(
 }
 
 /**
+ * 从字符串中提取 URL
+ *
+ * 处理多种情况：
+ * - 字符串本身就是 URL
+ * - JSON 字符串（递归解析）
+ * - 包含 URL 的文本（如 "视频地址：`https://...`"）
+ * - URL 可能被反引号、引号包裹
+ */
+function extractUrlFromString(str: string): string | undefined {
+  const trimmed = str.trim();
+
+  // 情况1：本身就是 URL
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // 情况2：尝试 JSON 解析后递归查找
+  try {
+    const parsed = JSON.parse(trimmed);
+    const found = extractFromObject(parsed);
+    if (found) return found;
+  } catch {
+    // 非 JSON，继续下面的匹配
+  }
+
+  // 情况3：优先匹配 .mp4 URL（排除反引号、引号、空格等）
+  const mp4Match = trimmed.match(
+    /https?:\/\/[^\s"'`<>\\]+\.mp4[^\s"'`<>\\]*/i,
+  );
+  if (mp4Match) return mp4Match[0];
+
+  // 情况4：匹配任何 URL
+  const match = trimmed.match(/https?:\/\/[^\s"'`<>\\]+/i);
+  if (match) return match[0];
+
+  return undefined;
+}
+
+/**
  * 从 Coze 任务输出中提取视频 URL
  *
  * Coze 的 output 字段可能是：
  * - 字符串 URL
- * - JSON 字符串（如 {"output": "url"} / {"video": "url"}）
+ * - JSON 字符串（如 {"output": "url"} / {"Output": {"data": "url"}}）
  * - 对象（已被 JSON 解析）
  *
  * @param output Coze 返回的 output 字段
@@ -177,28 +216,10 @@ export async function submitWorkflowTask(
 function extractVideoUrl(output: unknown): string | undefined {
   if (!output) return undefined;
 
-  // output 为字符串
   if (typeof output === "string") {
-    const trimmed = output.trim();
-
-    // 情况1：output 本身就是 URL
-    if (/^https?:\/\//i.test(trimmed)) {
-      return trimmed;
-    }
-
-    // 情况2：尝试 JSON 解析
-    try {
-      const parsed = JSON.parse(trimmed);
-      return extractFromObject(parsed);
-    } catch {
-      // 解析失败，尝试从字符串中匹配任何 URL
-      const match = trimmed.match(/https?:\/\/[^\s"'<>]+/i);
-      if (match) return match[0];
-    }
-    return undefined;
+    return extractUrlFromString(output);
   }
 
-  // output 为对象或数组
   if (typeof output === "object") {
     return extractFromObject(output);
   }
@@ -208,33 +229,57 @@ function extractVideoUrl(output: unknown): string | undefined {
 
 /**
  * 从对象中递归查找视频 URL
+ *
+ * - 字段名大小写不敏感匹配（如 Output / output 都能匹配）
+ * - 字符串值可能是嵌套的 JSON 字符串，也会递归解析
+ * - 优先返回 .mp4 URL
  */
 function extractFromObject(obj: unknown): string | undefined {
   if (!obj || typeof obj !== "object") return undefined;
 
   const record = obj as Record<string, unknown>;
 
-  // 常见字段名（优先级高）
-  const urlKeys = [
-    "video", "url", "output", "video_url", "videoUrl",
+  // 常见字段名（优先级高，小写形式用于匹配）
+  const urlKeys = new Set([
+    "video", "url", "output", "video_url", "videourl",
     "result", "data", "file", "file_url", "download_url",
-    "video_link", "videoLink", "link", "src", "source",
-    "media", "media_url", "mediaUrl",
-  ];
-  for (const key of urlKeys) {
-    const value = record[key];
-    if (typeof value === "string" && /^https?:\/\//i.test(value)) {
-      return value;
+    "video_link", "videolink", "link", "src", "source",
+    "media", "media_url", "mediaurl",
+  ]);
+
+  // 第一轮：优先匹配已知字段名（大小写不敏感）
+  for (const key of Object.keys(record)) {
+    if (urlKeys.has(key.toLowerCase())) {
+      const value = record[key];
+      const found = extractFromValue(value);
+      if (found) return found;
     }
   }
 
-  // 递归查找
+  // 第二轮：递归查找所有字段
   for (const key of Object.keys(record)) {
     const value = record[key];
-    if (value && typeof value === "object") {
-      const found = extractFromObject(value);
-      if (found) return found;
-    }
+    const found = extractFromValue(value);
+    if (found) return found;
+  }
+
+  return undefined;
+}
+
+/**
+ * 从任意值中提取 URL
+ * - 字符串：可能是 URL、JSON 字符串、包含 URL 的文本
+ * - 对象/数组：递归查找
+ */
+function extractFromValue(value: unknown): string | undefined {
+  if (!value) return undefined;
+
+  if (typeof value === "string") {
+    return extractUrlFromString(value);
+  }
+
+  if (typeof value === "object") {
+    return extractFromObject(value);
   }
 
   return undefined;
