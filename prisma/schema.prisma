@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String      @id @default(uuid())
+  email           String?     @unique
+  phone           String?     @unique
+  passwordHash    String      @map("password_hash")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  trialExpiresAt  DateTime    @map("trial_expires_at")
+  isSubscribed    Boolean     @default(false) @map("is_subscribed")
+  subscriptionPlan String?    @map("subscription_plan")
+  usageLogs       UsageLog[]
+
+  @@map("users")
+}
+
+model UsageLog {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  workflowId  String    @map("workflow_id")
+  taskId      String?   @map("task_id")
+  status      String    @default("pending")
+  tokensUsed  Int       @default(0) @map("tokens_used")
+  inputUrl    String?   @map("input_url")
+  outputUrl   String?   @map("output_url")
+  errorMessage String?  @map("error_message")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("usage_logs")
+}
+
+model Plan {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  dailyLimit    Int      @map("daily_limit")
+  monthlyPrice  Decimal  @db.Decimal(10, 2) @map("monthly_price")
+  features      Json
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("plans")
+}
+
+model Workflow {
+  id              String    @id @default(uuid())
+  name            String
+  description     String?
+  category        String
+  cozeWorkflowId  String    @map("coze_workflow_id")
+  icon            String?
+  status          String    @default("active")
+  feishuDocUrl    String?   @map("feishu_doc_url")
+  sortOrder       Int       @default(0) @map("sort_order")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("workflows")
+}
