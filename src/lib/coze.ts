@@ -27,8 +27,12 @@ interface CozeApiResponse<T = unknown> {
   msg?: string;
   message?: string;
   data?: T;
+  // 部分接口将 execute_id 放在顶层
+  execute_id?: string;
+  debug_url?: string;
   detail?: {
     reason?: string;
+    logid?: string;
     [key: string]: unknown;
   };
 }
@@ -133,7 +137,8 @@ export async function submitWorkflowTask(
   }
 
   // Coze 约定 code === 0 表示成功
-  if (response.code !== 0 || !response.data) {
+  // 注意：execute_id 可能在顶层或 data 字段中
+  if (response.code !== 0) {
     console.error("[Coze] 提交任务失败，完整响应:", JSON.stringify(response, null, 2));
     const message =
       response.msg ||
@@ -144,8 +149,13 @@ export async function submitWorkflowTask(
     throw new Error(message);
   }
 
-  const executeId = response.data.execute_id || response.data.task_id;
+  // execute_id 可能在顶层或 data 字段中
+  const executeId =
+    response.execute_id ||
+    response.data?.execute_id ||
+    response.data?.task_id;
   if (!executeId) {
+    console.error("[Coze] 响应中未包含 execute_id，完整响应:", JSON.stringify(response, null, 2));
     throw new Error("Coze 响应中未包含 execute_id");
   }
 
