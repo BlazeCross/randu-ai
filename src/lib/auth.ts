@@ -89,25 +89,34 @@ function forbiddenResponse(message = "权限不足，禁止访问") {
   return NextResponse.json({ message }, { status: 403 });
 }
 
+// Next.js Route Handler 的第二参数上下文类型（params 为 Promise，Next.js 16 异步参数）
+interface RouteContext {
+  params?: Promise<Record<string, string>>;
+}
+
 /**
  * 高阶函数：包装需要鉴权的 Route Handler
  * 未通过鉴权时直接返回 401；通过鉴权时将 userId 注入到 handler 参数
+ * 同时透传 Next.js 的路由上下文（params），支持动态路由
  *
  * @example
  * export const GET = requireAuth(async (request, { userId }) => { ... });
+ * export const DELETE = requireAuth(async (request, { userId, params }) => {
+ *   const { id } = await params;  // 动态路由参数
+ * });
  */
 export function requireAuth(
   handler: (
     request: Request,
-    ctx: { userId: string },
+    ctx: { userId: string; params?: Promise<Record<string, string>> },
   ) => Promise<Response> | Response,
-): (request: Request) => Promise<Response> {
-  return async (request: Request): Promise<Response> => {
+): (request: Request, context?: RouteContext) => Promise<Response> {
+  return async (request: Request, context?: RouteContext): Promise<Response> => {
     const payload = verifyToken(request);
     if (!payload) {
       return unauthorizedResponse();
     }
-    return handler(request, { userId: payload.userId });
+    return handler(request, { userId: payload.userId, params: context?.params });
   };
 }
 
@@ -156,7 +165,7 @@ async function verifyRole(
 /**
  * 高阶函数：包装需要 admin 及以上权限的 Route Handler
  * 校验 JWT → 查询用户角色 → 确认 role >= admin
- * 通过后将 userId + role 注入到 handler 参数
+ * 通过后将 userId + role 注入到 handler 参数，同时透传路由上下文
  *
  * @example
  * export const GET = requireAdmin(async (request, { userId, role }) => { ... });
@@ -164,37 +173,39 @@ async function verifyRole(
 export function requireAdmin(
   handler: (
     request: Request,
-    ctx: { userId: string; role: UserRole },
+    ctx: { userId: string; role: UserRole; params?: Promise<Record<string, string>> },
   ) => Promise<Response> | Response,
-): (request: Request) => Promise<Response> {
-  return async (request: Request): Promise<Response> => {
+): (request: Request, context?: RouteContext) => Promise<Response> {
+  return async (request: Request, context?: RouteContext): Promise<Response> => {
     const result = await verifyRole(request, "admin");
     if (result instanceof NextResponse) {
       return result;
     }
-    return handler(request, result);
+    return handler(request, { ...result, params: context?.params });
   };
 }
 
 /**
  * 高阶函数：包装需要 super_admin 权限的 Route Handler
  * 校验 JWT → 查询用户角色 → 确认 role === super_admin
- * 通过后将 userId + role 注入到 handler 参数
+ * 通过后将 userId + role 注入到 handler 参数，同时透传路由上下文
  *
  * @example
- * export const PATCH = requireSuperAdmin(async (request, { userId, role }) => { ... });
+ * export const PATCH = requireSuperAdmin(async (request, { userId, role, params }) => {
+ *   const { id } = await params;
+ * });
  */
 export function requireSuperAdmin(
   handler: (
     request: Request,
-    ctx: { userId: string; role: UserRole },
+    ctx: { userId: string; role: UserRole; params?: Promise<Record<string, string>> },
   ) => Promise<Response> | Response,
-): (request: Request) => Promise<Response> {
-  return async (request: Request): Promise<Response> => {
+): (request: Request, context?: RouteContext) => Promise<Response> {
+  return async (request: Request, context?: RouteContext): Promise<Response> => {
     const result = await verifyRole(request, "super_admin");
     if (result instanceof NextResponse) {
       return result;
     }
-    return handler(request, result);
+    return handler(request, { ...result, params: context?.params });
   };
 }
