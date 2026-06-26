@@ -72,6 +72,10 @@ services:
       OSS_CDN_DOMAIN: ${OSS_CDN_DOMAIN:-}
       # JWT 密钥
       JWT_SECRET: ${JWT_SECRET:?请在.env.production中设置JWT_SECRET}
+      # 火山方舟 AI 模型
+      VOLC_ARK_API_KEY: ${VOLC_ARK_API_KEY:-}
+      VOLC_MODEL_DOUBAO: ${VOLC_MODEL_DOUBAO:-}
+      VOLC_MODEL_SEEDREAM: ${VOLC_MODEL_SEEDREAM:-}
       # 应用配置
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       TZ: Asia/Shanghai
