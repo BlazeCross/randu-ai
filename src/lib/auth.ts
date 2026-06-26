@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
 import jwt, { type JwtPayload } from "jsonwebtoken";
+import { prisma } from "@/lib/prisma";
+
+// 用户角色类型（与数据库 User.role 字段一致）
+export type UserRole = "user" | "admin" | "super_admin";
+
+// 角色权限层级：数值越大权限越高
+const ROLE_LEVEL: Record<UserRole, number> = {
+  user: 0,
+  admin: 1,
+  super_admin: 2,
+};
 
 // JWT 载荷中包含的用户标识
 interface AuthPayload extends JwtPayload {
@@ -65,10 +76,17 @@ export function signToken(userId: string): string {
 }
 
 /**
- * 鉴权失败的统一响应
+ * 鉴权失败的统一响应（401）
  */
 function unauthorizedResponse(message = "未授权，请先登录") {
   return NextResponse.json({ message }, { status: 401 });
+}
+
+/**
+ * 权限不足的统一响应（403）
+ */
+function forbiddenResponse(message = "权限不足，禁止访问") {
+  return NextResponse.json({ message }, { status: 403 });
 }
 
 /**
@@ -90,5 +108,93 @@ export function requireAuth(
       return unauthorizedResponse();
     }
     return handler(request, { userId: payload.userId });
+  };
+}
+
+/**
+ * 内部辅助：校验 JWT 并查询用户角色，返回 userId + role 或错误响应
+ *
+ * @param request 请求对象
+ * @param requiredRole 最低要求的角色
+ * @returns 成功返回 { userId, role }，失败返回 NextResponse
+ */
+async function verifyRole(
+  request: Request,
+  requiredRole: UserRole,
+): Promise<{ userId: string; role: UserRole } | NextResponse> {
+  const payload = verifyToken(request);
+  if (!payload) {
+    return unauthorizedResponse();
+  }
+
+  // 查询用户角色与状态
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId },
+    select: { role: true, status: true },
+  });
+
+  // 用户不存在
+  if (!user) {
+    return unauthorizedResponse("用户不存在");
+  }
+
+  // 账号已被封禁
+  if (user.status === "blocked") {
+    return forbiddenResponse("账号已被封禁，请联系管理员");
+  }
+
+  const userRole = user.role as UserRole;
+
+  // 角色权限不足
+  if (ROLE_LEVEL[userRole] < ROLE_LEVEL[requiredRole]) {
+    return forbiddenResponse();
+  }
+
+  return { userId: payload.userId, role: userRole };
+}
+
+/**
+ * 高阶函数：包装需要 admin 及以上权限的 Route Handler
+ * 校验 JWT → 查询用户角色 → 确认 role >= admin
+ * 通过后将 userId + role 注入到 handler 参数
+ *
+ * @example
+ * export const GET = requireAdmin(async (request, { userId, role }) => { ... });
+ */
+export function requireAdmin(
+  handler: (
+    request: Request,
+    ctx: { userId: string; role: UserRole },
+  ) => Promise<Response> | Response,
+): (request: Request) => Promise<Response> {
+  return async (request: Request): Promise<Response> => {
+    const result = await verifyRole(request, "admin");
+    if (result instanceof NextResponse) {
+      return result;
+    }
+    return handler(request, result);
+  };
+}
+
+/**
+ * 高阶函数：包装需要 super_admin 权限的 Route Handler
+ * 校验 JWT → 查询用户角色 → 确认 role === super_admin
+ * 通过后将 userId + role 注入到 handler 参数
+ *
+ * @example
+ * export const PATCH = requireSuperAdmin(async (request, { userId, role }) => { ... });
+ */
+export function requireSuperAdmin(
+  handler: (
+    request: Request,
+    ctx: { userId: string; role: UserRole },
+  ) => Promise<Response> | Response,
+): (request: Request) => Promise<Response> {
+  return async (request: Request): Promise<Response> => {
+    const result = await verifyRole(request, "super_admin");
+    if (result instanceof NextResponse) {
+      return result;
+    }
+    return handler(request, result);
   };
 }
