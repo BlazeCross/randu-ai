@@ -1,27 +1,193 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { verifyNotifySign, isAlipayConfigured } from "@/lib/alipay";
 
 /**
- * 支付宝异步回调通知接口（Phase 2 完整实现）
+ * POST /api/payment/callback - 支付宝异步通知回调
  *
- * 当前版本（P1）为占位接口，直接返回 { success: true }。
+ * 支付宝在用户完成支付后会向本接口发送 POST 请求（application/x-www-form-urlencoded）。
+ * 接口必须：
+ *   1. 验签：防止伪造
+ *   2. 根据 trade_status 更新订单状态
+ *   3. 支付成功时更新用户订阅/积分
+ *   4. 返回字符串 "success"（支付宝要求，否则会重试）
  *
- * 注意：此接口不需要鉴权，由支付宝服务器主动调用。
+ * 安全要求：
+ * - 不信任任何未验签的请求
+ * - 幂等性：同一订单多次回调不重复发放权益
  *
- * Phase 2 将接入 alipay-payment-integration：
- * - 解析支付宝 POST 表单参数
- * - 校验支付宝签名（防止伪造）
- * - 根据 trade_status 更新订单状态
- * - 支付成功时更新用户订阅状态（isSubscribed=true, subscriptionPlan=套餐名）
- * - 返回 "success" 字符串给支付宝（支付宝要求返回 success 才停止重试）
- *
- * @example
- * 请求：POST /api/payment/callback
- * Content-Type: application/x-www-form-urlencoded
- * Body: 支付宝回调参数（trade_status, out_trade_no, total_amount 等）
- *
- * @returns 200 { success: true }（占位）
+ * 注意：本接口不需要鉴权，由支付宝服务器主动调用。
  */
-export async function POST() {
-  // Phase 2 将接入 alipay-payment-integration 实现回调验签与订单更新
-  return NextResponse.json({ success: true });
+export async function POST(request: Request) {
+  // 1. 检查支付宝配置
+  if (!isAlipayConfigured()) {
+    // 未配置时返回 fail，让支付宝停止重试
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 2. 解析表单参数（支付宝使用 application/x-www-form-urlencoded）
+  let params: Record<string, string>;
+  try {
+    const formData = await request.formData();
+    params = {};
+    for (const [key, value] of formData.entries()) {
+      params[key] = String(value);
+    }
+  } catch (error) {
+    console.error("[POST /api/payment/callback] 解析表单失败:", error);
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 3. 验签（checkNotifySign 是同步方法）
+  const signValid = verifyNotifySign(params);
+  if (!signValid) {
+    console.warn("[POST /api/payment/callback] 验签失败，疑似伪造请求");
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 4. 解析关键字段
+  const outTradeNo = params.out_trade_no; // 商户订单号
+  const tradeStatus = params.trade_status; // 交易状态
+  const tradeNo = params.trade_no; // 支付宝交易号
+  const totalAmount = params.total_amount; // 交易金额
+
+  if (!outTradeNo) {
+    console.warn("[POST /api/payment/callback] 缺少 out_trade_no 参数");
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 5. 查询订单
+  const order = await prisma.order.findUnique({
+    where: { orderNo: outTradeNo },
+    select: {
+      id: true,
+      userId: true,
+      type: true,
+      planId: true,
+      credits: true,
+      amount: true,
+      status: true,
+    },
+  });
+
+  if (!order) {
+    console.warn(
+      `[POST /api/payment/callback] 订单不存在: ${outTradeNo}`,
+    );
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 6. 幂等性检查：已支付的订单不再处理
+  if (order.status === "paid") {
+    console.log(
+      `[POST /api/payment/callback] 订单已支付，幂等返回 success: ${outTradeNo}`,
+    );
+    return new NextResponse("success", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 7. 根据 trade_status 判断支付结果
+  // TRADE_SUCCESS: 交易成功（普通付款）
+  // TRADE_FINISHED: 交易完成（不支持退款）
+  const isPaid = tradeStatus === "TRADE_SUCCESS" || tradeStatus === "TRADE_FINISHED";
+
+  if (!isPaid) {
+    // 其他状态（如 WAIT_BUYER_PAY、TRADE_CLOSED）：保持 pending 或标记失败
+    console.log(
+      `[POST /api/payment/callback] 交易状态未完成: ${tradeStatus}, 订单: ${outTradeNo}`,
+    );
+    return new NextResponse("success", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 8. 校验金额（防止篡改）
+  const expectedAmount = Number(order.amount).toFixed(2);
+  const receivedAmount = Number(totalAmount).toFixed(2);
+  if (expectedAmount !== receivedAmount) {
+    console.error(
+      `[POST /api/payment/callback] 金额不匹配: 期望 ${expectedAmount}, 实收 ${receivedAmount}, 订单 ${outTradeNo}`,
+    );
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 9. 使用事务更新订单 + 发放权益（保证原子性）
+  try {
+    await prisma.$transaction(async (tx) => {
+      // 更新订单状态
+      await tx.order.update({
+        where: { id: order.id },
+        data: {
+          status: "paid",
+          paymentId: tradeNo,
+          paidAt: new Date(),
+        },
+      });
+
+      // 根据订单类型发放权益
+      if (order.type === "subscription" && order.planId) {
+        // 订阅：更新用户订阅状态
+        const plan = await tx.plan.findUnique({
+          where: { id: order.planId },
+          select: { name: true, dailyLimit: true },
+        });
+        if (plan) {
+          await tx.user.update({
+            where: { id: order.userId },
+            data: {
+              isSubscribed: true,
+              subscriptionPlan: plan.name,
+            },
+          });
+        }
+      } else if (order.type === "credits" && order.credits > 0) {
+        // 积分充值：累加用户积分
+        await tx.user.update({
+          where: { id: order.userId },
+          data: {
+            credits: { increment: order.credits },
+          },
+        });
+      }
+    });
+
+    console.log(
+      `[POST /api/payment/callback] 订单支付成功: ${outTradeNo}, 金额: ${totalAmount}`,
+    );
+    return new NextResponse("success", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  } catch (error) {
+    console.error(
+      `[POST /api/payment/callback] 更新订单失败: ${outTradeNo}`,
+      error,
+    );
+    // 返回 fail 让支付宝重试
+    return new NextResponse("fail", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TRIAL_LIMIT, TRIAL_DAYS } from "@/lib/trial";
 
@@ -58,7 +57,6 @@ const PLANS = [
  */
 export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
   const router = useRouter();
-  const [showPayTip, setShowPayTip] = useState(false);
 
   // 标题与说明文案
   const title = reason === "limit_reached" ? "试用次数已用完" : "试用已过期";
@@ -69,13 +67,13 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
 
   // 关闭弹窗
   const handleClose = () => {
-    setShowPayTip(false);
     onClose?.();
   };
 
-  // 点击"立即升级"：暂时提示支付功能即将开放，或跳转个人中心
+  // 点击"立即升级"：跳转到订单页选择套餐并支付
   const handleUpgrade = () => {
-    setShowPayTip(true);
+    handleClose();
+    router.push("/dashboard/orders");
   };
 
   // 跳转个人中心
@@ -239,47 +237,6 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
             </button>
           </div>
         </div>
-
-        {/* 支付功能即将开放提示（Phase 2） */}
-        {showPayTip && (
-          <div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4"
-            onClick={(e) => e.stopPropagation()}
-            role="alertdialog"
-            aria-modal="true"
-          >
-            <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-neutral-900">
-                支付功能即将开放
-              </h3>
-              <p className="mb-6 text-sm text-neutral-500">
-                在线订阅支付功能正在开发中（Phase 2），敬请期待
-              </p>
-              <button
-                type="button"
-                onClick={() => setShowPayTip(false)}
-                className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
-              >
-                知道了
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

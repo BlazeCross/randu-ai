@@ -209,12 +209,18 @@ export default function DashboardPage() {
               管理你的账号、试用状态和使用记录
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard/history"
               className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
             >
               任务历史
+            </Link>
+            <Link
+              href="/dashboard/orders"
+              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+            >
+              订单管理
             </Link>
             <Link
               href="/dashboard/keys"

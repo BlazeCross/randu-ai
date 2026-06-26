@@ -91,10 +91,12 @@ model Order {
   paidAt        DateTime? @map("paid_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan? @relation(fields: [planId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
   @@index([status])
+  @@index([planId])
   @@map("orders")
 }
 
@@ -131,6 +133,8 @@ model Plan {
   features      Json
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
 
   @@map("plans")
 }
