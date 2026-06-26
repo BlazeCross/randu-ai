@@ -1,9 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 // localStorage 中存储 token 的键名（与 auth-context 保持一致）
 const TOKEN_KEY = "randu_token";
+
+// 全局轮询 tick 间隔（毫秒）
+const TICK_INTERVAL = 5000;
+// 清理间隔（毫秒）
+const CLEANUP_INTERVAL = 60000;
+// 已结束且无订阅者的任务，超过此时间后清理（毫秒）
+const CLEANUP_AFTER = 10 * 60 * 1000;
 
 // 任务状态类型
 export type TaskStatus =
@@ -25,6 +32,29 @@ interface TaskStatusResponse {
     rawOutput: unknown;
     message: string;
   };
+}
+
+// 单个任务的内部状态
+interface TaskState {
+  status: TaskStatus;
+  outputUrl: string | null;
+  errorMessage: string | null;
+  tokensUsed: number;
+  isPolling: boolean;
+  isTimeout: boolean;
+  debugInfo?: { rawOutput: unknown; message: string };
+  // 内部字段
+  lastPolledAt: number;
+  startedAt: number;
+  currentInterval: number;
+  version: number; // 递增版本号，用于 useSyncExternalStore 检测变化
+  options: {
+    interval: number;
+    maxInterval: number;
+    backoffFactor: number;
+    timeout: number;
+  };
+  subscriberCount: number;
 }
 
 // useTaskPolling 选项
@@ -51,21 +81,169 @@ interface UseTaskPollingResult {
   debugInfo?: { rawOutput: unknown; message: string };
 }
 
+// ===== 模块级全局存储（单例，组件卸载不销毁，切页面不中断轮询）=====
+const tasks = new Map<string, TaskState>();
+const listeners = new Set<() => void>();
+let tickHandle: ReturnType<typeof setInterval> | null = null;
+let cleanupHandle: ReturnType<typeof setInterval> | null = null;
+
+/** 通知所有订阅者状态已变化 */
+function notifyListeners() {
+  listeners.forEach((l) => l());
+}
+
+/** 查询单个任务状态（失败时保持原状态，等待下次轮询重试） */
+async function pollTask(taskId: string) {
+  const task = tasks.get(taskId);
+  if (!task || !task.isPolling) return;
+
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+
+  if (!token) {
+    task.status = "failed";
+    task.errorMessage = "未登录或登录已过期";
+    task.isPolling = false;
+    task.version++;
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/task/${taskId}/status`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        task.status = "failed";
+        task.errorMessage = "未授权，请重新登录";
+        task.isPolling = false;
+        task.version++;
+        return;
+      }
+      if (res.status === 404) {
+        task.status = "failed";
+        task.errorMessage = "任务不存在";
+        task.isPolling = false;
+        task.version++;
+        return;
+      }
+      // 5xx 等错误：继续重试，不改变状态
+      return;
+    }
+
+    const data = (await res.json()) as TaskStatusResponse;
+    task.status = data.status as TaskStatus;
+    task.outputUrl = data.outputUrl;
+    task.errorMessage = data.errorMessage;
+    task.tokensUsed = data.tokensUsed ?? 0;
+    task.debugInfo = data._debug;
+    task.lastPolledAt = Date.now();
+    task.version++;
+
+    if (task.status === "completed" || task.status === "failed") {
+      task.isPolling = false;
+    } else {
+      // 指数退避：间隔递增，上限 maxInterval
+      task.currentInterval = Math.min(
+        task.currentInterval * task.options.backoffFactor,
+        task.options.maxInterval,
+      );
+    }
+  } catch (error) {
+    console.warn(`查询任务 ${taskId} 状态失败:`, error);
+    // 网络错误：继续重试，不改变状态
+  }
+}
+
+/** 启动全局轮询 tick（若已启动则跳过） */
+function ensureGlobalTick() {
+  if (tickHandle) return;
+
+  // 轮询 tick：每 TICK_INTERVAL 毫秒检查所有 pending 任务
+  tickHandle = setInterval(async () => {
+    const now = Date.now();
+    let changed = false;
+    const tasksToPoll: string[] = [];
+
+    for (const [taskId, task] of tasks.entries()) {
+      if (!task.isPolling) continue;
+
+      // 检查超时
+      if (now - task.startedAt >= task.options.timeout) {
+        task.isTimeout = true;
+        task.isPolling = false;
+        task.version++;
+        changed = true;
+        continue;
+      }
+
+      // 检查是否到了轮询时间
+      if (now - task.lastPolledAt >= task.currentInterval) {
+        tasksToPoll.push(taskId);
+      }
+    }
+
+    // 并行轮询到期任务
+    if (tasksToPoll.length > 0) {
+      await Promise.all(tasksToPoll.map((id) => pollTask(id)));
+      changed = true;
+    }
+
+    if (changed) {
+      notifyListeners();
+    }
+
+    // 如果没有正在轮询的任务，停止 tick 节省资源
+    let anyPolling = false;
+    for (const task of tasks.values()) {
+      if (task.isPolling) {
+        anyPolling = true;
+        break;
+      }
+    }
+    if (!anyPolling && tickHandle) {
+      clearInterval(tickHandle);
+      tickHandle = null;
+    }
+  }, TICK_INTERVAL);
+
+  // 清理 tick：定期清理已结束且无订阅者的旧任务，避免内存泄漏
+  if (!cleanupHandle) {
+    cleanupHandle = setInterval(() => {
+      const now = Date.now();
+      let changed = false;
+      for (const [taskId, task] of tasks.entries()) {
+        if (
+          !task.isPolling &&
+          task.subscriberCount === 0 &&
+          now - task.lastPolledAt > CLEANUP_AFTER
+        ) {
+          tasks.delete(taskId);
+          changed = true;
+        }
+      }
+      if (changed) notifyListeners();
+    }, CLEANUP_INTERVAL);
+  }
+}
+
 /**
- * useTaskPolling：任务状态轮询 Hook
+ * useTaskPolling：任务状态轮询 Hook（全局单例，切页面不中断）
+ *
+ * 架构：
+ * - 模块级 Map 存储所有任务状态，组件卸载不销毁
+ * - 单一全局 setInterval 批量轮询所有 pending 任务
+ * - useSyncExternalStore 订阅状态变化，自动触发 re-render
+ * - 组件卸载仅取消订阅（subscriberCount--），轮询继续
+ * - 任务终态后 10 分钟无订阅者自动清理
  *
  * @param taskId UsageLog ID（创建任务时返回的 taskId），为 null 时不轮询
- * @param options.interval 轮询间隔，默认 5000ms
+ * @param options.interval 轮询起始间隔，默认 3000ms
+ * @param options.maxInterval 轮询最大间隔，默认 15000ms
+ * @param options.backoffFactor 退避因子，默认 1.5
  * @param options.timeout 超时时间，默认 300000ms（5 分钟）
- *
- * 行为：
- * - taskId 不为 null 时，每 interval 毫秒调用 GET /api/task/{taskId}/status
- * - 请求头带 Authorization: Bearer <token>（从 localStorage 读取）
- * - 状态变为 completed/failed 时停止轮询
- * - 超时 timeout 时停止轮询，isTimeout=true
- * - reset() 重置状态，允许重新开始
- * - 组件卸载时清除定时器
- * - 网络错误时连续重试，不轻易放弃
  */
 export function useTaskPolling(
   taskId: string | null,
@@ -78,223 +256,87 @@ export function useTaskPolling(
     timeout = 300000,
   } = options;
 
-  const [status, setStatus] = useState<TaskStatus>("idle");
-  const [outputUrl, setOutputUrl] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [tokensUsed, setTokensUsed] = useState<number>(0);
-  const [isPolling, setIsPolling] = useState<boolean>(false);
-  const [isTimeout, setIsTimeout] = useState<boolean>(false);
-  const [debugInfo, setDebugInfo] = useState<
-    { rawOutput: unknown; message: string } | undefined
-  >(undefined);
-
-  // 定时器与起始时间引用
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const startTimeRef = useRef<number>(0);
-  // 当前轮询间隔（指数退避：每次轮询后乘以 backoffFactor，上限 maxInterval）
-  const currentIntervalRef = useRef<number>(interval);
-  // 标记组件是否已卸载，避免卸载后 setState
-  const isMountedRef = useRef<boolean>(true);
-  // 持有最新的 scheduleNext 引用，用于递归调用（避免 useCallback 自引用导致的"先使用后声明"问题）
-  const scheduleNextRef = useRef<(id: string) => void>(() => {});
-
-  /**
-   * 清除当前定时器
-   */
-  const clearTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+  // useSyncExternalStore：订阅外部 store 变化，自动触发 re-render
+  const subscribeStore = useCallback((onStoreChange: () => void) => {
+    listeners.add(onStoreChange);
+    return () => {
+      listeners.delete(onStoreChange);
+    };
   }, []);
 
-  /**
-   * 重置状态，允许重新开始
-   */
-  const reset = useCallback(() => {
-    clearTimer();
-    setStatus("idle");
-    setOutputUrl(null);
-    setErrorMessage(null);
-    setTokensUsed(0);
-    setIsPolling(false);
-    setIsTimeout(false);
-    setDebugInfo(undefined);
-    startTimeRef.current = 0;
-    // 重置轮询间隔为起始值
-    currentIntervalRef.current = interval;
-  }, [clearTimer, interval]);
+  // 返回当前任务的版本号，版本号变化时触发 re-render
+  const getSnapshot = useCallback(() => {
+    if (!taskId) return 0;
+    return tasks.get(taskId)?.version ?? 0;
+  }, [taskId]);
 
-  /**
-   * 查询任务状态
-   * 失败时返回 false 表示应停止轮询，true 表示可继续
-   */
-  const pollOnce = useCallback(
-    async (id: string): Promise<boolean> => {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem(TOKEN_KEY)
-          : null;
+  // SSR 快照：服务端无任务状态，返回 0
+  const getServerSnapshot = useCallback(() => 0, []);
 
-      if (!token) {
-        // 无 token，停止轮询
-        setErrorMessage("未登录或登录已过期");
-        setStatus("failed");
-        return false;
-      }
+  useSyncExternalStore(subscribeStore, getSnapshot, getServerSnapshot);
 
-      try {
-        const res = await fetch(`/api/task/${id}/status`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          // HTTP 错误：401/404 等停止轮询，其他错误继续重试
-          if (res.status === 401) {
-            setErrorMessage("未授权，请重新登录");
-            setStatus("failed");
-            return false;
-          }
-          if (res.status === 404) {
-            setErrorMessage("任务不存在");
-            setStatus("failed");
-            return false;
-          }
-          // 5xx 等错误：继续重试
-          console.warn(`查询任务状态返回 ${res.status}，将重试`);
-          return true;
-        }
-
-        const data = (await res.json()) as TaskStatusResponse;
-
-        if (!isMountedRef.current) return false;
-
-        // 更新状态
-        const nextStatus = data.status as TaskStatus;
-        setStatus(nextStatus);
-        setOutputUrl(data.outputUrl);
-        setErrorMessage(data.errorMessage);
-        setTokensUsed(data.tokensUsed ?? 0);
-        setDebugInfo(data._debug);
-
-        // 终态：停止轮询
-        if (nextStatus === "completed" || nextStatus === "failed") {
-          return false;
-        }
-
-        // 继续轮询
-        return true;
-      } catch (error) {
-        // 网络错误：继续重试
-        console.warn("查询任务状态网络错误，将重试:", error);
-        return true;
-      }
-    },
-    [],
-  );
-
-  /**
-   * 轮询调度：递归 setTimeout（指数退避）
-   * 通过 scheduleNextRef 实现递归调用，避免 useCallback 自引用
-   * 每次轮询后间隔按 backoffFactor 递增，上限 maxInterval，减轻长任务的服务器压力
-   */
-  const scheduleNext = useCallback(
-    (id: string) => {
-      // 检查超时
-      if (
-        startTimeRef.current > 0 &&
-        Date.now() - startTimeRef.current >= timeout
-      ) {
-        if (isMountedRef.current) {
-          setIsTimeout(true);
-          setIsPolling(false);
-        }
-        return;
-      }
-
-      const delay = currentIntervalRef.current;
-      timerRef.current = setTimeout(async () => {
-        const shouldContinue = await pollOnce(id);
-        if (!isMountedRef.current) return;
-        if (shouldContinue) {
-          // 指数退避：间隔递增，上限 maxInterval
-          currentIntervalRef.current = Math.min(
-            currentIntervalRef.current * backoffFactor,
-            maxInterval,
-          );
-          scheduleNextRef.current(id);
-        } else {
-          setIsPolling(false);
-        }
-      }, delay);
-    },
-    [timeout, maxInterval, backoffFactor, pollOnce],
-  );
-
-  // 保持 scheduleNextRef 与最新的 scheduleNext 同步
+  // 订阅/取消订阅任务（taskId 变化时触发）
   useEffect(() => {
-    scheduleNextRef.current = scheduleNext;
-  }, [scheduleNext]);
+    if (!taskId) return;
 
-  // taskId 变化时启动/停止轮询
-  useEffect(() => {
-    isMountedRef.current = true;
-
-    if (!taskId) {
-      // 无 taskId，确保停止
-      clearTimer();
-      // 通过微任务延迟 setState，避免 effect 内同步 setState 触发级联渲染
-      Promise.resolve().then(() => {
-        if (isMountedRef.current) setIsPolling(false);
-      });
-      return;
+    const existing = tasks.get(taskId);
+    if (existing) {
+      // 任务已存在（用户切回页面）：增加订阅计数
+      existing.subscriberCount++;
+    } else {
+      // 新任务：创建状态并立即触发第一次轮询
+      const task: TaskState = {
+        status: "pending",
+        outputUrl: null,
+        errorMessage: null,
+        tokensUsed: 0,
+        isPolling: true,
+        isTimeout: false,
+        lastPolledAt: 0,
+        startedAt: Date.now(),
+        currentInterval: interval,
+        version: 1,
+        options: { interval, maxInterval, backoffFactor, timeout },
+        subscriberCount: 1,
+      };
+      tasks.set(taskId, task);
+      // 立即通知，让组件看到 pending 状态
+      notifyListeners();
+      // 立即触发第一次轮询（不等 tick）
+      pollTask(taskId).then(() => notifyListeners());
     }
 
-    // 启动轮询
-    startTimeRef.current = Date.now();
-    // 重置轮询间隔为起始值（指数退避起点）
-    currentIntervalRef.current = interval;
-    // 通过微任务延迟 setState，避免 effect 内同步 setState 触发级联渲染
-    Promise.resolve().then(() => {
-      if (!isMountedRef.current) return;
-      setStatus("pending");
-      setIsPolling(true);
-      setIsTimeout(false);
-      setOutputUrl(null);
-      setErrorMessage(null);
-      setTokensUsed(0);
-    });
+    // 确保全局轮询 tick 正在运行
+    ensureGlobalTick();
 
-    // 立即执行第一次查询，然后调度后续
-    (async () => {
-      const shouldContinue = await pollOnce(taskId);
-      if (!isMountedRef.current) return;
-      if (shouldContinue) {
-        scheduleNextRef.current(taskId);
-      } else {
-        setIsPolling(false);
-      }
-    })();
-
-    // 清理函数
+    // 清理函数：仅取消订阅，轮询继续（切页面不中断）
     return () => {
-      isMountedRef.current = false;
-      clearTimer();
+      const task = tasks.get(taskId);
+      if (task) {
+        task.subscriberCount = Math.max(0, task.subscriberCount - 1);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskId]);
 
+  // 读取当前状态
+  const taskState = taskId ? tasks.get(taskId) : undefined;
+
+  // 重置：删除任务状态，允许重新开始
+  const reset = useCallback(() => {
+    if (!taskId) return;
+    tasks.delete(taskId);
+    notifyListeners();
+  }, [taskId]);
+
   return {
-    status,
-    outputUrl,
-    errorMessage,
-    tokensUsed,
-    isPolling,
-    isTimeout,
+    status: taskState?.status ?? "idle",
+    outputUrl: taskState?.outputUrl ?? null,
+    errorMessage: taskState?.errorMessage ?? null,
+    tokensUsed: taskState?.tokensUsed ?? 0,
+    isPolling: taskState?.isPolling ?? false,
+    isTimeout: taskState?.isTimeout ?? false,
     reset,
-    debugInfo,
+    debugInfo: taskState?.debugInfo,
   };
 }
