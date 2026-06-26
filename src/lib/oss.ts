@@ -86,16 +86,27 @@ function generateUniqueFileName(originalFileName: string): string {
 
 /**
  * 拼接 CDN 完整 URL
+ * - 配置了 OSS_CDN_DOMAIN 时使用 CDN 域名
+ * - 未配置时回退到 OSS Bucket 默认外网域名（自动拼接 https://{bucket}.{region}.aliyuncs.com/{objectKey}）
  * @param objectKey OSS 中的对象路径
  */
 function buildCdnUrl(objectKey: string): string {
   const cdnDomain = process.env.OSS_CDN_DOMAIN;
-  if (!cdnDomain) {
-    throw new Error("OSS_CDN_DOMAIN 环境变量未配置");
+  const bucket = process.env.OSS_BUCKET;
+  const region = process.env.OSS_REGION;
+
+  // 优先使用 CDN 域名
+  if (cdnDomain) {
+    const base = cdnDomain.replace(/\/+$/, "").replace(/^https?:\/\//, "");
+    return `https://${base}/${objectKey}`;
   }
-  // 去除域名末尾可能的斜杠，避免出现双斜杠
-  const base = cdnDomain.replace(/\/+$/, "");
-  return `${base}/${objectKey}`;
+
+  // 未配置 CDN 时回退到 OSS 默认域名
+  if (bucket && region) {
+    return `https://${bucket}.${region}.aliyuncs.com/${objectKey}`;
+  }
+
+  throw new Error("OSS 环境变量未配置完整：需要 OSS_CDN_DOMAIN 或 (OSS_BUCKET + OSS_REGION)");
 }
 
 /**
