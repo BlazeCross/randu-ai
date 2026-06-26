@@ -8,31 +8,111 @@ datasource db {
 }
 
 model User {
-  id              String      @id @default(uuid())
-  email           String?     @unique
-  phone           String?     @unique
-  passwordHash    String      @map("password_hash")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  trialExpiresAt  DateTime    @map("trial_expires_at")
-  isSubscribed    Boolean     @default(false) @map("is_subscribed")
-  subscriptionPlan String?    @map("subscription_plan")
-  usageLogs       UsageLog[]
+  id               String      @id @default(uuid())
+  email            String?     @unique
+  phone            String?     @unique
+  passwordHash     String      @map("password_hash")
+  role             String      @default("user") // user | admin | super_admin
+  nickname         String?
+  avatar           String?
+  status           String      @default("active") // active | blocked
+  trialExpiresAt   DateTime    @map("trial_expires_at")
+  isSubscribed     Boolean     @default(false) @map("is_subscribed")
+  subscriptionPlan String?     @map("subscription_plan")
+  credits          Int         @default(0)
+  totalUsed        Int         @default(0) @map("total_used")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  usageLogs            UsageLog[]
+  apiKeys              ApiKey[]
+  orders               Order[]
+  callLogs             CallLog[]
+  notifications        Notification[]
+  actionLogsAsOperator ActionLog[] @relation("ActionLogOperator")
+  actionLogsAsTarget   ActionLog[] @relation("ActionLogTarget")
 
   @@map("users")
 }
 
-model UsageLog {
+model ApiKey {
   id          String    @id @default(uuid())
   userId      String    @map("user_id")
-  workflowId  String    @map("workflow_id")
-  taskId      String?   @map("task_id")
-  status      String    @default("pending")
-  tokensUsed  Int       @default(0) @map("tokens_used")
-  inputUrl    String?   @map("input_url")
-  outputUrl   String?   @map("output_url")
-  errorMessage String?  @map("error_message")
+  keyPrefix   String    @map("key_prefix")
+  keyHash     String    @unique @map("key_hash")
+  name        String
+  status      String    @default("active") // active | inactive | revoked
+  creditsUsed Int       @default(0) @map("credits_used")
+  totalCalls  Int       @default(0) @map("total_calls")
+  lastUsedAt  DateTime? @map("last_used_at")
+  expiresAt   DateTime? @map("expires_at")
   createdAt   DateTime  @default(now()) @map("created_at")
-  completedAt DateTime? @map("completed_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  callLogs CallLog[]
+
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model CallLog {
+  id           String    @id @default(uuid())
+  apiKeyId     String    @map("api_key_id")
+  userId       String    @map("user_id")
+  workflowId   String?   @map("workflow_id")
+  endpoint     String
+  method       String
+  creditsCost  Int       @default(0) @map("credits_cost")
+  status       String    @default("success") // success | failed
+  errorMessage String?   @map("error_message")
+  responseTime Int?      @map("response_time")
+  clientIp     String?   @map("client_ip")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  apiKey ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([apiKeyId, createdAt])
+  @@index([userId, createdAt])
+  @@map("call_logs")
+}
+
+model Order {
+  id            String    @id @default(uuid())
+  orderNo       String    @unique @map("order_no")
+  userId        String    @map("user_id")
+  type          String    // subscription | credits
+  planId        String?   @map("plan_id")
+  credits       Int       @default(0)
+  amount        Decimal   @db.Decimal(10, 2)
+  status        String    @default("pending") // pending | paid | failed | refunded
+  paymentMethod String?   @map("payment_method")
+  paymentId     String?   @map("payment_id")
+  paidAt        DateTime? @map("paid_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("orders")
+}
+
+model UsageLog {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  workflowId   String    @map("workflow_id")
+  taskId       String?   @map("task_id")
+  status       String    @default("pending")
+  tokensUsed   Int       @default(0) @map("tokens_used")
+  inputUrl     String?   @map("input_url")
+  outputUrl    String?   @map("output_url")
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  completedAt  DateTime? @map("completed_at")
+  creditsCost  Int       @default(0) @map("credits_cost")
+  source       String    @default("direct") // direct | api
+  thumbnail    String?
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
@@ -61,8 +141,15 @@ model Workflow {
   description     String?
   category        String
   cozeWorkflowId  String    @map("coze_workflow_id")
+  coverImage      String?   @map("cover_image")
+  inputSchema     Json?     @map("input_schema")
+  outputType      String    @default("text") @map("output_type")
+  creditsRequired Int       @default(1) @map("credits_required")
+  source          String    @default("coze") // coze | volcengine
+  volcModel       String?   @map("volc_model")
   icon            String?
   status          String    @default("active")
+  isDeleted       Boolean   @default(false) @map("is_deleted")
   feishuDocUrl    String?   @map("feishu_doc_url")
   sortOrder       Int       @default(0) @map("sort_order")
   createdAt       DateTime  @default(now()) @map("created_at")
@@ -72,4 +159,37 @@ model Workflow {
   @@index([status, sortOrder])
   @@index([category])
   @@map("workflows")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   // task_complete | system | announcement
+  title     String
+  content   String?
+  link      String?
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
+}
+
+model ActionLog {
+  id           String   @id @default(uuid())
+  operatorId   String   @map("operator_id")
+  targetUserId String?  @map("target_user_id")
+  action       String   // block | unblock | update_credits | update_plan | set_role
+  detail       Json?
+  ipAddress    String?  @map("ip_address")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  operator   User  @relation("ActionLogOperator", fields: [operatorId], references: [id], onDelete: Cascade)
+  targetUser User? @relation("ActionLogTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+
+  @@index([operatorId, createdAt])
+  @@index([targetUserId])
+  @@map("action_logs")
 }

@@ -41,14 +41,30 @@ const workflowsData: Array<{
   cozeWorkflowId: string;
   icon: string;
   feishuDocUrl: string;
+  inputSchema: Prisma.InputJsonValue;
+  creditsRequired: number;
+  outputType: string;
 }> = [
   {
     name: "服装换装视频生成",
     description: "上传服装图片，AI自动生成换装视频",
     category: "视频生成",
-    cozeWorkflowId: "placeholder_coze_workflow_id",
+    cozeWorkflowId: "7654310872097488946",
     icon: "shirt",
     feishuDocUrl: process.env.FEISHU_DOC_URL || "https://feishu.cn/doc/placeholder",
+    inputSchema: {
+      fields: [
+        {
+          name: "yuansitu",
+          label: "原图",
+          type: "image",
+          required: true,
+          placeholder: "请上传服装原图",
+        },
+      ],
+    } as Prisma.InputJsonValue,
+    creditsRequired: 1,
+    outputType: "video",
   },
 ];
 
