@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTaskPolling } from "@/hooks/useTaskPolling";
 import ImageUploader from "@/components/upload/ImageUploader";
+import DynamicForm, { type FormValues } from "@/components/workflow/DynamicForm";
 import UpgradePrompt from "@/components/upgrade/UpgradePrompt";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import {
@@ -13,6 +14,10 @@ import {
   getTrialDaysRemaining,
   isTrialExpired,
 } from "@/lib/trial";
+import type {
+  InputSchema,
+  WorkflowOutputType,
+} from "@/lib/schema";
 
 // 工作流详情类型（对应 /api/workflow/[id] 返回的 workflow 字段）
 interface WorkflowDetail {
@@ -23,6 +28,11 @@ interface WorkflowDetail {
   icon: string | null;
   status: string;
   feishuDocUrl: string | null;
+  // Phase 2.4：动态表单所需字段
+  inputSchema: InputSchema | null;
+  outputType: WorkflowOutputType;
+  creditsRequired: number;
+  source: "coze" | "volcengine";
 }
 
 // 使用记录接口返回结构（仅含试用状态所需字段）
@@ -38,10 +48,10 @@ type UpgradeReason = "limit_reached" | "expired";
 
 // 使用说明步骤
 const USAGE_STEPS = [
-  { num: 1, text: "上传图片" },
-  { num: 2, text: "点击生成" },
+  { num: 1, text: "填写输入内容" },
+  { num: 2, text: "点击提交任务" },
   { num: 3, text: "等待处理" },
-  { num: 4, text: "下载视频" },
+  { num: 4, text: "查看与下载结果" },
 ];
 
 /**
@@ -91,6 +101,7 @@ export default function WorkflowUsePage() {
   const [workflow, setWorkflow] = useState<WorkflowDetail | null>(null);
   const [workflowLoading, setWorkflowLoading] = useState(true);
 
+  // === 旧逻辑保留：无 inputSchema 时使用单一 imageUrl ===
   // 上传的图片 URL
   const [imageUrl, setImageUrl] = useState<string>("");
   // 上传错误提示
@@ -125,7 +136,6 @@ export default function WorkflowUsePage() {
 
   /**
    * 获取工作流详情（公开接口，无需鉴权）
-   * workflowLoading 初始值为 true，无需在 effect 内同步设置
    */
   useEffect(() => {
     if (!workflowId) return;
@@ -154,7 +164,6 @@ export default function WorkflowUsePage() {
 
   /**
    * 获取试用使用状态（需鉴权）
-   * 仅在已登录（有 token）时调用，用于显示试用次数提示横幅
    */
   useEffect(() => {
     if (!token) return;
@@ -168,7 +177,7 @@ export default function WorkflowUsePage() {
         setUsageData(data);
       })
       .catch(() => {
-        // 获取试用状态失败，静默处理
+        // 静默处理
       });
     return () => {
       cancelled = true;
@@ -177,7 +186,6 @@ export default function WorkflowUsePage() {
 
   /**
    * 已等待时间计时器：轮询开始时启动，结束时停止
-   * elapsedSeconds 在 handleGenerate/handleReset 中重置为 0
    */
   useEffect(() => {
     if (isPolling) {
@@ -198,24 +206,73 @@ export default function WorkflowUsePage() {
     };
   }, [isPolling]);
 
-  // 上传成功回调
+  // 上传成功回调（旧逻辑保留）
   const handleUploadSuccess = useCallback((url: string) => {
     setImageUrl(url);
     setUploadError("");
     setSubmitError("");
   }, []);
 
-  // 上传失败回调
+  // 上传失败回调（旧逻辑保留）
   const handleUploadError = useCallback((error: string) => {
     setUploadError(error);
   }, []);
 
   /**
-   * 提交生成视频
-   * 调用 POST /api/workflow/[id]/run，请求头带 Authorization
-   * 若返回 403（试用次数用完），弹出升级提示并阻止后续提交
+   * 提交任务（动态表单模式）
+   * 由 DynamicForm 触发，values 为字段名→值的对象
    */
-  const handleGenerate = useCallback(async () => {
+  const handleDynamicSubmit = useCallback(
+    async (values: FormValues) => {
+      if (!token || !workflowId) return;
+      setSubmitting(true);
+      setSubmitError("");
+      setElapsedSeconds(0);
+      try {
+        const res = await fetch(`/api/workflow/${workflowId}/run`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(values),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 403) {
+            const msg =
+              typeof data?.message === "string"
+                ? data.message
+                : "试用次数已用完，请升级套餐";
+            setUpgradeReason(msg.includes("过期") ? "expired" : "limit_reached");
+            setSubmitError(msg);
+            return;
+          }
+          setSubmitError(
+            typeof data?.message === "string" ? data.message : "提交任务失败",
+          );
+          return;
+        }
+        if (typeof data?.taskId === "string") {
+          setTaskId(data.taskId);
+        } else {
+          setSubmitError("提交任务响应格式错误");
+        }
+      } catch (err) {
+        console.error("提交任务失败:", err);
+        setSubmitError("网络错误，提交任务失败");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [token, workflowId],
+  );
+
+  /**
+   * 提交任务（旧模式：单一 imageUrl）
+   * 用于无 inputSchema 的工作流
+   */
+  const handleLegacyGenerate = useCallback(async () => {
     if (!imageUrl || !token || !workflowId) return;
     setSubmitting(true);
     setSubmitError("");
@@ -231,13 +288,11 @@ export default function WorkflowUsePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        // 403：试用过期或次数用完，弹出升级提示
         if (res.status === 403) {
           const msg =
             typeof data?.message === "string"
               ? data.message
               : "试用次数已用完，请升级套餐";
-          // 根据消息内容区分过期与次数用完
           setUpgradeReason(msg.includes("过期") ? "expired" : "limit_reached");
           setSubmitError(msg);
           return;
@@ -261,8 +316,7 @@ export default function WorkflowUsePage() {
   }, [imageUrl, token, workflowId]);
 
   /**
-   * 重置状态：清除任务，允许重新上传或重新生成
-   * 保留 imageUrl，用户可使用同一张图重新生成
+   * 重置状态：清除任务，允许重新提交
    */
   const handleReset = useCallback(() => {
     resetPolling();
@@ -282,16 +336,13 @@ export default function WorkflowUsePage() {
   const trialUsageCount = usageData?.trialUsageCount ?? 0;
   const trialLimit = usageData?.trialLimit ?? TRIAL_LIMIT;
   const trialExpiresAt = usageData?.trialExpiresAt ?? user?.trialExpiresAt ?? "";
-  // 优先使用后端返回的 isTrialExpired，兜底用前端工具函数计算
   const trialExpired =
     usageData?.isTrialExpired ?? (trialExpiresAt ? isTrialExpired(trialExpiresAt) : false);
   const trialDaysRemaining = trialExpiresAt ? getTrialDaysRemaining(trialExpiresAt) : 0;
   const trialRemainingCount = Math.max(trialLimit - trialUsageCount, 0);
-  // 试用次数已用完（未订阅且达到上限）
   const trialLimitReached = !isSubscribed && trialUsageCount >= trialLimit;
   // 是否允许提交：已订阅不受限；未订阅需试用未过期且次数未用完
-  const canGenerate =
-    Boolean(imageUrl) &&
+  const canSubmit =
     !submitting &&
     !isPolling &&
     (isSubscribed || (!trialExpired && !trialLimitReached));
@@ -306,6 +357,37 @@ export default function WorkflowUsePage() {
     if (taskStatus === "pending") return "排队中";
     return "准备中";
   })();
+
+  // 派生：是否使用动态表单
+  const useDynamicForm = Boolean(workflow?.inputSchema);
+  // 旧模式提交按钮可用条件
+  const legacyCanGenerate =
+    Boolean(imageUrl) && canSubmit;
+
+  // 提交按钮禁用时的提示
+  const submitDisabledHint = trialExpired
+    ? "试用已过期，请升级套餐"
+    : trialLimitReached
+      ? "试用次数已用完，请升级套餐"
+      : undefined;
+
+  // 结果区域标题（按输出类型）
+  const resultTitle = workflow
+    ? workflow.outputType === "video"
+      ? "视频生成完成"
+      : workflow.outputType === "image"
+        ? "图片生成完成"
+        : "结果生成完成"
+    : "结果生成完成";
+
+  // 结果按钮文案
+  const resultDownloadLabel = workflow
+    ? workflow.outputType === "video"
+      ? "下载视频"
+      : workflow.outputType === "image"
+        ? "下载图片"
+        : "下载结果"
+    : "下载结果";
 
   return (
     <main className="flex-1 bg-neutral-50">
@@ -400,7 +482,7 @@ export default function WorkflowUsePage() {
               请先登录
             </h2>
             <p className="mb-6 text-sm text-neutral-500">
-              登录后即可使用 AI 工作流生成视频
+              登录后即可使用 AI 工作流
             </p>
             <button
               type="button"
@@ -528,59 +610,81 @@ export default function WorkflowUsePage() {
               </>
             )}
 
-            {/* 双列布局：左侧上传+生成+进度+结果，右侧使用说明+飞书文档 */}
+            {/* 双列布局：左侧表单+进度+结果，右侧使用说明+飞书文档 */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {/* 左侧：操作区 */}
             <div className="space-y-6">
-              {/* 图片上传区 */}
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-                <h2 className="mb-4 text-base font-semibold text-neutral-900">
-                  上传图片
-                </h2>
-                <ImageUploader
-                  onUploadSuccess={handleUploadSuccess}
-                  onUploadError={handleUploadError}
-                />
-                {uploadError && (
-                  <p className="mt-3 text-sm text-red-600">{uploadError}</p>
-                )}
-              </div>
+              {/* 动态表单区：根据 inputSchema 渲染 */}
+              {useDynamicForm && workflow.inputSchema && showGenerateButton ? (
+                <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+                  <h2 className="mb-4 text-base font-semibold text-neutral-900">
+                    填写参数
+                  </h2>
+                  <DynamicForm
+                    schema={workflow.inputSchema}
+                    onSubmit={handleDynamicSubmit}
+                    submitting={submitting || isPolling}
+                    disabled={!canSubmit}
+                    disabledHint={submitDisabledHint}
+                  />
+                </div>
+              ) : /* 旧模式：单一图片上传 */ !useDynamicForm && showGenerateButton ? (
+                <>
+                  {/* 图片上传区 */}
+                  <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+                    <h2 className="mb-4 text-base font-semibold text-neutral-900">
+                      上传图片
+                    </h2>
+                    <ImageUploader
+                      onUploadSuccess={handleUploadSuccess}
+                      onUploadError={handleUploadError}
+                    />
+                    {uploadError && (
+                      <p className="mt-3 text-sm text-red-600">{uploadError}</p>
+                    )}
+                  </div>
 
-              {/* 生成视频按钮 */}
-              {showGenerateButton && (
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={!canGenerate}
-                  className="flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/20 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
-                >
-                  {submitting ? (
-                    <>
-                      <Spinner className="mr-2 h-5 w-5" />
-                      提交中...
-                    </>
-                  ) : isPolling ? (
-                    <>
-                      <Spinner className="mr-2 h-5 w-5" />
-                      生成中...
-                    </>
-                  ) : !imageUrl ? (
-                    "请先上传图片"
-                  ) : trialExpired ? (
-                    "试用已过期，请升级套餐"
-                  ) : trialLimitReached ? (
-                    "试用次数已用完，请升级套餐"
-                  ) : (
-                    "生成视频"
-                  )}
-                </button>
-              )}
+                  {/* 生成按钮 */}
+                  <button
+                    type="button"
+                    onClick={handleLegacyGenerate}
+                    disabled={!legacyCanGenerate}
+                    className="flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/20 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                  >
+                    {submitting ? (
+                      <>
+                        <Spinner className="mr-2 h-5 w-5" />
+                        提交中...
+                      </>
+                    ) : isPolling ? (
+                      <>
+                        <Spinner className="mr-2 h-5 w-5" />
+                        生成中...
+                      </>
+                    ) : !imageUrl ? (
+                      "请先上传图片"
+                    ) : trialExpired ? (
+                      "试用已过期，请升级套餐"
+                    ) : trialLimitReached ? (
+                      "试用次数已用完，请升级套餐"
+                    ) : (
+                      "生成视频"
+                    )}
+                  </button>
+                </>
+              ) : null}
 
               {/* 提交错误提示 */}
               {submitError && (
                 <ErrorMessage
                   message={submitError}
-                  onRetry={canGenerate ? handleGenerate : undefined}
+                  onRetry={
+                    useDynamicForm
+                      ? undefined
+                      : legacyCanGenerate
+                        ? handleLegacyGenerate
+                        : undefined
+                  }
                 />
               )}
 
@@ -599,7 +703,7 @@ export default function WorkflowUsePage() {
                     )}
                   </div>
 
-                  {/* 进度条（CSS 动画模拟） */}
+                  {/* 进度条 */}
                   <div className="h-3 w-full overflow-hidden rounded-full bg-neutral-200">
                     <div className="animate-workflow-progress h-full rounded-full bg-primary" />
                   </div>
@@ -610,13 +714,13 @@ export default function WorkflowUsePage() {
                       AI正在努力生成中，请稍候...
                     </p>
                     <p className="mt-1 text-sm text-neutral-500">
-                      视频生成约需5分钟，请耐心等待
+                      处理约需几分钟，请耐心等待
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* 视频结果展示 */}
+              {/* 结果展示区 */}
               {isCompleted && (
                 <div className="animate-fade-in rounded-2xl border border-success-200 bg-success-50/50 p-6">
                   <div className="mb-4 flex items-center gap-2">
@@ -634,7 +738,7 @@ export default function WorkflowUsePage() {
                       />
                     </svg>
                     <h3 className="text-base font-semibold text-neutral-900">
-                      视频生成完成
+                      {resultTitle}
                     </h3>
                     {tokensUsed > 0 && (
                       <span className="ml-auto text-sm text-neutral-500">
@@ -645,37 +749,80 @@ export default function WorkflowUsePage() {
 
                   {outputUrl ? (
                     <>
-                      {/* 视频预览 */}
-                      <video
-                        src={outputUrl}
-                        controls
-                        autoPlay
-                        className="w-full rounded-xl bg-black"
-                      />
+                      {/* 按 outputType 渲染结果预览 */}
+                      {workflow.outputType === "video" ? (
+                        <video
+                          src={outputUrl}
+                          controls
+                          autoPlay
+                          className="w-full rounded-xl bg-black"
+                        />
+                      ) : workflow.outputType === "image" ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={outputUrl}
+                          alt="生成结果"
+                          className="w-full rounded-xl bg-neutral-100"
+                        />
+                      ) : (
+                        // text 类型：展示在 pre 块中
+                        <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-white p-4 text-sm text-neutral-800">
+                          {outputUrl}
+                        </pre>
+                      )}
 
                       {/* 操作按钮 */}
                       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                        {/* 下载视频 */}
-                        <a
-                          href={outputUrl}
-                          download
-                          className="inline-flex flex-1 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
-                        >
-                          <svg
-                            className="mr-2 h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
+                        {/* 下载结果 */}
+                        {workflow.outputType === "text" ? (
+                          /* 文本结果：复制按钮 */
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (outputUrl) {
+                                void navigator.clipboard.writeText(outputUrl);
+                              }
+                            }}
+                            className="inline-flex flex-1 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                            />
-                          </svg>
-                          下载视频
-                        </a>
+                            <svg
+                              className="mr-2 h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                            复制结果
+                          </button>
+                        ) : (
+                          /* 视频/图片结果：下载链接 */
+                          <a
+                            href={outputUrl}
+                            download
+                            className="inline-flex flex-1 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                          >
+                            <svg
+                              className="mr-2 h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                              />
+                            </svg>
+                            {resultDownloadLabel}
+                          </a>
+                        )}
                         {/* 重新生成 */}
                         <button
                           type="button"
@@ -692,7 +839,6 @@ export default function WorkflowUsePage() {
                       <p className="mb-4 text-sm text-red-700">
                         结果获取失败，请重试
                       </p>
-                      {/* 调试信息：显示 Coze 返回的原始 output */}
                       {debugInfo && (
                         <details className="mb-4 rounded-lg border border-neutral-300 bg-neutral-50 p-3">
                           <summary className="cursor-pointer text-xs font-medium text-neutral-600">
@@ -836,7 +982,7 @@ export default function WorkflowUsePage() {
         )}
       </div>
 
-      {/* 升级套餐提示弹窗：提交返回 403 或试用过期时显示 */}
+      {/* 升级套餐提示弹窗 */}
       {upgradeReason && (
         <UpgradePrompt
           reason={upgradeReason}

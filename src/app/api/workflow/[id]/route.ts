@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  parseInputSchema,
+  parseOutputType,
+  type InputSchema,
+  type WorkflowOutputType,
+} from "@/lib/schema";
 
 // 工作流详情返回结构
 interface WorkflowDetail {
@@ -12,12 +18,20 @@ interface WorkflowDetail {
   status: string;
   feishuDocUrl: string | null;
   createdAt: Date;
+  // Phase 2.4：前台动态表单所需字段
+  inputSchema: InputSchema | null;
+  outputType: WorkflowOutputType;
+  creditsRequired: number;
+  source: "coze" | "volcengine";
 }
 
 /**
  * 获取工作流详情（公开接口）
  * 路由参数：params.id 为工作流 ID
  * 不存在返回 404
+ *
+ * Phase 2.4：返回 inputSchema、outputType、creditsRequired、source
+ * 供前台动态表单与结果展示使用
  */
 export async function GET(
   _request: Request,
@@ -46,6 +60,10 @@ export async function GET(
         status: true,
         feishuDocUrl: true,
         createdAt: true,
+        inputSchema: true,
+        outputType: true,
+        creditsRequired: true,
+        source: true,
       },
     });
 
@@ -66,6 +84,11 @@ export async function GET(
       status: workflow.status,
       feishuDocUrl: workflow.feishuDocUrl,
       createdAt: workflow.createdAt,
+      inputSchema: parseInputSchema(workflow.inputSchema),
+      outputType: parseOutputType(workflow.outputType),
+      creditsRequired: workflow.creditsRequired,
+      source:
+        workflow.source === "volcengine" ? "volcengine" : "coze",
     };
 
     return NextResponse.json({ workflow: result });
