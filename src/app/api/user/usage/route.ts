@@ -23,11 +23,23 @@ export const GET = requireAuth(async (_request, { userId }) => {
     }
 
     // 并行查询使用记录和试用期使用次数（减少 2 个串行 RTT）
+    // Phase 2.8：include workflow，便于 dashboard 列表展示工作流名称
     const [usageLogs, trialUsageCount] = await Promise.all([
       prisma.usageLog.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
         take: USAGE_LOG_LIMIT,
+        include: {
+          workflow: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
+              category: true,
+              outputType: true,
+            },
+          },
+        },
       }),
       prisma.usageLog.count({
         where: {

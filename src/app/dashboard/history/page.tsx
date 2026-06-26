@@ -12,8 +12,13 @@ interface HistoryItem {
   taskId: string | null;
   status: string;
   tokensUsed: number;
+  // Phase 2.8：积分消耗与来源
+  creditsCost: number;
+  source: string; // direct | api
   inputUrl: string | null;
   outputUrl: string | null;
+  // Phase 2.8：缩略图（用于列表预览）
+  thumbnail: string | null;
   errorMessage: string | null;
   createdAt: string;
   completedAt: string | null;
@@ -22,6 +27,9 @@ interface HistoryItem {
     name: string;
     icon: string;
     category: string;
+    // Phase 2.8：输出类型，用于渲染结果预览
+    outputType: string;
+    coverImage: string | null;
   } | null;
 }
 
@@ -242,6 +250,14 @@ export default function HistoryPage() {
                 const status =
                   statusConfig[item.status] || statusConfig.pending;
                 const hasOutput = item.outputUrl && item.status === "completed";
+                // Phase 2.8：缩略图优先级 thumbnail > outputUrl > workflow.coverImage
+                const previewUrl =
+                  item.thumbnail ||
+                  (hasOutput ? item.outputUrl : null) ||
+                  item.workflow?.coverImage ||
+                  null;
+                // Phase 2.8：来源徽章
+                const isApiCall = item.source === "api";
                 return (
                   <div
                     key={item.id}
@@ -249,10 +265,10 @@ export default function HistoryPage() {
                   >
                     {/* 缩略图 / 占位 */}
                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-neutral-100">
-                      {hasOutput ? (
+                      {previewUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={item.outputUrl!}
+                          src={previewUrl}
                           alt="缩略图"
                           className="h-12 w-12 rounded-lg object-cover"
                         />
@@ -284,11 +300,19 @@ export default function HistoryPage() {
                         >
                           {status.label}
                         </span>
+                        {isApiCall && (
+                          <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                            API
+                          </span>
+                        )}
                       </div>
                       <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-neutral-400">
                         <span>{formatDate(item.createdAt)}</span>
+                        {item.creditsCost > 0 && (
+                          <span>消耗 {item.creditsCost} 积分</span>
+                        )}
                         {item.tokensUsed > 0 && (
-                          <span>消耗 {item.tokensUsed} tokens</span>
+                          <span>{item.tokensUsed} tokens</span>
                         )}
                         {item.completedAt && (
                           <span>完成于 {formatDate(item.completedAt)}</span>
@@ -410,16 +434,43 @@ export default function HistoryPage() {
               </button>
             </div>
 
-            {/* 视频预览 / 错误信息 */}
+            {/* Phase 2.8：按 outputType 渲染结果预览 */}
             {detail.outputUrl && detail.status === "completed" ? (
-              <div className="mb-4 overflow-hidden rounded-xl bg-neutral-100">
-                <video
-                  src={detail.outputUrl}
-                  controls
-                  className="w-full"
-                  style={{ maxHeight: "400px" }}
-                />
-              </div>
+              detail.workflow?.outputType === "image" ? (
+                <div className="mb-4 overflow-hidden rounded-xl bg-neutral-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={detail.outputUrl}
+                    alt="生成结果"
+                    className="mx-auto max-h-[400px] w-full object-contain"
+                  />
+                </div>
+              ) : detail.workflow?.outputType === "text" ? (
+                <div className="mb-4 max-h-[300px] overflow-auto rounded-xl bg-neutral-50 p-4">
+                  <pre className="whitespace-pre-wrap break-all font-mono text-xs text-neutral-800">
+                    {detail.outputUrl}
+                  </pre>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard
+                        ?.writeText(detail.outputUrl || "")
+                        .catch(() => {});
+                    }}
+                    className="mt-3 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                  >
+                    复制内容
+                  </button>
+                </div>
+              ) : (
+                <div className="mb-4 overflow-hidden rounded-xl bg-neutral-100">
+                  <video
+                    src={detail.outputUrl}
+                    controls
+                    className="w-full"
+                    style={{ maxHeight: "400px" }}
+                  />
+                </div>
+              )
             ) : detail.status === "failed" ? (
               <div className="mb-4 rounded-xl bg-red-50 p-4">
                 <p className="text-sm text-red-700">
@@ -461,9 +512,21 @@ export default function HistoryPage() {
                 </p>
               </div>
               <div>
+                <span className="text-neutral-500">积分消耗</span>
+                <p className="mt-0.5 text-neutral-900">
+                  {detail.creditsCost > 0 ? `${detail.creditsCost}` : "-"}
+                </p>
+              </div>
+              <div>
                 <span className="text-neutral-500">Token 消耗</span>
                 <p className="mt-0.5 text-neutral-900">
                   {detail.tokensUsed > 0 ? `${detail.tokensUsed}` : "-"}
+                </p>
+              </div>
+              <div>
+                <span className="text-neutral-500">调用来源</span>
+                <p className="mt-0.5 text-neutral-900">
+                  {detail.source === "api" ? "API 调用" : "页面直调"}
                 </p>
               </div>
               <div>

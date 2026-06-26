@@ -39,6 +39,10 @@ export const GET = requireAuth(async (request, { userId }) => {
             name: true,
             icon: true,
             category: true,
+            // Phase 2.8：新增 outputType，便于前台按输出类型渲染结果
+            outputType: true,
+            // coverImage 用于无 thumbnail 时回退缩略图
+            coverImage: true,
           },
         },
       },

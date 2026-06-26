@@ -17,11 +17,23 @@ interface UsageLog {
   taskId: string | null;
   status: string;
   tokensUsed: number;
+  // Phase 2.8：积分消耗与来源
+  creditsCost: number;
+  source: string;
   inputUrl: string | null;
   outputUrl: string | null;
+  thumbnail: string | null;
   errorMessage: string | null;
   createdAt: string;
   completedAt: string | null;
+  // Phase 2.8：关联工作流信息（/api/user/usage 已 include）
+  workflow: {
+    id: string;
+    name: string;
+    icon: string | null;
+    category: string;
+    outputType: string;
+  } | null;
 }
 
 // 使用记录接口返回结构
@@ -390,23 +402,27 @@ export default function DashboardPage() {
                 const status =
                   statusConfig[log.status] || statusConfig.pending;
                 return (
-                  <div
+                  <Link
                     key={log.id}
+                    href="/dashboard/history"
                     className="flex items-center justify-between px-4 py-4 transition-colors hover:bg-neutral-50 sm:px-6"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-medium text-neutral-900">
-                          工作流
+                          {log.workflow?.name ?? "未知工作流"}
                         </span>
-                        <span className="text-xs text-neutral-400">
-                          #{log.workflowId.slice(-8)}
-                        </span>
+                        {log.source === "api" && (
+                          <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                            API
+                          </span>
+                        )}
                       </div>
                       <p className="mt-1 text-xs text-neutral-400">
                         {formatDate(log.createdAt)}
-                        {log.tokensUsed > 0 &&
-                          ` · 消耗 ${log.tokensUsed} tokens`}
+                        {log.creditsCost > 0 &&
+                          ` · 消耗 ${log.creditsCost} 积分`}
+                        {log.tokensUsed > 0 && ` · ${log.tokensUsed} tokens`}
                       </p>
                     </div>
                     <span
@@ -414,7 +430,7 @@ export default function DashboardPage() {
                     >
                       {status.label}
                     </span>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
