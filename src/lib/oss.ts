@@ -1,3 +1,4 @@
+import { Readable } from "node:stream";
 import OSS from "ali-oss";
 
 /**
@@ -135,6 +136,49 @@ export async function uploadToOss(
   // SDK 返回的 url 是 OSS 默认域名，统一改用 CDN 域名
   if (!result?.name) {
     throw new Error("OSS 上传失败：未返回对象名称");
+  }
+
+  return buildCdnUrl(result.name);
+}
+
+/**
+ * 以流式方式上传文件到阿里云 OSS
+ *
+ * 相比 uploadToOss（Buffer 方式），流式上传不会将整个文件加载到内存，
+ * 适合大文件上传，可显著降低服务端内存占用。
+ *
+ * @param stream        Web ReadableStream（来自 File.stream()）
+ * @param fileName      原始文件名（用于提取扩展名）
+ * @param contentType   文件 MIME 类型
+ * @param contentLength 文件大小（字节），用于 OSS SDK 设置 Content-Length
+ * @returns 上传成功后的 CDN URL
+ */
+export async function uploadStreamToOss(
+  stream: ReadableStream,
+  fileName: string,
+  contentType: string,
+  contentLength: number,
+): Promise<string> {
+  const client = getOssClient();
+  const objectKey = generateUniqueFileName(fileName);
+
+  // 将 Web ReadableStream 转换为 Node.js Readable
+  // 注：DOM lib 的 ReadableStream 类型与 node:stream/web 的类型定义存在差异，
+  // 但在 Node.js 运行时中二者是同一实现，此处进行类型转换以兼容 tsconfig 的 dom lib
+  const nodeStream = Readable.fromWeb(
+    stream as unknown as import("node:stream/web").ReadableStream,
+  );
+
+  // 使用 putStream 流式上传，避免将整个文件读入内存
+  const result = await client.putStream(objectKey, nodeStream, {
+    contentLength,
+    mime: contentType,
+    // 上传超时 60 秒
+    timeout: 60000,
+  } as Parameters<typeof client.putStream>[2]);
+
+  if (!result?.name) {
+    throw new Error("OSS 流式上传失败：未返回对象名称");
   }
 
   return buildCdnUrl(result.name);

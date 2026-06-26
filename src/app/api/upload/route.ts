@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
-import { uploadToOss } from "@/lib/oss";
+import { uploadStreamToOss } from "@/lib/oss";
 
 // 允许上传的图片 MIME 类型
 const ALLOWED_CONTENT_TYPES = [
@@ -64,12 +64,13 @@ export const POST = requireAuth(async (request) => {
       );
     }
 
-    // 读取文件内容为 Buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // 调用 OSS 上传
-    const cdnUrl = await uploadToOss(buffer, file.name, file.type);
+    // 流式上传：直接使用文件流，避免将整个文件读入内存（降低内存占用）
+    const cdnUrl = await uploadStreamToOss(
+      file.stream(),
+      file.name,
+      file.type,
+      file.size,
+    );
 
     return NextResponse.json({
       url: cdnUrl,

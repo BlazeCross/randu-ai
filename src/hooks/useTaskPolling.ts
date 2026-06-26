@@ -29,8 +29,12 @@ interface TaskStatusResponse {
 
 // useTaskPolling 选项
 interface UseTaskPollingOptions {
-  // 轮询间隔（毫秒），默认 5000
+  // 轮询起始间隔（毫秒），默认 3000，后续按 backoffFactor 递增至 maxInterval
   interval?: number;
+  // 轮询最大间隔（毫秒），默认 15000
+  maxInterval?: number;
+  // 退避因子，每次轮询后间隔乘以此值，默认 1.5
+  backoffFactor?: number;
   // 超时时间（毫秒），默认 300000（5 分钟）
   timeout?: number;
 }
@@ -67,7 +71,12 @@ export function useTaskPolling(
   taskId: string | null,
   options: UseTaskPollingOptions = {},
 ): UseTaskPollingResult {
-  const { interval = 5000, timeout = 300000 } = options;
+  const {
+    interval = 3000,
+    maxInterval = 15000,
+    backoffFactor = 1.5,
+    timeout = 300000,
+  } = options;
 
   const [status, setStatus] = useState<TaskStatus>("idle");
   const [outputUrl, setOutputUrl] = useState<string | null>(null);
@@ -82,6 +91,8 @@ export function useTaskPolling(
   // 定时器与起始时间引用
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startTimeRef = useRef<number>(0);
+  // 当前轮询间隔（指数退避：每次轮询后乘以 backoffFactor，上限 maxInterval）
+  const currentIntervalRef = useRef<number>(interval);
   // 标记组件是否已卸载，避免卸载后 setState
   const isMountedRef = useRef<boolean>(true);
   // 持有最新的 scheduleNext 引用，用于递归调用（避免 useCallback 自引用导致的"先使用后声明"问题）
@@ -110,7 +121,9 @@ export function useTaskPolling(
     setIsTimeout(false);
     setDebugInfo(undefined);
     startTimeRef.current = 0;
-  }, [clearTimer]);
+    // 重置轮询间隔为起始值
+    currentIntervalRef.current = interval;
+  }, [clearTimer, interval]);
 
   /**
    * 查询任务状态
@@ -184,8 +197,9 @@ export function useTaskPolling(
   );
 
   /**
-   * 轮询调度：递归 setTimeout
+   * 轮询调度：递归 setTimeout（指数退避）
    * 通过 scheduleNextRef 实现递归调用，避免 useCallback 自引用
+   * 每次轮询后间隔按 backoffFactor 递增，上限 maxInterval，减轻长任务的服务器压力
    */
   const scheduleNext = useCallback(
     (id: string) => {
@@ -201,17 +215,23 @@ export function useTaskPolling(
         return;
       }
 
+      const delay = currentIntervalRef.current;
       timerRef.current = setTimeout(async () => {
         const shouldContinue = await pollOnce(id);
         if (!isMountedRef.current) return;
         if (shouldContinue) {
+          // 指数退避：间隔递增，上限 maxInterval
+          currentIntervalRef.current = Math.min(
+            currentIntervalRef.current * backoffFactor,
+            maxInterval,
+          );
           scheduleNextRef.current(id);
         } else {
           setIsPolling(false);
         }
-      }, interval);
+      }, delay);
     },
-    [interval, timeout, pollOnce],
+    [timeout, maxInterval, backoffFactor, pollOnce],
   );
 
   // 保持 scheduleNextRef 与最新的 scheduleNext 同步
@@ -235,6 +255,8 @@ export function useTaskPolling(
 
     // 启动轮询
     startTimeRef.current = Date.now();
+    // 重置轮询间隔为起始值（指数退避起点）
+    currentIntervalRef.current = interval;
     // 通过微任务延迟 setState，避免 effect 内同步 setState 触发级联渲染
     Promise.resolve().then(() => {
       if (!isMountedRef.current) return;

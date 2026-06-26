@@ -26,8 +26,10 @@ const CATEGORIES = [
 ] as const;
 
 export default function WorkspacePage() {
-  // 搜索关键词
+  // 搜索关键词（输入框实时绑定，触发防抖）
   const [search, setSearch] = useState("");
+  // 防抖后的搜索关键词（延迟 300ms，避免每次按键都发请求）
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   // 当前选中的分类（"全部" 表示不筛选）
   const [category, setCategory] = useState<string>("全部");
   // 工作流列表
@@ -39,8 +41,16 @@ export default function WorkspacePage() {
   // 重拉触发器：递增以触发重新请求（用于"重新加载"按钮）
   const [reloadKey, setReloadKey] = useState(0);
 
+  // 搜索防抖：输入停止 300ms 后才更新 debouncedSearch，避免每次按键都触发请求
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   /**
-   * 数据拉取：监听 search / category / reloadKey 变化
+   * 数据拉取：监听 debouncedSearch / category / reloadKey 变化
    * 注意：为符合 React 19 的 react-hooks/set-state-in-effect 规则，
    * effect 内不同步调用 setState，所有状态更新均放在异步回调中。
    * loading=true 在事件处理器中先行设置。
@@ -53,8 +63,8 @@ export default function WorkspacePage() {
     if (category && category !== "全部") {
       params.set("category", category);
     }
-    if (search.trim()) {
-      params.set("search", search.trim());
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
     }
     const query = params.toString();
     const url = `/api/workflow/list${query ? `?${query}` : ""}`;
@@ -84,7 +94,7 @@ export default function WorkspacePage() {
     return () => {
       cancelled = true;
     };
-  }, [category, search, reloadKey]);
+  }, [category, debouncedSearch, reloadKey]);
 
   /** 切换分类（事件处理器中设置 loading） */
   const handleCategoryChange = (cat: string) => {
