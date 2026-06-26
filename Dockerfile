@@ -19,8 +19,13 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
+# 配置淘宝镜像源（国内服务器访问 npm 官方源经常超时）
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm config set fetch-timeout 600000 && \
+    npm config set fetch-retries 5
+
 # 安装所有依赖（含 devDependencies，构建需要）
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 
 # ---------- 阶段2：构建应用 ----------
 FROM node:20-alpine AS builder
@@ -66,10 +71,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
 
-# 创建启动脚本（先同步数据库 schema，再启动应用）
-# 项目使用 prisma db push 而非 migrate，直接同步 schema
+# 创建启动脚本（数据库 schema 已通过 SQL 脚本在主机同步，容器启动时不再迁移）
 RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'npx prisma db push --accept-data-loss' >> /app/start.sh && \
     echo 'node server.js' >> /app/start.sh && \
     chmod +x /app/start.sh
 
