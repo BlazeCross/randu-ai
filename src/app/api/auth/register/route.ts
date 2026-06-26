@@ -18,6 +18,9 @@ interface RegisterBody {
 // 试用期时长：7 天
 const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
+// 注册赠送积分：500 点（约 5 元，技术方案 13.1 试用期转化漏斗）
+const REGISTER_BONUS_CREDITS = 500;
+
 // 注册接口防批量限流：每分钟 3 次（IP 维度）
 const REGISTER_RATE_LIMIT_PER_MIN = 3;
 
@@ -99,13 +102,14 @@ export async function POST(request: Request) {
     // 试用到期时间：7 天后
     const trialExpiresAt = new Date(Date.now() + TRIAL_DURATION_MS);
 
-    // 创建用户记录
+    // 创建用户记录（赠送 500 点注册积分）
     const user = await prisma.user.create({
       data: {
         email: normalizedEmail ?? null,
         phone: normalizedPhone ?? null,
         passwordHash,
         trialExpiresAt,
+        credits: REGISTER_BONUS_CREDITS,
       },
     });
 
@@ -121,6 +125,7 @@ export async function POST(request: Request) {
           phone: user.phone,
           trialExpiresAt: user.trialExpiresAt,
           isSubscribed: user.isSubscribed,
+          credits: user.credits,
         },
       },
       { status: 201 },
