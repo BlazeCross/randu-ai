@@ -36,17 +36,27 @@ model User {
 }
 
 model ApiKey {
-  id          String    @id @default(uuid())
-  userId      String    @map("user_id")
-  keyPrefix   String    @map("key_prefix")
-  keyHash     String    @unique @map("key_hash")
-  name        String
-  status      String    @default("active") // active | inactive | revoked
-  creditsUsed Int       @default(0) @map("credits_used")
-  totalCalls  Int       @default(0) @map("total_calls")
-  lastUsedAt  DateTime? @map("last_used_at")
-  expiresAt   DateTime? @map("expires_at")
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  keyPrefix     String    @map("key_prefix")
+  keyHash       String    @unique @map("key_hash")
+  name          String
+  status        String    @default("active") // active | inactive | revoked
+  creditsUsed   Int       @default(0) @map("credits_used")
+  totalCalls    Int       @default(0) @map("total_calls")
+  lastUsedAt    DateTime? @map("last_used_at")
+  expiresAt     DateTime? @map("expires_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // 频率限制（Phase 3.4）
+  // qpsLimit：单 Key 每秒最大请求数（0 表示不限制）
+  qpsLimit      Int       @default(5) @map("qps_limit")
+  // dailyLimit：单 Key 每日最大调用次数（0 表示不限制）
+  dailyLimit    Int       @default(1000) @map("daily_limit")
+  // dailyUsed：今日已调用次数（每日 UTC 0 点重置）
+  dailyUsed     Int       @default(0) @map("daily_used")
+  // dailyResetAt：下次重置时间（UTC 0 点）
+  dailyResetAt  DateTime  @default(now()) @map("daily_reset_at")
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   callLogs CallLog[]

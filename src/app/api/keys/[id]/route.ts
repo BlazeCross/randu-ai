@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { generateApiKey } from "@/lib/apiKey";
 
+// 频率限制范围（与 POST /api/keys 保持一致）
+const MIN_QPS_LIMIT = 0;
+const MAX_QPS_LIMIT = 100;
+const MIN_DAILY_LIMIT = 0;
+const MAX_DAILY_LIMIT = 100_000;
+
 /**
  * DELETE /api/keys/[id] - 吊销 API Key（软删除：将状态改为 revoked）
  *
@@ -95,6 +101,115 @@ export const PATCH = requireAuth(async (_request, { userId, params }) => {
     });
   } catch (error) {
     console.error("重置 API Key 失败:", error);
+    return NextResponse.json(
+      { message: "服务器内部错误" },
+      { status: 500 },
+    );
+  }
+});
+
+/**
+ * PUT /api/keys/[id] - 更新 Key 配置（频率限制）
+ *
+ * 请求体：{
+ *   qpsLimit?: number,    // 每秒最大请求数，0 表示不限制，范围 0-100
+ *   dailyLimit?: number,  // 每日最大调用次数，0 表示不限制，范围 0-100000
+ * }
+ *
+ * 安全检查：Key 必须属于当前用户
+ */
+export const PUT = requireAuth(async (request, { userId, params }) => {
+  try {
+    const { id } = await params!;
+
+    // 查找 Key 并验证所有权
+    const apiKey = await prisma.apiKey.findUnique({
+      where: { id },
+      select: { userId: true, status: true },
+    });
+
+    if (!apiKey || apiKey.userId !== userId) {
+      return NextResponse.json(
+        { message: "Key 不存在或无权操作" },
+        { status: 404 },
+      );
+    }
+
+    if (apiKey.status === "revoked") {
+      return NextResponse.json(
+        { message: "已吊销的 Key 无法修改配置" },
+        { status: 400 },
+      );
+    }
+
+    // 解析请求体
+    const body = (await request.json().catch(() => ({}))) as {
+      qpsLimit?: number;
+      dailyLimit?: number;
+    };
+
+    // 构建更新数据（仅包含传入的字段）
+    const data: { qpsLimit?: number; dailyLimit?: number } = {};
+
+    if (body.qpsLimit !== undefined) {
+      const qpsLimit = Number(body.qpsLimit);
+      if (
+        !Number.isInteger(qpsLimit) ||
+        qpsLimit < MIN_QPS_LIMIT ||
+        qpsLimit > MAX_QPS_LIMIT
+      ) {
+        return NextResponse.json(
+          {
+            message: `qpsLimit 必须是 ${MIN_QPS_LIMIT}-${MAX_QPS_LIMIT} 的整数`,
+          },
+          { status: 400 },
+        );
+      }
+      data.qpsLimit = qpsLimit;
+    }
+
+    if (body.dailyLimit !== undefined) {
+      const dailyLimit = Number(body.dailyLimit);
+      if (
+        !Number.isInteger(dailyLimit) ||
+        dailyLimit < MIN_DAILY_LIMIT ||
+        dailyLimit > MAX_DAILY_LIMIT
+      ) {
+        return NextResponse.json(
+          {
+            message: `dailyLimit 必须是 ${MIN_DAILY_LIMIT}-${MAX_DAILY_LIMIT} 的整数`,
+          },
+          { status: 400 },
+        );
+      }
+      data.dailyLimit = dailyLimit;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json(
+        { message: "请至少提供 qpsLimit 或 dailyLimit 字段" },
+        { status: 400 },
+      );
+    }
+
+    // 更新数据库
+    const updated = await prisma.apiKey.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        qpsLimit: true,
+        dailyLimit: true,
+      },
+    });
+
+    return NextResponse.json({
+      id: updated.id,
+      qpsLimit: updated.qpsLimit,
+      dailyLimit: updated.dailyLimit,
+    });
+  } catch (error) {
+    console.error("更新 API Key 配置失败:", error);
     return NextResponse.json(
       { message: "服务器内部错误" },
       { status: 500 },

@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 // Key 前缀
 const KEY_PREFIX = "blaze_";
@@ -57,6 +58,7 @@ export interface ApiKeyValidationResult {
   apiKeyId: string;
   userId: string;
   keyName: string;
+  qpsLimit: number;
 }
 
 /**
@@ -90,6 +92,7 @@ export async function verifyApiKey(
       status: true,
       expiresAt: true,
       name: true,
+      qpsLimit: true,
       user: { select: { id: true, status: true } },
     },
   });
@@ -130,14 +133,15 @@ export async function verifyApiKey(
     apiKeyId: record.id,
     userId: record.user.id,
     keyName: record.name,
+    qpsLimit: record.qpsLimit,
   };
 }
 
 /**
  * 高阶函数：包装需要 API Key 鉴权的对外 Route Handler
  *
- * 流程：从 X-API-Key 头验证 Key → 注入 { apiKeyId, userId } → 调用 handler
- * 鉴权失败返回 401/403
+ * 流程：从 X-API-Key 头验证 Key → 频率限制检查 → 注入 { apiKeyId, userId } → 调用 handler
+ * 鉴权失败返回 401/403，频率超限返回 429
  *
  * @example
  * export const POST = requireApiKey(async (request, { apiKeyId, userId }) => { ... });
@@ -153,6 +157,44 @@ export function requireApiKey(
     if (result instanceof NextResponse) {
       return result;
     }
+
+    // 频率限制检查（QPS + 每日限额）
+    const rateLimitResult = await checkRateLimit(
+      result.apiKeyId,
+      result.qpsLimit,
+    );
+    if (!rateLimitResult.allowed) {
+      if (rateLimitResult.reason === "qps") {
+        const retryAfterSec = Math.ceil(
+          (rateLimitResult.retryAfterMs ?? 1000) / 1000,
+        );
+        return NextResponse.json(
+          {
+            message: `请求过于频繁，请 ${retryAfterSec} 秒后重试`,
+            reason: "qps_limit",
+            retryAfter: retryAfterSec,
+          },
+          {
+            status: 429,
+            headers: { "Retry-After": String(retryAfterSec) },
+          },
+        );
+      }
+      // 每日限额
+      const resetAtIso = rateLimitResult.resetAt?.toISOString();
+      return NextResponse.json(
+        {
+          message: "今日 API 调用次数已达上限",
+          reason: "daily_limit",
+          resetAt: resetAtIso,
+        },
+        {
+          status: 429,
+          headers: resetAtIso ? { "X-RateLimit-Reset": resetAtIso } : {},
+        },
+      );
+    }
+
     return handler(request, result);
   };
 }

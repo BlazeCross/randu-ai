@@ -15,6 +15,11 @@ interface ApiKeyItem {
   lastUsedAt: string | null;
   expiresAt: string | null;
   createdAt: string;
+  // 频率限制（Phase 3.4）
+  qpsLimit: number;
+  dailyLimit: number;
+  dailyUsed: number;
+  dailyResetAt: string;
 }
 
 // 创建 Key 后返回的明文 Key（仅显示一次）
@@ -69,7 +74,16 @@ export default function KeysPage() {
   // 创建 Key 表单状态
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
+  // 频率限制默认值（与后端默认对齐）
+  const [newQpsLimit, setNewQpsLimit] = useState(5);
+  const [newDailyLimit, setNewDailyLimit] = useState(1000);
   const [creating, setCreating] = useState(false);
+
+  // 编辑频率限制弹窗
+  const [editLimitKey, setEditLimitKey] = useState<ApiKeyItem | null>(null);
+  const [editQpsLimit, setEditQpsLimit] = useState(5);
+  const [editDailyLimit, setEditDailyLimit] = useState(1000);
+  const [savingLimit, setSavingLimit] = useState(false);
 
   // 新创建的明文 Key（弹窗展示一次）
   const [createdKey, setCreatedKey] = useState<CreatedKey | null>(null);
@@ -147,7 +161,11 @@ export default function KeysPage() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({
+          name,
+          qpsLimit: newQpsLimit,
+          dailyLimit: newDailyLimit,
+        }),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as {
@@ -158,6 +176,9 @@ export default function KeysPage() {
       const data = (await res.json()) as CreatedKey;
       setCreatedKey(data);
       setNewKeyName("");
+      // 重置频率限制为默认值
+      setNewQpsLimit(5);
+      setNewDailyLimit(1000);
       setShowCreateForm(false);
       // 刷新列表
       await fetchKeys();
@@ -166,7 +187,50 @@ export default function KeysPage() {
     } finally {
       setCreating(false);
     }
-  }, [token, newKeyName, fetchKeys]);
+  }, [token, newKeyName, newQpsLimit, newDailyLimit, fetchKeys]);
+
+  /**
+   * 打开频率限制编辑弹窗
+   */
+  const openEditLimit = useCallback((key: ApiKeyItem) => {
+    setEditLimitKey(key);
+    setEditQpsLimit(key.qpsLimit);
+    setEditDailyLimit(key.dailyLimit);
+  }, []);
+
+  /**
+   * 保存频率限制更新
+   */
+  const handleSaveLimit = useCallback(async () => {
+    if (!token || !editLimitKey) return;
+    setSavingLimit(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/keys/${editLimitKey.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          qpsLimit: editQpsLimit,
+          dailyLimit: editDailyLimit,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as {
+          message?: string;
+        };
+        throw new Error(data.message || "保存失败");
+      }
+      setEditLimitKey(null);
+      await fetchKeys();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "保存失败");
+    } finally {
+      setSavingLimit(false);
+    }
+  }, [token, editLimitKey, editQpsLimit, editDailyLimit, fetchKeys]);
 
   /**
    * 吊销 Key
@@ -332,8 +396,8 @@ export default function KeysPage() {
             <h2 className="mb-4 text-base font-semibold text-neutral-900">
               创建新 API Key
             </h2>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-              <div className="flex-1">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="sm:col-span-3">
                 <label className="mb-1.5 block text-sm font-medium text-neutral-700">
                   Key 名称
                 </label>
@@ -349,13 +413,51 @@ export default function KeysPage() {
                   用于标识 Key 的用途，最多 30 字
                 </p>
               </div>
-              <button
-                onClick={handleCreate}
-                disabled={creating || !newKeyName.trim()}
-                className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {creating ? "创建中..." : "创建"}
-              </button>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  QPS 限制（次/秒）
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={newQpsLimit}
+                  onChange={(e) =>
+                    setNewQpsLimit(Number(e.target.value) || 0)
+                  }
+                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                />
+                <p className="mt-1 text-xs text-neutral-400">
+                  0 = 不限制，范围 0-100
+                </p>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  每日限额（次/天）
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100000}
+                  value={newDailyLimit}
+                  onChange={(e) =>
+                    setNewDailyLimit(Number(e.target.value) || 0)
+                  }
+                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                />
+                <p className="mt-1 text-xs text-neutral-400">
+                  0 = 不限制，范围 0-100000
+                </p>
+              </div>
+              <div className="flex items-end sm:col-span-3">
+                <button
+                  onClick={handleCreate}
+                  disabled={creating || !newKeyName.trim()}
+                  className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {creating ? "创建中..." : "创建"}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -476,11 +578,61 @@ export default function KeysPage() {
                             </span>
                           )}
                         </div>
+                        {/* 频率限制（Phase 3.4） */}
+                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                          <span className="inline-flex items-center gap-1 text-neutral-400">
+                            <svg
+                              className="h-3 w-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"
+                              />
+                            </svg>
+                            QPS：
+                            <strong className="text-neutral-600">
+                              {key.qpsLimit === 0 ? "不限" : `${key.qpsLimit}/s`}
+                            </strong>
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-neutral-400">
+                            <svg
+                              className="h-3 w-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            每日：
+                            <strong className="text-neutral-600">
+                              {key.dailyLimit === 0
+                                ? "不限"
+                                : `${key.dailyUsed}/${key.dailyLimit}`}
+                            </strong>
+                          </span>
+                        </div>
                       </div>
 
                       {/* 右侧：操作按钮 */}
                       {!isRevoked && (
                         <div className="flex flex-shrink-0 gap-2">
+                          <button
+                            onClick={() => openEditLimit(key)}
+                            disabled={actionKeyId === key.id}
+                            className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900 disabled:opacity-50"
+                          >
+                            限额
+                          </button>
                           <button
                             onClick={() =>
                               setConfirmAction({ type: "reset", key })
@@ -654,6 +806,84 @@ export default function KeysPage() {
                   : confirmAction.type === "revoke"
                     ? "确认吊销"
                     : "确认重置"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 编辑频率限制弹窗 */}
+      {editLimitKey && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="mb-2 text-base font-semibold text-neutral-900">
+              调整频率限制
+            </h3>
+            <p className="mb-5 text-sm text-neutral-500">
+              调整此 Key 的 QPS 限制和每日调用限额，立即生效。
+            </p>
+            <div className="mb-5 rounded-xl bg-neutral-50 p-3">
+              <p className="text-xs text-neutral-500">Key 名称</p>
+              <p className="mt-0.5 text-sm font-medium text-neutral-900">
+                {editLimitKey.name}
+              </p>
+              <p className="mt-2 text-xs text-neutral-500">Key 前缀</p>
+              <code className="mt-0.5 block font-mono text-xs text-neutral-600">
+                {editLimitKey.keyPrefix}••••••••
+              </code>
+            </div>
+            <div className="mb-5 space-y-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  QPS 限制（次/秒）
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={editQpsLimit}
+                  onChange={(e) =>
+                    setEditQpsLimit(Number(e.target.value) || 0)
+                  }
+                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                />
+                <p className="mt-1 text-xs text-neutral-400">
+                  0 = 不限制，范围 0-100
+                </p>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  每日限额（次/天）
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100000}
+                  value={editDailyLimit}
+                  onChange={(e) =>
+                    setEditDailyLimit(Number(e.target.value) || 0)
+                  }
+                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                />
+                <p className="mt-1 text-xs text-neutral-400">
+                  0 = 不限制，范围 0-100000
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setEditLimitKey(null)}
+                disabled={savingLimit}
+                className="flex-1 rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleSaveLimit}
+                disabled={savingLimit}
+                className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+              >
+                {savingLimit ? "保存中..." : "保存"}
               </button>
             </div>
           </div>
