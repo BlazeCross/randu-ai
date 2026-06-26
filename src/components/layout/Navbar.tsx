@@ -15,6 +15,7 @@ const navLinks = [
   { label: "智能体", href: "/chat" },
   { label: "教程", href: "/docs" },
   { label: "课程", href: "/courses" },
+  { label: "API 文档", href: "/api-docs" },
 ];
 
 /**

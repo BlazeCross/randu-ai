@@ -1,0 +1,564 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+// 最小化的 OpenAPI 规范类型（运行时容错）
+interface OpenApiSchema {
+  type?: string;
+  properties?: Record<string, OpenApiSchema>;
+  items?: OpenApiSchema;
+  required?: string[];
+  description?: string;
+  enum?: (string | number)[];
+  default?: string | number | boolean;
+  minimum?: number;
+  maximum?: number;
+  maxLength?: number;
+  example?: unknown;
+  nullable?: boolean;
+  $ref?: string;
+}
+
+interface OpenApiOperation {
+  tags?: string[];
+  summary?: string;
+  description?: string;
+  parameters?: Array<{
+    name: string;
+    in: string;
+    required?: boolean;
+    schema?: OpenApiSchema;
+    description?: string;
+  }>;
+  requestBody?: {
+    required?: boolean;
+    content?: Record<string, { schema?: OpenApiSchema }>;
+  };
+  responses?: Record<string, { description?: string; content?: Record<string, { schema?: OpenApiSchema }> }>;
+  security?: Array<Record<string, unknown>>;
+}
+
+interface OpenApiPath {
+  get?: OpenApiOperation;
+  post?: OpenApiOperation;
+  put?: OpenApiOperation;
+  delete?: OpenApiOperation;
+  patch?: OpenApiOperation;
+}
+
+interface OpenApiSpec {
+  info: { title: string; version: string; description?: string };
+  servers?: Array<{ url: string; description?: string }>;
+  tags?: Array<{ name: string; description?: string }>;
+  paths: Record<string, OpenApiPath>;
+  components?: {
+    securitySchemes?: Record<string, { type: string; in?: string; name?: string; description?: string }>;
+  };
+}
+
+const HTTP_METHOD_COLORS: Record<string, string> = {
+  get: "bg-blue-50 text-blue-700 border-blue-200",
+  post: "bg-green-50 text-green-700 border-green-200",
+  put: "bg-amber-50 text-amber-700 border-amber-200",
+  delete: "bg-red-50 text-red-700 border-red-200",
+  patch: "bg-purple-50 text-purple-700 border-purple-200",
+};
+
+/**
+ * 渲染一个 schema 为简化的字段列表
+ */
+function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: number }) {
+  if (!schema) return null;
+
+  // 数组类型
+  if (schema.type === "array" && schema.items) {
+    return (
+      <div className={depth > 0 ? "ml-4 border-l border-neutral-200 pl-3" : ""}>
+        <p className="text-xs text-neutral-500">数组元素：</p>
+        <SchemaTable schema={schema.items} depth={depth + 1} />
+      </div>
+    );
+  }
+
+  // 对象类型
+  const props = schema.properties;
+  if (!props) {
+    return (
+      <div className="text-xs text-neutral-500">
+        {schema.type || "any"}
+        {schema.enum && ` · 可选值：${schema.enum.join(" / ")}`}
+        {schema.description && ` · ${schema.description}`}
+      </div>
+    );
+  }
+
+  const required = new Set(schema.required ?? []);
+
+  return (
+    <div className={depth > 0 ? "ml-4 border-l border-neutral-200 pl-3" : ""}>
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="border-b border-neutral-200 text-left text-neutral-500">
+            <th className="py-1.5 pr-2 font-medium">字段</th>
+            <th className="py-1.5 pr-2 font-medium">类型</th>
+            <th className="py-1.5 pr-2 font-medium">说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(props).map(([key, prop]) => (
+            <tr key={key} className="border-b border-neutral-100 last:border-0">
+              <td className="py-1.5 pr-2 font-mono text-neutral-900">
+                {key}
+                {required.has(key) && (
+                  <span className="ml-1 text-red-500" title="必填">
+                    *
+                  </span>
+                )}
+              </td>
+              <td className="py-1.5 pr-2 font-mono text-neutral-600">
+                {prop.type === "array" ? "array" : prop.type ?? "object"}
+                {prop.nullable && " | null"}
+                {prop.enum && (
+                  <div className="mt-0.5 text-[10px] text-neutral-400">
+                    enum: {prop.enum.join(", ")}
+                  </div>
+                )}
+              </td>
+              <td className="py-1.5 pr-2 text-neutral-600">
+                {prop.description}
+                {prop.default !== undefined && (
+                  <span className="ml-1 text-neutral-400">
+                    默认: <code className="font-mono">{String(prop.default)}</code>
+                  </span>
+                )}
+                {prop.minimum !== undefined && ` · min: ${prop.minimum}`}
+                {prop.maximum !== undefined && ` · max: ${prop.maximum}`}
+                {prop.maxLength !== undefined && ` · 最大长度: ${prop.maxLength}`}
+                {prop.example !== undefined && (
+                  <div className="mt-0.5 text-[10px] text-neutral-400">
+                    示例: {String(prop.example)}
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/**
+ * 单个接口的展开卡片
+ */
+function OperationCard({
+  path,
+  method,
+  operation,
+  baseUrl,
+}: {
+  path: string;
+  method: string;
+  operation: OpenApiOperation;
+  baseUrl: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const requestBodySchema =
+    operation.requestBody?.content?.["application/json"]?.schema;
+
+  // 提取成功响应的 schema
+  const okResponse = operation.responses?.["200"];
+  const responseSchema = okResponse?.content?.["application/json"]?.schema;
+
+  const fullUrl = `${baseUrl}${path}`;
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-neutral-50"
+      >
+        <span
+          className={`inline-flex h-7 w-16 items-center justify-center rounded-md border text-xs font-bold uppercase ${HTTP_METHOD_COLORS[method] ?? "bg-neutral-100 text-neutral-700 border-neutral-200"}`}
+        >
+          {method}
+        </span>
+        <code className="font-mono text-sm text-neutral-900">{path}</code>
+        <span className="ml-auto flex items-center gap-3">
+          {operation.summary && (
+            <span className="hidden text-sm text-neutral-600 sm:inline">
+              {operation.summary}
+            </span>
+          )}
+          <svg
+            className={`h-4 w-4 flex-shrink-0 text-neutral-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="space-y-5 border-t border-neutral-100 px-5 py-5">
+          {/* 描述 */}
+          {operation.description && (
+            <p className="text-sm text-neutral-700">{operation.description}</p>
+          )}
+
+          {/* 完整 URL */}
+          <div>
+            <p className="mb-1 text-xs font-medium text-neutral-500">完整地址</p>
+            <code className="block break-all rounded-lg bg-neutral-900 px-3 py-2 font-mono text-xs text-neutral-100">
+              {method.toUpperCase()} {fullUrl}
+            </code>
+          </div>
+
+          {/* 鉴权 */}
+          {operation.security && (
+            <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              鉴权：X-API-Key 请求头（在
+              <Link href="/dashboard/keys" className="underline">
+                {" "}
+                个人中心 → API Key{" "}
+              </Link>
+              创建后获取）
+            </div>
+          )}
+
+          {/* 查询参数 */}
+          {operation.parameters && operation.parameters.length > 0 && (
+            <div>
+              <p className="mb-2 text-sm font-medium text-neutral-700">查询参数</p>
+              <SchemaTable
+                schema={{
+                  type: "object",
+                  properties: Object.fromEntries(
+                    operation.parameters.map((p) => [
+                      p.name,
+                      { ...(p.schema ?? {}), description: p.description },
+                    ]),
+                  ),
+                  required: operation.parameters
+                    .filter((p) => p.required)
+                    .map((p) => p.name),
+                }}
+              />
+            </div>
+          )}
+
+          {/* 请求体 */}
+          {requestBodySchema && (
+            <div>
+              <p className="mb-2 text-sm font-medium text-neutral-700">
+                请求体
+                {operation.requestBody?.required && (
+                  <span className="ml-1 text-xs text-red-500">必填</span>
+                )}
+              </p>
+              <SchemaTable schema={requestBodySchema} />
+            </div>
+          )}
+
+          {/* 响应 */}
+          {responseSchema && (
+            <div>
+              <p className="mb-2 text-sm font-medium text-neutral-700">
+                响应（200）
+              </p>
+              <SchemaTable schema={responseSchema} />
+            </div>
+          )}
+
+          {/* 其他响应码 */}
+          {operation.responses &&
+            Object.entries(operation.responses).filter(([code]) => code !== "200").length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium text-neutral-700">其他响应</p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(operation.responses)
+                    .filter(([code]) => code !== "200")
+                    .map(([code, resp]) => (
+                      <span
+                        key={code}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-600"
+                      >
+                        <code className="font-mono font-medium text-neutral-900">
+                          {code}
+                        </code>
+                        {resp.description && (
+                          <span className="text-neutral-500">{resp.description}</span>
+                        )}
+                      </span>
+                    ))}
+                </div>
+              </div>
+            )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ApiDocsClient() {
+  const [spec, setSpec] = useState<OpenApiSpec | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTag, setActiveTag] = useState<string>("all");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/docs/openapi.json", { cache: "no-cache" })
+      .then((res) => {
+        if (!res.ok) throw new Error("加载 OpenAPI 规范失败");
+        return res.json();
+      })
+      .then((data: OpenApiSpec) => {
+        if (cancelled) return;
+        setSpec(data);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "加载失败");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 按 tag 分组接口
+  const groupedPaths: Record<string, Array<{ path: string; method: string; op: OpenApiOperation }>> = {};
+  if (spec) {
+    for (const [path, methods] of Object.entries(spec.paths)) {
+      for (const [method, op] of Object.entries(methods)) {
+        if (!op) continue;
+        const tags = op.tags ?? ["Other"];
+        for (const t of tags) {
+          if (!groupedPaths[t]) groupedPaths[t] = [];
+          groupedPaths[t].push({ path, method, op });
+        }
+      }
+    }
+  }
+
+  const baseUrl = spec?.servers?.[0]?.url ?? "";
+
+  return (
+    <main className="flex-1 bg-neutral-50">
+      {/* 面包屑 */}
+      <div className="border-b border-neutral-200 bg-white">
+        <nav
+          aria-label="面包屑"
+          className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8"
+        >
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
+            <li>
+              <Link href="/" className="hover:text-primary">
+                首页
+              </Link>
+            </li>
+            <li aria-hidden>/</li>
+            <li className="font-medium text-neutral-900" aria-current="page">
+              API 文档
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* 页面标题 */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+            API 文档
+          </h1>
+          {spec ? (
+            <p className="mt-2 text-sm text-neutral-600">
+              {spec.info.description} ·{" "}
+              <span className="font-mono">v{spec.info.version}</span>
+              {baseUrl && (
+                <>
+                  {" "}
+                  · Base URL:{" "}
+                  <code className="font-mono text-primary">{baseUrl}</code>
+                </>
+              )}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm text-neutral-600">加载中...</p>
+          )}
+
+          {/* 快速入口 */}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/api/docs/openapi.json"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-400"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              下载 OpenAPI JSON
+            </a>
+            <Link
+              href="/dashboard/keys"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-400"
+            >
+              管理 API Key
+            </Link>
+          </div>
+        </div>
+
+        {/* 鉴权说明 */}
+        <div className="mb-8 rounded-2xl border border-primary-100 bg-primary-50/50 p-5">
+          <h2 className="mb-2 text-sm font-semibold text-primary-900">鉴权方式</h2>
+          <p className="text-xs text-primary-800">
+            所有接口使用 HTTP Header <code className="rounded bg-white px-1.5 py-0.5 font-mono">X-API-Key</code> 鉴权。
+            在个人中心创建 API Key 后获得明文 Key，每次请求需在 Header 中携带：
+          </p>
+          <pre className="mt-3 overflow-x-auto rounded-lg bg-neutral-900 p-3 text-xs text-neutral-100">
+            <code>{`X-API-Key: sk_your_api_key_here
+Content-Type: application/json`}</code>
+          </pre>
+        </div>
+
+        {/* 加载中 */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <svg className="h-10 w-10 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          </div>
+        ) : error ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        ) : !spec ? null : (
+          <>
+            {/* 标签筛选 */}
+            {spec.tags && spec.tags.length > 0 && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setActiveTag("all")}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                    activeTag === "all"
+                      ? "bg-primary text-white"
+                      : "border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+                  }`}
+                >
+                  全部
+                </button>
+                {spec.tags.map((tag) => (
+                  <button
+                    key={tag.name}
+                    onClick={() => setActiveTag(tag.name)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                      activeTag === tag.name
+                        ? "bg-primary text-white"
+                        : "border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+                    }`}
+                  >
+                    {tag.name}
+                    {tag.description && (
+                      <span className="ml-1.5 text-[10px] opacity-70">
+                        {tag.description}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* 接口列表 */}
+            <div className="space-y-6">
+              {Object.entries(groupedPaths)
+                .filter(([tag]) => activeTag === "all" || activeTag === tag)
+                .map(([tag, ops]) => (
+                  <section key={tag}>
+                    <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+                      {tag}
+                    </h2>
+                    <div className="space-y-3">
+                      {ops.map(({ path, method, op }) => (
+                        <OperationCard
+                          key={`${method}-${path}`}
+                          path={path}
+                          method={method}
+                          operation={op}
+                          baseUrl={baseUrl}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+            </div>
+
+            {/* 错误码参考 */}
+            <div className="mt-10 rounded-2xl border border-neutral-200 bg-white p-6">
+              <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+                错误码参考
+              </h2>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
+                    <th className="py-2 pr-3 font-medium">HTTP 状态码</th>
+                    <th className="py-2 pr-3 font-medium">含义</th>
+                  </tr>
+                </thead>
+                <tbody className="text-neutral-700">
+                  {[
+                    ["200", "请求成功"],
+                    ["400", "请求参数错误"],
+                    ["401", "API Key 无效或缺失"],
+                    ["402", "点数不足，需充值"],
+                    ["403", "账号被禁用或无权访问"],
+                    ["404", "资源不存在"],
+                    ["429", "触发频率限制（QPS 或每日限额）"],
+                    ["500", "服务器内部错误"],
+                    ["502", "上游服务（火山方舟 / Coze）调用失败"],
+                  ].map(([code, meaning]) => (
+                    <tr key={code} className="border-b border-neutral-100 last:border-0">
+                      <td className="py-2 pr-3">
+                        <code className="font-mono text-neutral-900">{code}</code>
+                      </td>
+                      <td className="py-2 pr-3">{meaning}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 频率限制说明 */}
+            <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
+              <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+                频率限制
+              </h2>
+              <p className="mb-3 text-sm text-neutral-600">
+                每个 API Key 有独立的 QPS 限制和每日调用上限，可在
+                <Link href="/dashboard/keys" className="mx-1 text-primary underline">
+                  API Key 管理
+                </Link>
+                页面调整：
+              </p>
+              <ul className="space-y-1.5 text-sm text-neutral-700">
+                <li>· QPS 限制：每秒最大请求数，默认 5 次/秒，0 表示不限制</li>
+                <li>· 每日限额：每日最大调用次数，默认 1000 次/天，0 表示不限制</li>
+                <li>· 触发限流时返回 429，响应头包含 Retry-After（建议重试等待秒数）</li>
+              </ul>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
