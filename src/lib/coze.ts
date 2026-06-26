@@ -61,34 +61,39 @@ interface CozeTaskData {
   [key: string]: unknown;
 }
 
-/**
- * 获取 Coze API 基础地址
- * 默认使用 https://api.coze.cn
- */
-function getBaseUrl(): string {
-  return process.env.COZE_BASE_URL || "https://api.coze.cn";
-}
+// Coze 请求超时时间（毫秒）：防止 Coze 接口挂起时长时间占用服务端连接
+const COZE_REQUEST_TIMEOUT_MS = 15000;
+
+// 模块级缓存：仅在首次调用时读取环境变量并构造请求头，后续直接复用
+// 避免每次轮询都重复读取 process.env 和拼接字符串
+let cachedConfig: {
+  baseUrl: string;
+  headers: HeadersInit;
+} | null = null;
 
 /**
- * 获取 Coze API Token
- * 未配置时抛出错误
+ * 初始化并缓存 Coze 配置（baseUrl + 请求头）
+ * 首次调用时读取环境变量，后续直接返回缓存
  */
-function getApiToken(): string {
+function getConfig(): { baseUrl: string; headers: HeadersInit } {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
+
+  const baseUrl = process.env.COZE_BASE_URL || "https://api.coze.cn";
   const token = process.env.COZE_API_TOKEN;
   if (!token) {
     throw new Error("COZE_API_TOKEN 未配置");
   }
-  return token;
-}
 
-/**
- * 构造 Coze API 请求头
- */
-function buildHeaders(): HeadersInit {
-  return {
-    Authorization: `Bearer ${getApiToken()}`,
-    "Content-Type": "application/json",
+  cachedConfig = {
+    baseUrl,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   };
+  return cachedConfig;
 }
 
 /**
@@ -117,18 +122,21 @@ export async function submitWorkflowTask(
   workflowId: string,
   parameters: Record<string, unknown>,
 ): Promise<{ executeId: string }> {
-  const url = `${getBaseUrl()}/v1/workflow/run`;
+  const { baseUrl, headers } = getConfig();
+  const url = `${baseUrl}/v1/workflow/run`;
 
   let response: CozeApiResponse<CozeAsyncRunData>;
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: buildHeaders(),
+      headers,
       body: JSON.stringify({
         workflow_id: workflowId,
         parameters,
         is_async: true,
       }),
+      // 超时中止：防止 Coze 接口挂起时长时间占用服务端连接
+      signal: AbortSignal.timeout(COZE_REQUEST_TIMEOUT_MS),
     });
     response = (await res.json()) as CozeApiResponse<CozeAsyncRunData>;
   } catch (error) {
@@ -320,7 +328,8 @@ export async function getTaskStatus(
   executeId: string,
   workflowId: string,
 ): Promise<CozeTaskResult> {
-  const url = `${getBaseUrl()}/v1/workflows/${workflowId}/run_histories/${executeId}`;
+  const { baseUrl, headers } = getConfig();
+  const url = `${baseUrl}/v1/workflows/${workflowId}/run_histories/${executeId}`;
 
   interface HistoryItem {
     execute_status?: string;
@@ -337,7 +346,9 @@ export async function getTaskStatus(
   try {
     const res = await fetch(url, {
       method: "GET",
-      headers: buildHeaders(),
+      headers,
+      // 超时中止：防止 Coze 接口挂起时长时间占用服务端连接
+      signal: AbortSignal.timeout(COZE_REQUEST_TIMEOUT_MS),
     });
     response = (await res.json()) as CozeApiResponse<HistoryItem[]>;
   } catch (error) {

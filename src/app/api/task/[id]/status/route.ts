@@ -20,15 +20,12 @@ import { getTaskStatus, type CozeTaskResult } from "@/lib/coze";
  */
 export const GET = requireAuth(
   async (
-    request: Request,
-    { userId }: { userId: string },
+    _request: Request,
+    { userId, params }: { userId: string; params?: Promise<Record<string, string>> },
   ) => {
     try {
-      // 从 URL 中解析路径参数 id
-      // 期望路径：/api/task/[id]/status
-      const { pathname } = new URL(request.url);
-      const segments = pathname.split("/").filter(Boolean);
-      const logId = segments[segments.length - 2];
+      // Next.js 16：动态路由 params 为 Promise，需 await
+      const { id: logId } = await params!;
 
       if (!logId) {
         return NextResponse.json(

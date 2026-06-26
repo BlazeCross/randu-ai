@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { Readable } from "node:stream";
 import OSS from "ali-oss";
 
@@ -50,15 +51,16 @@ function getOssClient(): OSS {
 }
 
 /**
- * 生成随机字符串，用于文件名去重
+ * 生成随机字符串，用于文件名去重（使用 crypto 安全随机源）
  * @param length 字符串长度，默认 8
  */
 function randomString(length = 8): string {
   const chars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const bytes = crypto.randomBytes(length);
   let result = "";
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    result += chars[bytes[i] % chars.length];
   }
   return result;
 }
@@ -111,40 +113,9 @@ function buildCdnUrl(objectKey: string): string {
 }
 
 /**
- * 上传文件到阿里云 OSS
- *
- * @param file        文件内容（Buffer）
- * @param fileName    原始文件名（用于提取扩展名）
- * @param contentType 文件 MIME 类型
- * @returns 上传成功后的 CDN URL
- */
-export async function uploadToOss(
-  file: Buffer,
-  fileName: string,
-  contentType: string,
-): Promise<string> {
-  const client = getOssClient();
-  const objectKey = generateUniqueFileName(fileName);
-
-  // 调用 OSS SDK 上传，headers 中指定 Content-Type
-  const result = await client.put(objectKey, file, {
-    headers: {
-      "Content-Type": contentType,
-    },
-  });
-
-  // SDK 返回的 url 是 OSS 默认域名，统一改用 CDN 域名
-  if (!result?.name) {
-    throw new Error("OSS 上传失败：未返回对象名称");
-  }
-
-  return buildCdnUrl(result.name);
-}
-
-/**
  * 以流式方式上传文件到阿里云 OSS
  *
- * 相比 uploadToOss（Buffer 方式），流式上传不会将整个文件加载到内存，
+ * 流式上传不会将整个文件加载到内存，
  * 适合大文件上传，可显著降低服务端内存占用。
  *
  * @param stream        Web ReadableStream（来自 File.stream()）

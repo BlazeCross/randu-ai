@@ -29,14 +29,11 @@ interface RunWorkflowBody {
 export const POST = requireAuth(
   async (
     request: Request,
-    { userId }: { userId: string },
+    { userId, params }: { userId: string; params?: Promise<Record<string, string>> },
   ) => {
     try {
-      // Next.js 16 中需通过 URL 解析路径参数
-      const { pathname } = new URL(request.url);
-      const segments = pathname.split("/").filter(Boolean);
-      // 期望路径：/api/workflow/[id]/run
-      const workflowId = segments[segments.length - 2];
+      // Next.js 16：动态路由 params 为 Promise，需 await
+      const { id: workflowId } = await params!;
 
       if (!workflowId) {
         return NextResponse.json(
