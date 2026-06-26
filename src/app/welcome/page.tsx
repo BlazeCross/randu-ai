@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/components/ui/Toast";
 
 interface UserProfile {
   id: string;
@@ -100,6 +101,7 @@ const GUIDE_CARDS = [
 export default function WelcomePage() {
   const router = useRouter();
   const { token, user, loading } = useAuth();
+  const toast = useToast();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -108,7 +110,6 @@ export default function WelcomePage() {
   const [nickname, setNickname] = useState("");
   const [savingNickname, setSavingNickname] = useState(false);
   const [nicknameError, setNicknameError] = useState<string | null>(null);
-  const [nicknameSuccess, setNicknameSuccess] = useState(false);
 
   // 未登录时重定向到登录页
   useEffect(() => {
@@ -154,7 +155,6 @@ export default function WelcomePage() {
     if (!token) return;
 
     setNicknameError(null);
-    setNicknameSuccess(false);
 
     const trimmed = nickname.trim();
     if (!trimmed) {
@@ -181,7 +181,8 @@ export default function WelcomePage() {
         setNicknameError(data.message || "保存失败");
         return;
       }
-      setNicknameSuccess(true);
+      // Toast 提示保存成功
+      toast.success("昵称已保存");
       // 同步更新本地 profile
       if (profile) {
         setProfile({ ...profile, nickname: trimmed });
@@ -276,7 +277,6 @@ export default function WelcomePage() {
                     value={nickname}
                     onChange={(e) => {
                       setNickname(e.target.value);
-                      setNicknameSuccess(false);
                       setNicknameError(null);
                     }}
                     placeholder="如：燃渡探索者"
@@ -297,11 +297,6 @@ export default function WelcomePage() {
               </form>
               {nicknameError && (
                 <p className="mt-2 text-sm text-red-600">{nicknameError}</p>
-              )}
-              {nicknameSuccess && (
-                <p className="mt-2 text-sm text-success-700">
-                  ✓ 昵称已保存
-                </p>
               )}
             </div>
           </div>
