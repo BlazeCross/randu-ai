@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { getTaskStatus, type CozeTaskResult } from "@/lib/coze";
+import { getVideoTaskStatus, type VideoTaskResult } from "@/lib/volcengine";
 import { createNotification } from "@/lib/notification";
 
 /**
@@ -35,12 +36,16 @@ export const GET = requireAuth(
         );
       }
 
-      // 1. 查询当前用户的 UsageLog（关联 Workflow 获取 cozeWorkflowId）
+      // 1. 查询当前用户的 UsageLog（关联 Workflow 获取执行源信息）
       const usageLog = await prisma.usageLog.findUnique({
         where: { id: logId },
         include: {
           workflow: {
-            select: { cozeWorkflowId: true },
+            select: {
+              cozeWorkflowId: true,
+              source: true,
+              volcModel: true,
+            },
           },
         },
       });
@@ -81,15 +86,39 @@ export const GET = requireAuth(
         });
       }
 
-      let cozeResult: CozeTaskResult;
+      // 4. pending/running：按工作流来源派发查询
+      let unifiedStatus: "pending" | "running" | "completed" | "failed";
+      let outputUrl: string | undefined;
+      let tokensUsed: number | undefined;
+      let errorMessage: string | undefined;
+      let rawOutput: unknown;
+
       try {
-        cozeResult = await getTaskStatus(
-          usageLog.taskId,
-          usageLog.workflow.cozeWorkflowId,
-        );
+        if (usageLog.workflow.source === "volcengine") {
+          // Volcengine Seedance 视频任务
+          const videoResult: VideoTaskResult = await getVideoTaskStatus(
+            usageLog.taskId,
+          );
+          unifiedStatus = videoResult.status;
+          outputUrl = videoResult.videoUrl;
+          tokensUsed = videoResult.tokensUsed;
+          errorMessage = videoResult.errorMessage;
+          rawOutput = videoResult.rawResponse;
+        } else {
+          // 默认 Coze 工作流任务
+          const cozeResult: CozeTaskResult = await getTaskStatus(
+            usageLog.taskId,
+            usageLog.workflow.cozeWorkflowId,
+          );
+          unifiedStatus = cozeResult.status;
+          outputUrl = cozeResult.output;
+          tokensUsed = cozeResult.tokensUsed;
+          errorMessage = cozeResult.errorMessage;
+          rawOutput = cozeResult.rawOutput;
+        }
       } catch (error) {
-        // Coze 查询失败：保持原状态，返回错误信息但不修改数据库
-        console.error("查询 Coze 任务状态失败:", error);
+        // 查询失败：保持原状态，返回错误信息但不修改数据库
+        console.error("查询任务状态失败:", error);
         return NextResponse.json(
           {
             message:
@@ -101,16 +130,16 @@ export const GET = requireAuth(
         );
       }
 
-      // 5. 根据 Coze 返回更新 UsageLog
-      if (cozeResult.status === "completed") {
+      // 5. 根据统一状态更新 UsageLog
+      if (unifiedStatus === "completed") {
         // 如果提取到视频 URL，更新数据库
-        if (cozeResult.output) {
+        if (outputUrl) {
           await prisma.usageLog.update({
             where: { id: usageLog.id },
             data: {
               status: "completed",
-              outputUrl: cozeResult.output,
-              tokensUsed: cozeResult.tokensUsed ?? 0,
+              outputUrl,
+              tokensUsed: tokensUsed ?? 0,
               completedAt: new Date(),
             },
           });
@@ -127,27 +156,27 @@ export const GET = requireAuth(
 
         return NextResponse.json({
           status: "completed",
-          outputUrl: cozeResult.output ?? null,
+          outputUrl: outputUrl ?? null,
           errorMessage: null,
-          tokensUsed: cozeResult.tokensUsed ?? 0,
+          tokensUsed: tokensUsed ?? 0,
           createdAt: usageLog.createdAt,
           completedAt: new Date(),
           // 调试信息：当 outputUrl 为空时，返回原始 output 便于排查
-          ...(cozeResult.output ? {} : {
+          ...(outputUrl ? {} : {
             _debug: {
-              rawOutput: cozeResult.rawOutput,
+              rawOutput,
               message: "视频 URL 提取失败，请将此信息提供给开发者",
             },
           }),
         });
       }
 
-      if (cozeResult.status === "failed") {
+      if (unifiedStatus === "failed") {
         await prisma.usageLog.update({
           where: { id: usageLog.id },
           data: {
             status: "failed",
-            errorMessage: cozeResult.errorMessage ?? "任务执行失败",
+            errorMessage: errorMessage ?? "任务执行失败",
             completedAt: new Date(),
           },
         });
@@ -157,14 +186,14 @@ export const GET = requireAuth(
           userId,
           type: "task_failed",
           title: "任务执行失败",
-          content: cozeResult.errorMessage ?? "任务执行失败，请重试",
+          content: errorMessage ?? "任务执行失败，请重试",
           link: `/dashboard/history`,
         });
 
         return NextResponse.json({
           status: "failed",
           outputUrl: null,
-          errorMessage: cozeResult.errorMessage ?? "任务执行失败",
+          errorMessage: errorMessage ?? "任务执行失败",
           tokensUsed: 0,
           createdAt: usageLog.createdAt,
           completedAt: new Date(),
@@ -173,7 +202,7 @@ export const GET = requireAuth(
 
       // running / pending：保持原状态
       return NextResponse.json({
-        status: cozeResult.status,
+        status: unifiedStatus,
         outputUrl: null,
         errorMessage: null,
         tokensUsed: 0,

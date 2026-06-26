@@ -190,6 +190,11 @@ export async function deductCredits(
 
 /**
  * 记录 API 调用日志到 CallLog 表
+ *
+ * workflowId 字段可选：
+ * - 同步调用（如 /api/external/generate/copy）通常不填
+ * - 异步调用（如 /api/external/generate/video/status）可用于存储外部任务 ID
+ *   便于幂等检查（避免重复扣点）
  */
 export async function logApiCall(data: {
   apiKeyId: string;
@@ -201,6 +206,8 @@ export async function logApiCall(data: {
   errorMessage?: string;
   responseTime: number;
   clientIp?: string;
+  /** 可选：关联的外部任务 ID 或工作流 ID（用于异步任务幂等检查） */
+  workflowId?: string;
 }): Promise<void> {
   await prisma.callLog.create({ data });
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { submitWorkflowTask } from "@/lib/coze";
+import { submitVideoTask } from "@/lib/volcengine";
 import { TRIAL_LIMIT } from "@/lib/trial";
 import { parseInputSchema, type SchemaField } from "@/lib/schema";
 
@@ -62,6 +63,8 @@ export const POST = requireAuth(
             cozeWorkflowId: true,
             status: true,
             inputSchema: true,
+            source: true,
+            volcModel: true,
           },
         }),
         prisma.user.findUnique({
@@ -170,18 +173,51 @@ export const POST = requireAuth(
         },
       });
 
-      // 4. 调用 Coze 异步接口提交任务
+      // 4. 按工作流来源派发任务（Coze / Volcengine Seedance）
       try {
-        const { executeId: cozeExecuteId } = await submitWorkflowTask(
-          workflow.cozeWorkflowId,
-          parameters,
-        );
+        let externalTaskId: string;
+
+        if (workflow.source === "volcengine") {
+          // Volcengine Seedance 视频生成
+          // 从校验后的参数中提取首帧图片 URL（按 inputSchema 字段 type=image 提取）
+          let firstFrameUrl: string | undefined;
+          let promptText: string | undefined;
+          if (inputSchema) {
+            for (const field of inputSchema.fields) {
+              if (field.type === "image" && !firstFrameUrl) {
+                const v = parameters[field.name];
+                if (typeof v === "string" && v) firstFrameUrl = v;
+              }
+              if (
+                (field.type === "text" || field.type === "textarea") &&
+                !promptText
+              ) {
+                const v = parameters[field.name];
+                if (typeof v === "string" && v) promptText = v;
+              }
+            }
+          }
+
+          const { taskId: volcTaskId } = await submitVideoTask({
+            model: workflow.volcModel ?? undefined,
+            prompt: promptText,
+            firstFrameUrl,
+          });
+          externalTaskId = volcTaskId;
+        } else {
+          // 默认走 Coze 工作流
+          const { executeId: cozeExecuteId } = await submitWorkflowTask(
+            workflow.cozeWorkflowId,
+            parameters,
+          );
+          externalTaskId = cozeExecuteId;
+        }
 
         // 5. 更新 UsageLog：taskId、status=running
         await prisma.usageLog.update({
           where: { id: usageLog.id },
           data: {
-            taskId: cozeExecuteId,
+            taskId: externalTaskId,
             status: "running",
           },
         });
@@ -189,13 +225,13 @@ export const POST = requireAuth(
         // 6. 返回 usageLog.id 供前端轮询
         return NextResponse.json({
           taskId: usageLog.id,
-          cozeTaskId: cozeExecuteId,
+          externalTaskId,
           status: "running",
         });
       } catch (error) {
-        // Coze 调用失败：更新 UsageLog 状态为 failed
+        // 任务提交失败：更新 UsageLog 状态为 failed
         const errorMessage =
-          error instanceof Error ? error.message : "Coze 任务提交失败";
+          error instanceof Error ? error.message : "任务提交失败";
 
         await prisma.usageLog.update({
           where: { id: usageLog.id },
@@ -205,7 +241,7 @@ export const POST = requireAuth(
           },
         });
 
-        console.error("提交 Coze 任务失败:", error);
+        console.error("提交工作流任务失败:", error);
         return NextResponse.json(
           { message: `提交任务失败：${errorMessage}` },
           { status: 500 },
