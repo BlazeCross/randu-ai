@@ -61,9 +61,9 @@ export default function RegisterPage() {
         return;
       }
 
-      // 保存 token 并获取用户信息，然后跳转
+      // 保存 token 并获取用户信息，然后跳转到新用户引导页
       await login(data.token);
-      router.push("/dashboard");
+      router.push("/welcome");
     } catch {
       setError("网络错误，请稍后重试");
     } finally {
