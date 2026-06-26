@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useHeartbeat } from "@/hooks/useHeartbeat";
+import OnlineCount from "@/components/layout/OnlineCount";
 
 // 导航链接配置
 const navLinks = [
@@ -24,6 +26,9 @@ export default function Navbar() {
   const router = useRouter();
   const { user, loading, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // 已登录用户启动心跳上报（每 30 秒更新在线状态）
+  useHeartbeat();
 
   // 判断链接是否激活
   const isActive = (href: string) => {
@@ -88,6 +93,7 @@ export default function Navbar() {
 
         {/* 右侧：用户操作区 */}
         <div className="hidden items-center gap-3 md:flex">
+          <OnlineCount />
           {loading ? (
             // 加载中：显示占位
             <div className="h-8 w-20 animate-pulse rounded-lg bg-neutral-100" />
