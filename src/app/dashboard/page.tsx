@@ -196,15 +196,23 @@ export default function DashboardPage() {
               管理你的账号、试用状态和使用记录
             </p>
           </div>
-          <button
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-            className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
-          >
-            退出登录
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard/keys"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
+            >
+              API Key 管理
+            </Link>
+            <button
+              onClick={() => {
+                logout();
+                router.push("/login");
+              }}
+              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
+            >
+              退出登录
+            </button>
+          </div>
         </div>
 
         {/* 试用过期/次数用完提示横幅：已订阅用户不显示 */}

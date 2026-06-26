@@ -16,6 +16,11 @@ export interface User {
   id: string;
   email: string | null;
   phone: string | null;
+  nickname: string | null;
+  avatar: string | null;
+  role: "user" | "admin" | "super_admin";
+  credits: number;
+  totalUsed: number;
   trialExpiresAt: string;
   isSubscribed: boolean;
   subscriptionPlan: string | null;
