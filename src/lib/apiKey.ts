@@ -132,3 +132,87 @@ export async function verifyApiKey(
     keyName: record.name,
   };
 }
+
+/**
+ * 高阶函数：包装需要 API Key 鉴权的对外 Route Handler
+ *
+ * 流程：从 X-API-Key 头验证 Key → 注入 { apiKeyId, userId } → 调用 handler
+ * 鉴权失败返回 401/403
+ *
+ * @example
+ * export const POST = requireApiKey(async (request, { apiKeyId, userId }) => { ... });
+ */
+export function requireApiKey(
+  handler: (
+    request: Request,
+    ctx: { apiKeyId: string; userId: string },
+  ) => Promise<Response> | Response,
+): (request: Request) => Promise<Response> {
+  return async (request: Request): Promise<Response> => {
+    const result = await verifyApiKey(request);
+    if (result instanceof NextResponse) {
+      return result;
+    }
+    return handler(request, result);
+  };
+}
+
+/**
+ * 扣减用户点数并更新 Key 用量统计（事务操作）
+ *
+ * @param userId    用户 ID
+ * @param apiKeyId  API Key ID
+ * @param credits   消耗点数
+ */
+export async function deductCredits(
+  userId: string,
+  apiKeyId: string,
+  credits: number,
+): Promise<void> {
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: userId },
+      data: {
+        credits: { decrement: credits },
+        totalUsed: { increment: 1 },
+      },
+    }),
+    prisma.apiKey.update({
+      where: { id: apiKeyId },
+      data: {
+        creditsUsed: { increment: credits },
+        totalCalls: { increment: 1 },
+        lastUsedAt: new Date(),
+      },
+    }),
+  ]);
+}
+
+/**
+ * 记录 API 调用日志到 CallLog 表
+ */
+export async function logApiCall(data: {
+  apiKeyId: string;
+  userId: string;
+  endpoint: string;
+  method: string;
+  creditsCost: number;
+  status: "success" | "failed";
+  errorMessage?: string;
+  responseTime: number;
+  clientIp?: string;
+}): Promise<void> {
+  await prisma.callLog.create({ data });
+}
+
+/**
+ * 从请求中提取客户端 IP
+ */
+export function getClientIp(request: Request): string | undefined {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    // x-forwarded-for 可能包含多个 IP，取第一个
+    return forwarded.split(",")[0].trim();
+  }
+  return request.headers.get("x-real-ip") || undefined;
+}
