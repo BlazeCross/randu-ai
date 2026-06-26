@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { getTaskStatus, type CozeTaskResult } from "@/lib/coze";
+import { createNotification } from "@/lib/notification";
 
 /**
  * 查询任务状态（需鉴权）
@@ -113,6 +114,15 @@ export const GET = requireAuth(
               completedAt: new Date(),
             },
           });
+
+          // 任务完成：发送站内通知（静默失败，不影响主流程）
+          await createNotification({
+            userId,
+            type: "task_complete",
+            title: "任务已完成",
+            content: `你的任务已处理完成，点击查看结果`,
+            link: `/dashboard/history`,
+          });
         }
 
         return NextResponse.json({
@@ -140,6 +150,15 @@ export const GET = requireAuth(
             errorMessage: cozeResult.errorMessage ?? "任务执行失败",
             completedAt: new Date(),
           },
+        });
+
+        // 任务失败：发送站内通知（静默失败，不影响主流程）
+        await createNotification({
+          userId,
+          type: "task_failed",
+          title: "任务执行失败",
+          content: cozeResult.errorMessage ?? "任务执行失败，请重试",
+          link: `/dashboard/history`,
         });
 
         return NextResponse.json({

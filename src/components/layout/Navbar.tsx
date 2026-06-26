@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 import OnlineCount from "@/components/layout/OnlineCount";
+import NotificationBell from "@/components/layout/NotificationBell";
 
 // 导航链接配置
 const navLinks = [
@@ -98,13 +99,16 @@ export default function Navbar() {
             // 加载中：显示占位
             <div className="h-8 w-20 animate-pulse rounded-lg bg-neutral-100" />
           ) : user ? (
-            // 已登录：显示退出按钮
-            <button
-              onClick={handleLogout}
-              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
-            >
-              退出登录
-            </button>
+            // 已登录：显示通知铃铛 + 退出按钮
+            <>
+              <NotificationBell />
+              <button
+                onClick={handleLogout}
+                className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
+              >
+                退出登录
+              </button>
+            </>
           ) : (
             // 未登录：显示登录和注册按钮
             <>
@@ -183,17 +187,30 @@ export default function Navbar() {
               </Link>
             ))}
             {user && (
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileOpen(false)}
-                className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive("/dashboard")
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
-                }`}
-              >
-                个人中心
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive("/dashboard")
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  }`}
+                >
+                  个人中心
+                </Link>
+                <Link
+                  href="/dashboard/notifications"
+                  onClick={() => setMobileOpen(false)}
+                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive("/dashboard/notifications")
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  }`}
+                >
+                  通知中心
+                </Link>
+              </>
             )}
             {/* 移动端用户操作 */}
             <div className="border-t border-neutral-200 pt-3">
