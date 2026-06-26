@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -49,6 +49,12 @@ const STATUS_BADGES: Record<
   blocked: { label: "已拉黑", bg: "bg-red-50", text: "text-red-700" },
 };
 
+// 模态框类型
+type ModalType = "plan" | "credits" | "role" | null;
+
+// 用户角色字面量类型
+type UserRoleLiteral = "user" | "admin" | "super_admin";
+
 /**
  * 格式化日期（上海时区）
  */
@@ -77,9 +83,6 @@ function getInitial(
   return "U";
 }
 
-// 操作按钮 tooltip 提示
-const ACTION_DISABLED_TITLE = "Phase 2.6 接入";
-
 /**
  * 后台用户详情页
  *
@@ -87,7 +90,9 @@ const ACTION_DISABLED_TITLE = "Phase 2.6 接入";
  * - 卡片1 基本信息：头像 + 昵称 + 角色徽章 + 状态徽章 + 邮箱/手机/ID + 时间
  * - 卡片2 套餐与积分：订阅状态、套餐名、积分余额、累计使用、试用到期
  * - 卡片3 使用统计：使用记录数、订单数、已支付订单数、API Key 数
- * - 卡片4 操作区：敏感操作占位（Phase 2.6 接入），按钮全部 disabled
+ * - 卡片4 操作区：仅 super_admin 可见的敏感操作（拉黑/解封/改套餐/改余额/设置角色）
+ *   - 拉黑/解封用 window.confirm，其余用 modal 弹窗
+ *   - 操作后通过 toast 提示并重新拉取用户数据
  */
 export default function AdminUserDetailPage() {
   const params = useParams<{ id: string }>();
@@ -101,6 +106,24 @@ export default function AdminUserDetailPage() {
 
   // 当前管理员是否为 super_admin（用于决定操作按钮的提示文案）
   const isSuperAdmin = currentUser?.role === "super_admin";
+
+  // 模态框状态
+  const [modal, setModal] = useState<ModalType>(null);
+  const [planIsSubscribed, setPlanIsSubscribed] = useState(false);
+  const [planName, setPlanName] = useState("");
+  const [creditsInput, setCreditsInput] = useState("");
+  const [roleSelect, setRoleSelect] =
+    useState<UserRoleLiteral>("user");
+
+  // toast 状态（3 秒后自动消失）
+  const [toast, setToast] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 操作进行中（按钮禁用）
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -138,6 +161,195 @@ export default function AdminUserDetailPage() {
       cancelled = true;
     };
   }, [userId, token]);
+
+  // 卸载时清理 toast 定时器
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * 显示 toast（3 秒后自动消失，新 toast 替换旧的）
+   */
+  function showToast(type: "success" | "error", message: string) {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+    setToast({ type, message });
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, 3000);
+  }
+
+  /**
+   * 重新拉取用户详情（操作成功后刷新本地数据）
+   */
+  async function refreshUser() {
+    if (!token || !userId) return;
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { user?: UserDetail };
+      if (data.user) setDetail(data.user);
+    } catch {
+      // 静默失败，UI 已通过 toast 反馈操作结果
+    }
+  }
+
+  /**
+   * 调用 PATCH /api/admin/users/[id]
+   * 成功返回响应数据；失败抛出带 message 的 Error
+   */
+  async function patchUser(
+    body: Record<string, unknown>,
+  ): Promise<{ user?: UserDetail; actionLogged?: boolean }> {
+    if (!token || !userId) {
+      throw new Error("登录已失效，请重新登录");
+    }
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      message?: string;
+      user?: UserDetail;
+      actionLogged?: boolean;
+    };
+    if (!res.ok) {
+      throw new Error(data.message || `操作失败 (${res.status})`);
+    }
+    return data;
+  }
+
+  /**
+   * 打开 modal 前根据当前用户详情初始化表单字段
+   */
+  function openModal(type: Exclude<ModalType, null>) {
+    if (!detail) return;
+    if (type === "plan") {
+      setPlanIsSubscribed(detail.isSubscribed);
+      setPlanName(detail.subscriptionPlan || "");
+    } else if (type === "credits") {
+      setCreditsInput(String(detail.credits));
+    } else if (type === "role") {
+      // 强制收敛到联合类型字面量，未知值默认为 user
+      setRoleSelect(
+        (detail.role === "user" ||
+        detail.role === "admin" ||
+        detail.role === "super_admin"
+          ? detail.role
+          : "user") as UserRoleLiteral,
+      );
+    }
+    setModal(type);
+  }
+
+  /**
+   * 拉黑 / 解封：使用 window.confirm 确认后 PATCH
+   */
+  async function handleBlockUnblock() {
+    if (!detail) return;
+    const next: "active" | "blocked" =
+      detail.status === "active" ? "blocked" : "active";
+    const verb = next === "blocked" ? "拉黑" : "解封";
+    const nickname = detail.nickname || "该用户";
+    const confirmed = window.confirm(
+      `确定${verb}用户 ${nickname}？此操作将禁止该用户登录与使用平台功能。`,
+    );
+    if (!confirmed) return;
+
+    setActionLoading(true);
+    try {
+      await patchUser({ status: next });
+      showToast("success", `${verb}成功`);
+      await refreshUser();
+    } catch (err) {
+      showToast(
+        "error",
+        err instanceof Error ? err.message : `${verb}失败`,
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  /**
+   * 修改套餐：提交 modal
+   */
+  async function handleSubmitPlan() {
+    setActionLoading(true);
+    try {
+      await patchUser({
+        isSubscribed: planIsSubscribed,
+        subscriptionPlan: planName,
+      });
+      showToast("success", "套餐更新成功");
+      setModal(null);
+      await refreshUser();
+    } catch (err) {
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "套餐更新失败",
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  /**
+   * 修改余额：提交 modal
+   */
+  async function handleSubmitCredits() {
+    const n = Number(creditsInput);
+    if (!Number.isInteger(n) || n < 0) {
+      showToast("error", "积分必须为非负整数");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await patchUser({ credits: n });
+      showToast("success", "余额更新成功");
+      setModal(null);
+      await refreshUser();
+    } catch (err) {
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "余额更新失败",
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  /**
+   * 设置角色：提交 modal
+   */
+  async function handleSubmitRole() {
+    setActionLoading(true);
+    try {
+      await patchUser({ role: roleSelect });
+      showToast("success", "角色更新成功");
+      setModal(null);
+      await refreshUser();
+    } catch (err) {
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "角色更新失败",
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  }
 
   // 加载中
   if (loading) {
@@ -202,6 +414,205 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="space-y-5">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed left-1/2 top-4 z-[60] -translate-x-1/2">
+          <div
+            className={`rounded-lg px-4 py-2 text-sm font-medium shadow-lg ${
+              toast.type === "success"
+                ? "bg-success-600 text-white"
+                : "bg-red-600 text-white"
+            }`}
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {modal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/40 backdrop-blur-sm"
+          onClick={() => setModal(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {modal === "plan" && (
+              <>
+                <h3 className="mb-4 text-base font-semibold text-neutral-900">
+                  修改套餐
+                </h3>
+                <div className="space-y-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={planIsSubscribed}
+                      onChange={(e) => setPlanIsSubscribed(e.target.checked)}
+                      className="h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm text-neutral-700">已订阅</span>
+                  </label>
+                  <div>
+                    <label className="mb-1 block text-xs text-neutral-500">
+                      套餐名称
+                    </label>
+                    <input
+                      type="text"
+                      value={planName}
+                      onChange={(e) => setPlanName(e.target.value)}
+                      placeholder="输入套餐名称（可留空）"
+                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end gap-2">
+                  <button
+                    onClick={() => setModal(null)}
+                    className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleSubmitPlan}
+                    disabled={actionLoading}
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                  >
+                    确定
+                  </button>
+                </div>
+              </>
+            )}
+
+            {modal === "credits" && (
+              <>
+                <h3 className="mb-4 text-base font-semibold text-neutral-900">
+                  修改余额
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="mb-1 block text-xs text-neutral-500">
+                      积分余额（非负整数）
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={creditsInput}
+                      onChange={(e) => setCreditsInput(e.target.value)}
+                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCreditsInput(
+                          String(Number(creditsInput || 0) + 50),
+                        )
+                      }
+                      className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                    >
+                      +50
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCreditsInput(
+                          String(Number(creditsInput || 0) + 100),
+                        )
+                      }
+                      className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                    >
+                      +100
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCreditsInput(
+                          String(Number(creditsInput || 0) + 500),
+                        )
+                      }
+                      className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                    >
+                      +500
+                    </button>
+                  </div>
+                  <p className="text-xs text-neutral-500">
+                    当前余额：{detail.credits}
+                  </p>
+                </div>
+                <div className="mt-6 flex justify-end gap-2">
+                  <button
+                    onClick={() => setModal(null)}
+                    className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleSubmitCredits}
+                    disabled={actionLoading}
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                  >
+                    确定
+                  </button>
+                </div>
+              </>
+            )}
+
+            {modal === "role" && (
+              <>
+                <h3 className="mb-4 text-base font-semibold text-neutral-900">
+                  设置角色
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="mb-1 block text-xs text-neutral-500">
+                      角色
+                    </label>
+                    <select
+                      value={roleSelect}
+                      onChange={(e) =>
+                        setRoleSelect(
+                          e.target.value as UserRoleLiteral,
+                        )
+                      }
+                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="user">普通用户</option>
+                      <option value="admin">管理员</option>
+                      <option value="super_admin">超级管理员</option>
+                    </select>
+                  </div>
+                  {currentUser?.id === detail.id &&
+                    roleSelect !== "super_admin" && (
+                      <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                        注意：不允许修改自己的角色
+                      </p>
+                    )}
+                </div>
+                <div className="mt-6 flex justify-end gap-2">
+                  <button
+                    onClick={() => setModal(null)}
+                    className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleSubmitRole}
+                    disabled={actionLoading}
+                    className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-800 disabled:opacity-50"
+                  >
+                    确定
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 面包屑 + 返回 */}
       <div className="flex items-center justify-between">
         <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
@@ -340,46 +751,47 @@ export default function AdminUserDetailPage() {
         <h2 className="mb-4 text-sm font-semibold text-neutral-900">
           管理操作
         </h2>
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          敏感操作（拉黑 / 解封 / 改套餐 / 改余额 / 设置管理员）将在 Phase 2.6
-          接入
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {/* 拉黑 / 解封（根据当前状态显示） */}
-          <button
-            disabled
-            title={ACTION_DISABLED_TITLE}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white opacity-50"
-          >
-            {detail.status === "active" ? "拉黑用户" : "解封用户"}
-          </button>
-          <button
-            disabled
-            title={ACTION_DISABLED_TITLE}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white opacity-50"
-          >
-            修改套餐
-          </button>
-          <button
-            disabled
-            title={ACTION_DISABLED_TITLE}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white opacity-50"
-          >
-            修改余额
-          </button>
-          <button
-            disabled
-            title={ACTION_DISABLED_TITLE}
-            className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white opacity-50"
-          >
-            {isSuperAdmin ? "设置管理员角色" : "设置管理员角色（仅超管）"}
-          </button>
-        </div>
-        {!isSuperAdmin && (
-          <p className="mt-3 text-xs text-neutral-400">
-            提示：拉黑/解封、改套餐、改余额、设置管理员等操作仅超级管理员可用，将在
-            Phase 2.6 接入。
-          </p>
+        {isSuperAdmin ? (
+          <>
+            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              敏感操作（拉黑 / 解封 / 改套餐 / 改余额 / 设置管理员）将记录到操作日志
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {/* 拉黑 / 解封（根据当前状态显示） */}
+              <button
+                onClick={handleBlockUnblock}
+                disabled={actionLoading}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {detail.status === "active" ? "拉黑用户" : "解封用户"}
+              </button>
+              <button
+                onClick={() => openModal("plan")}
+                disabled={actionLoading}
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              >
+                修改套餐
+              </button>
+              <button
+                onClick={() => openModal("credits")}
+                disabled={actionLoading}
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              >
+                修改余额
+              </button>
+              <button
+                onClick={() => openModal("role")}
+                disabled={actionLoading}
+                className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-800 disabled:opacity-50"
+              >
+                设置管理员角色
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-6 text-center text-sm text-neutral-500">
+            敏感操作仅超级管理员可用
+          </div>
         )}
       </section>
     </div>

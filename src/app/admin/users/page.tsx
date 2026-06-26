@@ -94,7 +94,7 @@ function getInitial(
  */
 export default function AdminUsersPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, user: currentUser } = useAuth();
 
   // 列表数据
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -103,6 +103,59 @@ export default function AdminUsersPage() {
   const pageSize = 20;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 当前登录用户是否为 super_admin（决定是否显示快捷拉黑/解封按钮）
+  const isSuperAdmin = currentUser?.role === "super_admin";
+
+  // 行内快捷操作的进行中用户 ID（一次仅允许一个）
+  const [quickActionUserId, setQuickActionUserId] = useState<string | null>(
+    null,
+  );
+
+  /**
+   * 行内快捷拉黑 / 解封：window.confirm 确认后 PATCH，成功后局部更新 state
+   * 仅 super_admin 可触发（按钮仅在 isSuperAdmin 为 true 时渲染）
+   */
+  async function handleQuickBlock(u: UserListItem) {
+    const next: "active" | "blocked" =
+      u.status === "active" ? "blocked" : "active";
+    const verb = next === "blocked" ? "拉黑" : "解封";
+    const nickname = u.nickname || "该用户";
+    const confirmed = window.confirm(
+      `确定${verb}用户 ${nickname}？此操作将禁止该用户登录与使用平台功能。`,
+    );
+    if (!confirmed) return;
+    if (!token) return;
+
+    setQuickActionUserId(u.id);
+    try {
+      const res = await fetch(`/api/admin/users/${u.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: next }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        message?: string;
+      };
+      if (!res.ok) {
+        alert(data.message || `${verb}失败 (${res.status})`);
+        return;
+      }
+      // 局部更新列表中该用户的状态（不重新拉取列表）
+      setUsers((prev) =>
+        prev.map((x) =>
+          x.id === u.id ? { ...x, status: next } : x,
+        ),
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : `${verb}失败`);
+    } finally {
+      setQuickActionUserId(null);
+    }
+  }
 
   // 筛选条件
   const [search, setSearch] = useState("");
@@ -377,12 +430,31 @@ export default function AdminUsersPage() {
                         {formatDate(u.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => router.push(`/admin/users/${u.id}`)}
-                          className="text-xs font-medium text-primary hover:text-primary-hover"
-                        >
-                          查看
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => router.push(`/admin/users/${u.id}`)}
+                            className="text-xs font-medium text-primary hover:text-primary-hover"
+                          >
+                            查看
+                          </button>
+                          {isSuperAdmin && (
+                            <button
+                              onClick={() => handleQuickBlock(u)}
+                              disabled={quickActionUserId === u.id}
+                              className={`text-xs font-medium disabled:opacity-50 ${
+                                u.status === "active"
+                                  ? "text-red-600 hover:text-red-700"
+                                  : "text-success-700 hover:text-success-800"
+                              }`}
+                            >
+                              {quickActionUserId === u.id
+                                ? "处理中..."
+                                : u.status === "active"
+                                  ? "拉黑"
+                                  : "解封"}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
