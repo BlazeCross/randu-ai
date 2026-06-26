@@ -8,6 +8,7 @@ import UpgradePrompt from "@/components/upgrade/UpgradePrompt";
 import SubscriptionCard, {
   type TrialStatus,
 } from "@/components/dashboard/SubscriptionCard";
+import { SkeletonListItem } from "@/components/ui/Skeleton";
 
 // 使用记录类型（对应 /api/user/usage 返回的 usageLogs 元素）
 interface UsageLog {
@@ -373,27 +374,11 @@ export default function DashboardPage() {
           </div>
 
           {usageLoading ? (
-            // 使用记录加载中
-            <div className="flex items-center justify-center py-16">
-              <svg
-                className="h-8 w-8 animate-spin text-primary"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
+            // 使用记录加载中：骨架屏列表
+            <div className="divide-y divide-neutral-100">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonListItem key={i} />
+              ))}
             </div>
           ) : usageData && usageData.usageLogs.length > 0 ? (
             // 使用记录列表
