@@ -1,0 +1,222 @@
+openapi: 3.0.0
+info:
+  title: 燃渡AI 平台 API
+  description: |
+    燃渡AI Coze 生态工具供应商平台对外 API。
+
+    ## 鉴权方式
+    所有接口需在请求头携带 `X-API-Key`，格式为 `blaze_xxxx`。
+    可在燃渡AI控制台「个人中心 → API Key 管理」创建。
+
+    ## 计费规则
+    - AI 文案生成：1 点/次
+    - AI 生图：5 点/张（n 参数控制数量）
+    - 余额不足返回 HTTP 402
+
+    ## 接口域名
+    生产环境：https://randuai.cn
+  version: 1.0.0
+  contact:
+    name: 燃渡AI
+    url: https://randuai.cn
+
+servers:
+  - url: https://randuai.cn
+    description: 生产环境
+
+# 全局鉴权：所有接口都需要 X-API-Key
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: 燃渡AI 平台 API Key（blaze_ 前缀）
+
+paths:
+  /api/external/key/verify:
+    get:
+      operationId: verifyApiKey
+      summary: 验证 API Key 有效性
+      description: |
+        校验 API Key 是否有效、是否过期、账号是否可用，并返回当前余额。
+        适用于 Coze 插件启动时自检。
+      tags:
+        - Key 管理
+      responses:
+        '200':
+          description: 校验成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    description: Key 是否有效
+                  keyName:
+                    type: string
+                    description: Key 名称
+                  credits:
+                    type: number
+                    description: 当前余额（点）
+        '401':
+          description: Key 无效/已吊销/已过期
+        '403':
+          description: 账号已被封禁
+
+  /api/external/user/usage:
+    get:
+      operationId: getUserUsage
+      summary: 查询用户用量统计
+      description: 返回用户的余额、累计调用次数及所有 Key 的用量汇总。
+      tags:
+        - Key 管理
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  credits:
+                    type: number
+                    description: 当前余额（点）
+                  totalUsed:
+                    type: integer
+                    description: 累计调用次数
+                  keys:
+                    type: array
+                    description: Key 用量列表
+                    items:
+                      type: object
+                      properties:
+                        keyPrefix:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                        creditsUsed:
+                          type: number
+                        totalCalls:
+                          type: integer
+
+  /api/external/generate/copy:
+    post:
+      operationId: generateCopy
+      summary: AI 文案生成
+      description: |
+        调用火山方舟豆包大模型生成文案，支持系统提示词和写作风格。
+        消耗点数：1 点/次。
+      tags:
+        - AI 生成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  description: 文案生成的需求描述
+                  example: "帮我写一段夏季新品连衣裙的电商文案，突出清凉透气"
+                  maxLength: 2000
+                style:
+                  type: string
+                  description: 写作风格（可选），如活泼/正式/文艺
+                  example: "活泼"
+      responses:
+        '200':
+          description: 生成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                    description: 生成的文案内容
+                  tokensUsed:
+                    type: integer
+                    description: 本次消耗的 token 数
+                  creditsCost:
+                    type: number
+                    description: 本次扣除的点数
+        '400':
+          description: 参数错误（prompt 为空或超长）
+        '402':
+          description: 余额不足
+        '502':
+          description: 豆包模型调用失败
+
+  /api/external/generate/image:
+    post:
+      operationId: generateImage
+      summary: AI 生图（Seedream）
+      description: |
+        调用火山方舟 Seedream 模型生成图片，支持指定尺寸和数量。
+        消耗点数：5 点/张（按 n 计费）。
+      tags:
+        - AI 生成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  description: 图片生成的描述
+                  example: "一只穿着汉服的猫，水墨画风格"
+                  maxLength: 1000
+                size:
+                  type: string
+                  description: 图片尺寸
+                  enum:
+                    - 1024x1024
+                    - 768x1024
+                    - 1024x768
+                  default: 1024x1024
+                n:
+                  type: integer
+                  description: 生成数量（1-4）
+                  minimum: 1
+                  maximum: 4
+                  default: 1
+      responses:
+        '200':
+          description: 生成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  urls:
+                    type: array
+                    description: 生成图片的 URL 列表
+                    items:
+                      type: string
+                      format: uri
+                  count:
+                    type: integer
+                    description: 实际生成数量
+                  creditsCost:
+                    type: number
+                    description: 本次扣除的点数
+        '400':
+          description: 参数错误
+        '402':
+          description: 余额不足
+        '502':
+          description: Seedream 模型调用失败
