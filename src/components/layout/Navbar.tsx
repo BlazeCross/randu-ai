@@ -13,6 +13,7 @@ const navLinks = [
   { label: "首页", href: "/" },
   { label: "工作台", href: "/workspace" },
   { label: "智能体", href: "/chat" },
+  { label: "教程", href: "/docs" },
 ];
 
 /**

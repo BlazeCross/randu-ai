@@ -9,6 +9,8 @@ interface WorkflowListItem {
   category: string;
   icon: string | null;
   status: string;
+  // Phase 2.10：教程文档中心需要 feishuDocUrl
+  feishuDocUrl: string | null;
 }
 
 /**
@@ -51,6 +53,7 @@ export async function GET(request: Request) {
         category: true,
         icon: true,
         status: true,
+        feishuDocUrl: true,
       },
       ...(page && pageSize
         ? { skip: (page - 1) * pageSize, take: pageSize }
@@ -64,6 +67,7 @@ export async function GET(request: Request) {
       category: w.category,
       icon: w.icon,
       status: w.status,
+      feishuDocUrl: w.feishuDocUrl,
     }));
 
     // 工作流列表变更频率低，客户端/CDN 可缓存 60s
