@@ -198,6 +198,12 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
+              href="/dashboard/history"
+              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+            >
+              任务历史
+            </Link>
+            <Link
               href="/dashboard/keys"
               className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
             >
