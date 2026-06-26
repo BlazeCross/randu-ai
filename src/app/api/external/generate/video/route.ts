@@ -42,6 +42,18 @@ interface VideoRequestBody {
 }
 
 /**
+ * 构建火山方舟回调 URL（指向本服务的 webhook 接收端点）
+ *
+ * 火山方舟会在任务状态变化时主动 POST 到此地址。
+ * 我们接收后会更新本地任务状态并转发给用户配置的 webhookUrl（如有）。
+ */
+function buildVolcWebhookUrl(): string | undefined {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) return undefined;
+  return `${appUrl.replace(/\/$/, "")}/api/external/webhook/volcengine`;
+}
+
+/**
  * POST /api/external/generate/video - 提交 Seedance 视频生成任务
  *
  * 鉴权：X-API-Key 请求头
@@ -49,8 +61,10 @@ interface VideoRequestBody {
  * 流程：验证 Key → 校验余额 → 提交 Seedance 任务 → 返回 taskId
  *
  * 注：本接口为异步接口，仅提交任务并返回 taskId。
- *     客户端需轮询 GET /api/external/generate/video/status?taskId=xxx 查询结果。
- *     点数在任务成功时扣除（在 status 接口中处理），失败不扣点。
+ *     客户端可：
+ *     - 轮询 GET /api/external/generate/video/status?taskId=xxx 查询结果
+ *     - 或在 API Key 上配置 webhookUrl，任务完成时主动通知（Phase 3.6）
+ *     点数在任务成功时扣除（在 status 接口或 webhook 接收端点中处理），失败不扣点。
  *
  * 支持场景：
  * - 文生视频：仅传 prompt
@@ -189,7 +203,8 @@ export const POST = requireApiKey(
       );
     }
 
-    // 2. 提交 Seedance 任务
+    // 2. 提交 Seedance 任务（始终注入我们的回调地址，由我们再转发给用户）
+    const callbackUrl = buildVolcWebhookUrl();
     let externalTaskId: string;
     try {
       const result = await submitVideoTask({
@@ -219,6 +234,7 @@ export const POST = requireApiKey(
           typeof generateAudio === "boolean" ? generateAudio : undefined,
         returnLastFrame:
           typeof returnLastFrame === "boolean" ? returnLastFrame : undefined,
+        callbackUrl,
       });
       externalTaskId = result.taskId;
     } catch (error) {

@@ -1,10 +1,14 @@
 -- ============================================================
--- Phase 3.4 schema 同步脚本（幂等）
--- 为 api_keys 表添加频率限制字段：
---   qps_limit       单 Key 每秒最大请求数（默认 5）
---   daily_limit     单 Key 每日最大调用次数（默认 1000）
---   daily_used      今日已调用次数（每日 UTC 0 点重置）
---   daily_reset_at  下次重置时间
+-- Phase 3.4 + 3.6 schema 同步脚本（幂等）
+-- 为 api_keys 表添加：
+--   Phase 3.4 频率限制字段：
+--     qps_limit       单 Key 每秒最大请求数（默认 5）
+--     daily_limit     单 Key 每日最大调用次数（默认 1000）
+--     daily_used      今日已调用次数（每日 UTC 0 点重置）
+--     daily_reset_at  下次重置时间
+--   Phase 3.6 Webhook 配置字段：
+--     webhook_url     长任务完成时主动通知的 URL
+--     webhook_secret  HMAC-SHA256 签名密钥
 -- 已存在的对象会被跳过，可重复执行
 -- ============================================================
 
@@ -44,9 +48,26 @@ BEGIN
   ) THEN
     ALTER TABLE api_keys ADD COLUMN daily_reset_at TIMESTAMP NOT NULL DEFAULT NOW();
   END IF;
+
+  -- ===== 2. 添加 Webhook 配置字段 =====
+  -- webhook_url
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'api_keys' AND column_name = 'webhook_url'
+  ) THEN
+    ALTER TABLE api_keys ADD COLUMN webhook_url TEXT;
+  END IF;
+
+  -- webhook_secret
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'api_keys' AND column_name = 'webhook_secret'
+  ) THEN
+    ALTER TABLE api_keys ADD COLUMN webhook_secret TEXT;
+  END IF;
 END$$;
 
 COMMIT;
 
 -- 验证
-\echo '✓ api_keys 频率限制字段已就绪（qps_limit / daily_limit / daily_used / daily_reset_at）'
+\echo '✓ api_keys 频率限制 + Webhook 配置字段已就绪'

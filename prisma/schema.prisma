@@ -58,6 +58,12 @@ model ApiKey {
   // dailyResetAt：下次重置时间（UTC 0 点）
   dailyResetAt  DateTime  @default(now()) @map("daily_reset_at")
 
+  // Webhook 配置（Phase 3.6）
+  // webhookUrl：长任务完成时主动通知的 URL（HTTPS 推荐）
+  webhookUrl    String?   @map("webhook_url")
+  // webhookSecret：HMAC-SHA256 签名密钥（用于校验通知真实性）
+  webhookSecret String?   @map("webhook_secret")
+
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   callLogs CallLog[]
 

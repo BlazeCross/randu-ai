@@ -20,6 +20,8 @@ interface ApiKeyItem {
   dailyLimit: number;
   dailyUsed: number;
   dailyResetAt: string;
+  // Webhook 配置（Phase 3.6）
+  webhookUrl: string | null;
 }
 
 // 创建 Key 后返回的明文 Key（仅显示一次）
@@ -83,7 +85,10 @@ export default function KeysPage() {
   const [editLimitKey, setEditLimitKey] = useState<ApiKeyItem | null>(null);
   const [editQpsLimit, setEditQpsLimit] = useState(5);
   const [editDailyLimit, setEditDailyLimit] = useState(1000);
+  const [editWebhookUrl, setEditWebhookUrl] = useState("");
   const [savingLimit, setSavingLimit] = useState(false);
+  // 首次生成的 webhookSecret（明文返回一次）
+  const [newWebhookSecret, setNewWebhookSecret] = useState<string | null>(null);
 
   // 新创建的明文 Key（弹窗展示一次）
   const [createdKey, setCreatedKey] = useState<CreatedKey | null>(null);
@@ -196,6 +201,8 @@ export default function KeysPage() {
     setEditLimitKey(key);
     setEditQpsLimit(key.qpsLimit);
     setEditDailyLimit(key.dailyLimit);
+    setEditWebhookUrl(key.webhookUrl ?? "");
+    setNewWebhookSecret(null);
   }, []);
 
   /**
@@ -206,6 +213,11 @@ export default function KeysPage() {
     setSavingLimit(true);
     setError(null);
     try {
+      // 检测 webhookUrl 是否变化
+      const originalWebhookUrl = editLimitKey.webhookUrl ?? "";
+      const trimmedWebhookUrl = editWebhookUrl.trim();
+      const webhookChanged = trimmedWebhookUrl !== originalWebhookUrl;
+
       const res = await fetch(`/api/keys/${editLimitKey.id}`, {
         method: "PUT",
         headers: {
@@ -215,6 +227,10 @@ export default function KeysPage() {
         body: JSON.stringify({
           qpsLimit: editQpsLimit,
           dailyLimit: editDailyLimit,
+          // 仅在变化时传 webhookUrl，避免误触发 secret 重新生成
+          ...(webhookChanged
+            ? { webhookUrl: trimmedWebhookUrl || null }
+            : {}),
         }),
       });
       if (!res.ok) {
@@ -223,14 +239,22 @@ export default function KeysPage() {
         };
         throw new Error(data.message || "保存失败");
       }
-      setEditLimitKey(null);
+      const data = (await res.json().catch(() => ({}))) as {
+        webhookSecret?: string;
+      };
+      // 若首次设置 webhookUrl 并生成 secret，明文展示一次
+      if (data.webhookSecret) {
+        setNewWebhookSecret(data.webhookSecret);
+      } else {
+        setEditLimitKey(null);
+      }
       await fetchKeys();
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
     } finally {
       setSavingLimit(false);
     }
-  }, [token, editLimitKey, editQpsLimit, editDailyLimit, fetchKeys]);
+  }, [token, editLimitKey, editQpsLimit, editDailyLimit, editWebhookUrl, fetchKeys]);
 
   /**
    * 吊销 Key
@@ -812,15 +836,15 @@ export default function KeysPage() {
         </div>
       )}
 
-      {/* 编辑频率限制弹窗 */}
+      {/* 编辑频率限制 / Webhook 弹窗 */}
       {editLimitKey && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <h3 className="mb-2 text-base font-semibold text-neutral-900">
-              调整频率限制
+              频率限制 / Webhook
             </h3>
             <p className="mb-5 text-sm text-neutral-500">
-              调整此 Key 的 QPS 限制和每日调用限额，立即生效。
+              调整 QPS 限制、每日调用限额，配置 Webhook 回调地址。
             </p>
             <div className="mb-5 rounded-xl bg-neutral-50 p-3">
               <p className="text-xs text-neutral-500">Key 名称</p>
@@ -869,10 +893,69 @@ export default function KeysPage() {
                   0 = 不限制，范围 0-100000
                 </p>
               </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  Webhook 回调地址
+                </label>
+                <input
+                  type="url"
+                  value={editWebhookUrl}
+                  onChange={(e) => setEditWebhookUrl(e.target.value)}
+                  placeholder="https://your-server.com/webhook"
+                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                />
+                <p className="mt-1 text-xs text-neutral-400">
+                  任务完成时主动通知此地址（HMAC-SHA256 签名）。留空 = 仅轮询。
+                </p>
+                {editLimitKey.webhookUrl && !newWebhookSecret && (
+                  <p className="mt-1.5 text-xs text-amber-600">
+                    已配置 Webhook。清空地址将同时删除签名密钥。
+                  </p>
+                )}
+              </div>
             </div>
+
+            {/* 首次生成的 webhookSecret 明文展示（仅一次） */}
+            {newWebhookSecret && (
+              <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-semibold text-amber-900">
+                  Webhook 签名密钥（仅显示一次）
+                </p>
+                <p className="mt-1 text-xs text-amber-700">
+                  请立即复制保存。此密钥用于校验回调请求的 X-Webhook-Signature
+                  头，丢失后只能重新设置 Webhook 地址来重新生成。
+                </p>
+                <code className="mt-3 block break-all rounded-lg bg-white p-3 font-mono text-xs text-neutral-900">
+                  {newWebhookSecret}
+                </code>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(newWebhookSecret)}
+                    className="flex-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-amber-700"
+                  >
+                    {copied ? "已复制" : "复制密钥"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewWebhookSecret(null);
+                      setEditLimitKey(null);
+                    }}
+                    className="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
+                  >
+                    我已保存，关闭
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
-                onClick={() => setEditLimitKey(null)}
+                onClick={() => {
+                  setEditLimitKey(null);
+                  setNewWebhookSecret(null);
+                }}
                 disabled={savingLimit}
                 className="flex-1 rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
               >
@@ -880,7 +963,7 @@ export default function KeysPage() {
               </button>
               <button
                 onClick={handleSaveLimit}
-                disabled={savingLimit}
+                disabled={savingLimit || !!newWebhookSecret}
                 className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
               >
                 {savingLimit ? "保存中..." : "保存"}

@@ -37,10 +37,16 @@ export const GET = requireAuth(async (_request, { userId }) => {
       dailyLimit: true,
       dailyUsed: true,
       dailyResetAt: true,
+      // 仅返回 webhookUrl（不返回 webhookSecret，安全考虑）
+      webhookUrl: true,
+      // webhookSecret 仅返回前 8 位 + 掩码（用于辨识是否已设置）
+      // 完整 secret 仅在首次设置时通过 PUT 接口返回一次
     },
     orderBy: { createdAt: "desc" },
   });
 
+  // 二次处理：脱敏 webhookSecret（如未来 select 中加入的话）
+  // 这里直接不查询 webhookSecret，所以无需处理
   return NextResponse.json({ keys });
 });
 
