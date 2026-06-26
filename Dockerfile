@@ -60,11 +60,11 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 # 复制 Prisma 相关文件（运行迁移需要）
 COPY --from=builder /app/prisma ./prisma
-# 复制 Prisma Client 和 CLI
+# 复制 Prisma Client 和 CLI（包含 wasm 引擎文件）
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
 
 # 创建启动脚本（先同步数据库 schema，再启动应用）
 # 项目使用 prisma db push 而非 migrate，直接同步 schema

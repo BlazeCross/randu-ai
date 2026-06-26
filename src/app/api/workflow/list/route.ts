@@ -22,6 +22,13 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category")?.trim() || undefined;
     const search = searchParams.get("search")?.trim() || undefined;
+    // 分页参数（默认全量，传 page/pageSize 时启用分页）
+    const page = searchParams.has("page")
+      ? Math.max(1, parseInt(searchParams.get("page")!, 10) || 1)
+      : undefined;
+    const pageSize = searchParams.has("pageSize")
+      ? Math.min(100, Math.max(1, parseInt(searchParams.get("pageSize")!, 10) || 20))
+      : undefined;
 
     // 构建 where 条件
     const where: Record<string, unknown> = { status: "active" };
@@ -33,7 +40,7 @@ export async function GET(request: Request) {
       where.name = { contains: search, mode: "insensitive" };
     }
 
-    // 查询工作流列表
+    // 查询工作流列表（带可选分页）
     const workflows = await prisma.workflow.findMany({
       where,
       orderBy: { sortOrder: "asc" },
@@ -45,6 +52,9 @@ export async function GET(request: Request) {
         icon: true,
         status: true,
       },
+      ...(page && pageSize
+        ? { skip: (page - 1) * pageSize, take: pageSize }
+        : {}),
     });
 
     const result: WorkflowListItem[] = workflows.map((w) => ({
@@ -56,7 +66,16 @@ export async function GET(request: Request) {
       status: w.status,
     }));
 
-    return NextResponse.json({ workflows: result });
+    // 工作流列表变更频率低，客户端/CDN 可缓存 60s
+    // s-maxage=60（CDN 缓存），stale-while-revalidate=30（过期后台静默更新）
+    return NextResponse.json(
+      { workflows: result },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
+        },
+      },
+    );
   } catch (error) {
     console.error("获取工作流列表失败:", error);
     return NextResponse.json(

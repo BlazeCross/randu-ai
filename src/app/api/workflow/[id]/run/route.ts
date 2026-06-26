@@ -66,16 +66,25 @@ export const POST = requireAuth(
         );
       }
 
-      // 1. 查询工作流
-      const workflow = await prisma.workflow.findUnique({
-        where: { id: workflowId },
-        select: {
-          id: true,
-          name: true,
-          cozeWorkflowId: true,
-          status: true,
-        },
-      });
+      // 1. 并行查询工作流和用户（减少 1 个串行 RTT）
+      const [workflow, user] = await Promise.all([
+        prisma.workflow.findUnique({
+          where: { id: workflowId },
+          select: {
+            id: true,
+            name: true,
+            cozeWorkflowId: true,
+            status: true,
+          },
+        }),
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: {
+            trialExpiresAt: true,
+            isSubscribed: true,
+          },
+        }),
+      ]);
 
       if (!workflow) {
         return NextResponse.json(
@@ -83,15 +92,6 @@ export const POST = requireAuth(
           { status: 404 },
         );
       }
-
-      // 2. 试用次数校验
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          trialExpiresAt: true,
-          isSubscribed: true,
-        },
-      });
 
       if (!user) {
         return NextResponse.json(

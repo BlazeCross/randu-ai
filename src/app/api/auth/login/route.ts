@@ -30,12 +30,18 @@ export async function POST(request: Request) {
 
     const normalizedAccount = account.trim();
 
-    // 查询用户：email = account OR phone = account
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: normalizedAccount }, { phone: normalizedAccount }],
-      },
-    });
+    // 根据账号格式命中唯一索引，避免 OR 全表扫描
+    // 含 @ 视为邮箱，纯数字视为手机号，其余回退到 OR
+    const isEmail = normalizedAccount.includes("@");
+    const isPhone = /^\d{6,}$/.test(normalizedAccount);
+
+    const user = isEmail
+      ? await prisma.user.findUnique({ where: { email: normalizedAccount } })
+      : isPhone
+        ? await prisma.user.findUnique({ where: { phone: normalizedAccount } })
+        : await prisma.user.findFirst({
+            where: { OR: [{ email: normalizedAccount }, { phone: normalizedAccount }] },
+          });
 
     // 账号不存在
     if (!user) {

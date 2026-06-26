@@ -37,6 +37,9 @@ model UsageLog {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
+  @@index([userId, status])
+  @@index([workflowId])
   @@map("usage_logs")
 }
 
@@ -66,5 +69,7 @@ model Workflow {
   updatedAt       DateTime  @updatedAt @map("updated_at")
   usageLogs       UsageLog[]
 
+  @@index([status, sortOrder])
+  @@index([category])
   @@map("workflows")
 }

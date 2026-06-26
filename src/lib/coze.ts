@@ -340,8 +340,6 @@ export async function getTaskStatus(
       headers: buildHeaders(),
     });
     response = (await res.json()) as CozeApiResponse<HistoryItem[]>;
-    // 打印完整响应用于调试
-    console.error("[Coze] run_histories 完整响应:", JSON.stringify(response, null, 2));
   } catch (error) {
     throw new Error(
       `调用 Coze run_histories 接口失败：${error instanceof Error ? error.message : String(error)}`,

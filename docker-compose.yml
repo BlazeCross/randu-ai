@@ -32,6 +32,9 @@ services:
     ports:
       # 仅限本机访问，不对外暴露（安全）
       - "127.0.0.1:5432:5432"
+    # 2核4G 内存配额：数据库限制 1G，留出余量给应用与系统
+    mem_limit: 1g
+    mem_reservation: 512m
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-randu} -d ${POSTGRES_DB:-randu_ai}"]
       interval: 10s
@@ -55,7 +58,9 @@ services:
         condition: service_healthy
     environment:
       # 数据库连接（指向 db 容器）
-      DATABASE_URL: postgresql://${POSTGRES_USER:-randu}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-randu_ai}?schema=public
+      # connection_limit 限制 Prisma 连接池大小，避免 2核4G 下超 PostgreSQL max_connections
+      # pool_timeout 获取连接超时（秒），避免请求无限堆积
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-randu}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-randu_ai}?connection_limit=5&pool_timeout=10&schema=public"
       # Coze API
       COZE_API_TOKEN: ${COZE_API_TOKEN:?请在.env.production中设置COZE_API_TOKEN}
       COZE_BASE_URL: ${COZE_BASE_URL:-https://api.coze.cn}
@@ -73,6 +78,9 @@ services:
     ports:
       # 对外暴露 3000 端口（后续可用 Nginx 反向代理）
       - "3000:3000"
+    # 2核4G 内存配额：应用限制 2G，配合 db 的 1G 共 3G，留 1G 给系统
+    mem_limit: 2g
+    mem_reservation: 1g
     networks:
       - randu-network
 

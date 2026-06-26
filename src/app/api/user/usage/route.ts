@@ -23,20 +23,20 @@ export const GET = requireAuth(async (_request, { userId }) => {
       );
     }
 
-    // 查询使用记录（按 createdAt 降序，限制 50 条）
-    const usageLogs = await prisma.usageLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: USAGE_LOG_LIMIT,
-    });
-
-    // 统计试用期内的使用次数（createdAt <= trialExpiresAt）
-    const trialUsageCount = await prisma.usageLog.count({
-      where: {
-        userId,
-        createdAt: { lte: user.trialExpiresAt },
-      },
-    });
+    // 并行查询使用记录和试用期使用次数（减少 2 个串行 RTT）
+    const [usageLogs, trialUsageCount] = await Promise.all([
+      prisma.usageLog.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: USAGE_LOG_LIMIT,
+      }),
+      prisma.usageLog.count({
+        where: {
+          userId,
+          createdAt: { lte: user.trialExpiresAt },
+        },
+      }),
+    ]);
 
     // 计算试用状态
     const now = Date.now();
