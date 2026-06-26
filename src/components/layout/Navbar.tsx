@@ -89,6 +89,20 @@ export default function Navbar() {
                 个人中心
               </Link>
             )}
+            {/* admin 及以上显示后台管理入口 */}
+            {user &&
+              (user.role === "admin" || user.role === "super_admin") && (
+                <Link
+                  href="/admin"
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive("/admin")
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  }`}
+                >
+                  后台管理
+                </Link>
+              )}
           </div>
         </div>
 
@@ -210,6 +224,19 @@ export default function Navbar() {
                 >
                   通知中心
                 </Link>
+                {user.role === "admin" || user.role === "super_admin" ? (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive("/admin")
+                        ? "bg-primary-50 text-primary-700"
+                        : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                    }`}
+                  >
+                    后台管理
+                  </Link>
+                ) : null}
               </>
             )}
             {/* 移动端用户操作 */}
