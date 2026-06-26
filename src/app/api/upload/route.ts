@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { uploadStreamToOss } from "@/lib/oss";
+import {
+  getClientIp,
+  checkIpRateLimit,
+  ipRateLimitedResponse,
+} from "@/lib/ipRateLimit";
+import { validateImageBytes } from "@/lib/imageValidation";
 
 // 允许上传的图片 MIME 类型
 const ALLOWED_CONTENT_TYPES = [
@@ -12,18 +18,30 @@ const ALLOWED_CONTENT_TYPES = [
 
 // 文件大小上限：10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// magic bytes 校验需要的文件头长度（4KB 足够覆盖所有支持格式的头信息）
+const HEADER_BYTES_FOR_VALIDATION = 4096;
+
+// 上传接口防滥用限流：每分钟 20 次（IP 维度）
+const UPLOAD_RATE_LIMIT_PER_MIN = 20;
 
 /**
  * 图片上传接口
  *
  * - 需鉴权（Authorization: Bearer <token>）
  * - 接收 multipart/form-data，字段名 file
- * - 校验：文件存在、类型为图片、大小 ≤ 10MB
+ * - 校验：文件存在、类型为图片、大小 ≤ 10MB、magic bytes 一致、尺寸合理
  * - 成功返回 { url, fileName, size }
  * - 错误返回 400 / 401 / 500
  */
 export const POST = requireAuth(async (request) => {
   try {
+    // IP 限流（防滥用）
+    const clientIp = getClientIp(request);
+    const ipResult = checkIpRateLimit(clientIp, UPLOAD_RATE_LIMIT_PER_MIN);
+    if (!ipResult.allowed) {
+      return ipRateLimitedResponse(ipResult.retryAfterMs, UPLOAD_RATE_LIMIT_PER_MIN);
+    }
+
     // 解析 multipart/form-data
     const formData = await request.formData();
     const file = formData.get("file");
@@ -64,6 +82,20 @@ export const POST = requireAuth(async (request) => {
       );
     }
 
+    // 内容安全审核（Phase 4.3）：
+    // 读取前 4KB 校验 magic bytes + 尺寸
+    // file.slice 返回新的 Blob，不影响后续 file.stream() 流式上传
+    const headerBlob = file.slice(0, HEADER_BYTES_FOR_VALIDATION);
+    const headerBuffer = await headerBlob.arrayBuffer();
+    const headerBytes = new Uint8Array(headerBuffer);
+    const validation = validateImageBytes(headerBytes, file.type);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { message: validation.reason ?? "图片内容校验失败" },
+        { status: 400 },
+      );
+    }
+
     // 流式上传：直接使用文件流，避免将整个文件读入内存（降低内存占用）
     const cdnUrl = await uploadStreamToOss(
       file.stream(),
@@ -76,6 +108,8 @@ export const POST = requireAuth(async (request) => {
       url: cdnUrl,
       fileName: file.name,
       size: file.size,
+      width: validation.width,
+      height: validation.height,
     });
   } catch (error) {
     console.error("文件上传失败:", error);

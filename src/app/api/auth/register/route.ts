@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
+import {
+  getClientIp,
+  checkIpRateLimit,
+  ipRateLimitedResponse,
+} from "@/lib/ipRateLimit";
 
 // 注册接口请求体
 interface RegisterBody {
@@ -13,8 +18,18 @@ interface RegisterBody {
 // 试用期时长：7 天
 const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
+// 注册接口防批量限流：每分钟 3 次（IP 维度）
+const REGISTER_RATE_LIMIT_PER_MIN = 3;
+
 export async function POST(request: Request) {
   try {
+    // IP 限流（防批量注册）
+    const clientIp = getClientIp(request);
+    const ipResult = checkIpRateLimit(clientIp, REGISTER_RATE_LIMIT_PER_MIN);
+    if (!ipResult.allowed) {
+      return ipRateLimitedResponse(ipResult.retryAfterMs, REGISTER_RATE_LIMIT_PER_MIN);
+    }
+
     const body = (await request.json()) as RegisterBody;
     const { email, phone, password } = body;
 

@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
+import {
+  getClientIp,
+  checkIpRateLimit,
+  ipRateLimitedResponse,
+} from "@/lib/ipRateLimit";
 
 // 登录接口请求体
 interface LoginBody {
@@ -9,8 +14,18 @@ interface LoginBody {
   password?: string;
 }
 
+// 登录接口防爆破限流：每分钟 5 次（IP 维度）
+const LOGIN_RATE_LIMIT_PER_MIN = 5;
+
 export async function POST(request: Request) {
   try {
+    // IP 限流（防爆破）
+    const clientIp = getClientIp(request);
+    const ipResult = checkIpRateLimit(clientIp, LOGIN_RATE_LIMIT_PER_MIN);
+    if (!ipResult.allowed) {
+      return ipRateLimitedResponse(ipResult.retryAfterMs, LOGIN_RATE_LIMIT_PER_MIN);
+    }
+
     const body = (await request.json()) as LoginBody;
     const { account, password } = body;
 
