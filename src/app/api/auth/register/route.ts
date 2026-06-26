@@ -28,6 +28,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // 校验：手机号格式（11位，以1开头，第二位为3-9）
+    if (normalizedPhone && !/^1[3-9]\d{9}$/.test(normalizedPhone)) {
+      return NextResponse.json(
+        { message: "手机号格式不正确，请输入11位有效手机号" },
+        { status: 400 },
+      );
+    }
+
+    // 校验：邮箱格式（简单校验）
+    if (normalizedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      return NextResponse.json(
+        { message: "邮箱格式不正确" },
+        { status: 400 },
+      );
+    }
+
     // 校验：密码长度 >= 6
     if (!password || typeof password !== "string" || password.length < 6) {
       return NextResponse.json(
