@@ -164,6 +164,26 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
+  {
+    label: "数据导出",
+    href: "/admin/export",
+    role: "admin",
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        strokeWidth={1.8}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+        />
+      </svg>
+    ),
+  },
 ];
 
 // 角色层级（与 auth.ts 中 ROLE_LEVEL 保持一致）
