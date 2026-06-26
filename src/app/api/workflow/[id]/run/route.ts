@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { submitWorkflowTask } from "@/lib/coze";
-
-// 试用期使用次数上限
-const TRIAL_LIMIT = 10;
+import { TRIAL_LIMIT } from "@/lib/trial";
 
 // 请求体结构
 interface RunWorkflowBody {

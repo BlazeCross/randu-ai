@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
 // JWT 载荷中包含的用户标识
-export interface AuthPayload extends JwtPayload {
+interface AuthPayload extends JwtPayload {
   userId: string;
 }
 
@@ -11,7 +11,7 @@ export interface AuthPayload extends JwtPayload {
  * @param request Next.js Request 对象
  * @returns token 字符串，若不存在或格式错误则返回 null
  */
-export function getTokenFromRequest(request: Request): string | null {
+function getTokenFromRequest(request: Request): string | null {
   const authHeader = request.headers.get("authorization");
   if (!authHeader) return null;
 
@@ -29,7 +29,7 @@ export function getTokenFromRequest(request: Request): string | null {
  * @param request Next.js Request 对象
  * @returns 包含 userId 的载荷对象；校验失败返回 null
  */
-export function verifyToken(request: Request): AuthPayload | null {
+function verifyToken(request: Request): AuthPayload | null {
   const token = getTokenFromRequest(request);
   if (!token) return null;
 

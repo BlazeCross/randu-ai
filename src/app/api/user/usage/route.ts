@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
+import { TRIAL_LIMIT } from "@/lib/trial";
 
-// 试用期使用次数上限
-const TRIAL_LIMIT = 10;
 // 返回记录条数上限
 const USAGE_LOG_LIMIT = 50;
 

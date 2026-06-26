@@ -20,7 +20,7 @@ export interface PlanInfo {
 }
 
 // 套餐列表（与 seed.ts 中的 plansData 完全一致）
-export const PLANS: PlanInfo[] = [
+const PLANS: PlanInfo[] = [
   {
     name: "基础版",
     dailyLimit: 30,

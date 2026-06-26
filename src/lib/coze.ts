@@ -11,7 +11,7 @@
  */
 
 // Coze 任务状态（内部统一状态）
-export type CozeTaskStatus = "pending" | "running" | "completed" | "failed";
+type CozeTaskStatus = "pending" | "running" | "completed" | "failed";
 
 // Coze 任务查询结果
 export interface CozeTaskResult {
