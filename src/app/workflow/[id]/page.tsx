@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 
 // 工作流详情页（服务端组件）
@@ -27,6 +28,44 @@ async function getWorkflow(id: string) {
       createdAt: true,
     },
   });
+}
+
+/**
+ * 动态生成工作流详情页 SEO 元数据
+ *
+ * Next.js 16 中 params 为 Promise，需 await
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const workflow = await getWorkflow(id);
+  if (!workflow) {
+    return {
+      title: "工作流不存在",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = `${workflow.name} - 使用教程与立即体验`;
+  const description =
+    workflow.description ??
+    `${workflow.name} 是燃渡AI 提供的 ${workflow.category} 工作流，立即体验 AI 能力。`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/workflow/${id}`,
+    },
+    openGraph: {
+      title: `${workflow.name} | 燃渡AI`,
+      description,
+      type: "article",
+    },
+  };
 }
 
 /**
