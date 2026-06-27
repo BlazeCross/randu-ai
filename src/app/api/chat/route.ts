@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
+import { preDeductUserCredits, refundUserCredits } from "@/lib/apiKey";
 import {
   chatCompletion,
   generateImage,
@@ -112,8 +113,9 @@ export const POST = requireAuth(async (request, { userId }) => {
 
   const creditsCost = isImageRequest ? IMAGE_GEN_CREDITS : TEXT_CHAT_CREDITS;
 
-  // 积分校验：已订阅用户检查 credits 余额；未订阅用户也需有积分
-  if (user.credits < creditsCost) {
+  // 预扣费（原子操作，防并发超扣）
+  const preDeducted = await preDeductUserCredits(userId, creditsCost);
+  if (!preDeducted) {
     return NextResponse.json(
       {
         message: `积分余额不足，本次操作需要 ${creditsCost} 积分，当前余额 ${user.credits} 积分，请充值`,
@@ -132,6 +134,8 @@ export const POST = requireAuth(async (request, { userId }) => {
       // ===== 图片生成路径 =====
       const result = await generateImage({ prompt: userInput });
       if (result.urls.length === 0) {
+        // 退还预扣积分
+        await refundUserCredits(userId, creditsCost).catch(() => {});
         return NextResponse.json(
           { message: "图片生成失败，未返回图片" },
           { status: 500 },
@@ -139,13 +143,10 @@ export const POST = requireAuth(async (request, { userId }) => {
       }
       const imageUrl = result.urls[0];
 
-      // 扣减积分 + 累加使用次数
+      // 确认扣费：累加使用次数（积分已在预扣时扣减）
       await prisma.user.update({
         where: { id: userId },
-        data: {
-          credits: { decrement: creditsCost },
-          totalUsed: { increment: 1 },
-        },
+        data: { totalUsed: { increment: 1 } },
       });
 
       return NextResponse.json({
@@ -166,13 +167,10 @@ export const POST = requireAuth(async (request, { userId }) => {
 
       const result = await chatCompletion({ messages });
 
-      // 扣减积分 + 累加使用次数
+      // 确认扣费：累加使用次数（积分已在预扣时扣减）
       await prisma.user.update({
         where: { id: userId },
-        data: {
-          credits: { decrement: creditsCost },
-          totalUsed: { increment: 1 },
-        },
+        data: { totalUsed: { increment: 1 } },
       });
 
       return NextResponse.json({
@@ -184,6 +182,8 @@ export const POST = requireAuth(async (request, { userId }) => {
       });
     }
   } catch (error) {
+    // 调用失败：退还预扣积分
+    await refundUserCredits(userId, creditsCost).catch(() => {});
     console.error("[POST /api/chat] 失败:", error);
     const msg = error instanceof Error ? error.message : "智能体调用失败";
     return NextResponse.json(

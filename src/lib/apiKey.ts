@@ -231,6 +231,65 @@ export async function deductCredits(
 }
 
 /**
+ * 预扣费：原子性地扣减用户积分（防并发超扣）
+ *
+ * 使用条件更新 WHERE credits >= N，只在余额充足时扣减。
+ * 如果余额不足，返回 false（不扣减任何积分）。
+ *
+ * 调用模型前先预扣，失败后用 refundUserCredits 退还。
+ *
+ * @param userId  用户 ID
+ * @param credits 需要预扣的积分数
+ * @returns true=预扣成功，false=余额不足
+ */
+export async function preDeductUserCredits(
+  userId: string,
+  credits: number,
+): Promise<boolean> {
+  const result = await prisma.user.updateMany({
+    where: { id: userId, credits: { gte: credits } },
+    data: { credits: { decrement: credits } },
+  });
+  return result.count > 0;
+}
+
+/**
+ * 退还积分（预扣费后调用失败时使用）
+ *
+ * @param userId  用户 ID
+ * @param credits 需要退还的积分数
+ */
+export async function refundUserCredits(
+  userId: string,
+  credits: number,
+): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { credits: { increment: credits } },
+  });
+}
+
+/**
+ * 确认扣费：预扣成功后，更新 Key 用量统计（不重复扣用户积分）
+ *
+ * @param apiKeyId  API Key ID
+ * @param credits   消耗点数
+ */
+export async function confirmKeyUsage(
+  apiKeyId: string,
+  credits: number,
+): Promise<void> {
+  await prisma.apiKey.update({
+    where: { id: apiKeyId },
+    data: {
+      creditsUsed: { increment: credits },
+      totalCalls: { increment: 1 },
+      lastUsedAt: new Date(),
+    },
+  });
+}
+
+/**
  * 记录 API 调用日志到 CallLog 表
  *
  * workflowId 字段可选：

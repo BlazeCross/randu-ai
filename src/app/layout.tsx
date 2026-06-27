@@ -3,6 +3,8 @@ import "./globals.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import Navbar from "@/components/layout/Navbar";
+import UserOnboarding from "@/components/common/UserOnboarding";
+import CustomerServiceButton from "@/components/common/CustomerServiceButton";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randu.ai";
@@ -82,6 +84,8 @@ export default function RootLayout({
           <ToastProvider>
             <Navbar />
             {children}
+            <UserOnboarding />
+            <CustomerServiceButton />
           </ToastProvider>
         </AuthProvider>
       </body>

@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   requireApiKey,
-  deductCredits,
+  preDeductUserCredits,
+  refundUserCredits,
+  confirmKeyUsage,
   logApiCall,
   getClientIp,
 } from "@/lib/apiKey";
@@ -33,7 +35,7 @@ interface ImageRequestBody {
  *
  * 鉴权：X-API-Key 请求头
  * 请求体：{ prompt: string, size?: string, n?: number }
- * 流程：验证 Key → 校验余额 → 调用 Seedream → 扣点 + 记日志 → 返回图片 URL
+ * 流程：验证 Key → 校验账号 → 预扣费 → 调用 Seedream → 成功确认/失败退还 → 记日志
  *
  * 用于 Coze 插件调用火山方舟 Seedream 模型生成图片
  */
@@ -84,7 +86,7 @@ export const POST = requireApiKey(
     // 总消耗点数 = 单张 × 数量
     const creditsCost = IMAGE_CREDITS_PER_PIECE * n;
 
-    // 1. 校验余额
+    // 1. 校验账号状态
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { credits: true, status: true },
@@ -95,7 +97,10 @@ export const POST = requireApiKey(
         { status: 403 },
       );
     }
-    if (user.credits < creditsCost) {
+
+    // 2. 预扣费（原子操作，防并发超扣）
+    const preDeducted = await preDeductUserCredits(userId, creditsCost);
+    if (!preDeducted) {
       return NextResponse.json(
         {
           message: "点数不足，请充值",
@@ -106,7 +111,7 @@ export const POST = requireApiKey(
       );
     }
 
-    // 2. 调用 Seedream 生图
+    // 3. 调用 Seedream 生图
     let urls: string[];
     try {
       const result = await generateImage({
@@ -116,7 +121,8 @@ export const POST = requireApiKey(
       });
       urls = result.urls;
     } catch (error) {
-      // 调用失败：记录失败日志（不扣点）
+      // 调用失败：退还预扣积分 + 记录失败日志
+      await refundUserCredits(userId, creditsCost).catch(() => {});
       const errorMessage =
         error instanceof Error ? error.message : "Seedream 生图失败";
       await logApiCall({
@@ -138,7 +144,8 @@ export const POST = requireApiKey(
     }
 
     if (urls.length === 0) {
-      // 模型返回成功但未包含图片 URL
+      // 模型返回成功但未包含图片 URL → 退还预扣积分
+      await refundUserCredits(userId, creditsCost).catch(() => {});
       await logApiCall({
         apiKeyId,
         userId,
@@ -157,8 +164,12 @@ export const POST = requireApiKey(
       );
     }
 
-    // 3. 成功：扣点 + 记日志
-    await deductCredits(userId, apiKeyId, creditsCost);
+    // 4. 成功：确认 Key 用量 + 累加 totalUsed + 记日志
+    await prisma.user.update({
+      where: { id: userId },
+      data: { totalUsed: { increment: 1 } },
+    });
+    await confirmKeyUsage(apiKeyId, creditsCost);
     await logApiCall({
       apiKeyId,
       userId,

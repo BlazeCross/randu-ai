@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   requireApiKey,
-  deductCredits,
+  preDeductUserCredits,
+  refundUserCredits,
+  confirmKeyUsage,
   logApiCall,
   getClientIp,
 } from "@/lib/apiKey";
@@ -26,7 +28,7 @@ interface CopyRequestBody {
  *
  * 鉴权：X-API-Key 请求头
  * 请求体：{ prompt: string, style?: string }
- * 流程：验证 Key → 校验余额 → 调用豆包 → 扣点 + 记日志 → 返回文案
+ * 流程：验证 Key → 校验账号 → 预扣费 → 调用豆包 → 成功确认/失败退还 → 记日志
  *
  * 用于 Coze 插件调用火山方舟豆包模型生成文案
  */
@@ -62,7 +64,7 @@ export const POST = requireApiKey(
       );
     }
 
-    // 1. 校验余额
+    // 1. 校验账号状态
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { credits: true, status: true },
@@ -73,7 +75,10 @@ export const POST = requireApiKey(
         { status: 403 },
       );
     }
-    if (user.credits < COPY_CREDITS_COST) {
+
+    // 2. 预扣费（原子操作，防并发超扣）
+    const preDeducted = await preDeductUserCredits(userId, COPY_CREDITS_COST);
+    if (!preDeducted) {
       return NextResponse.json(
         {
           message: "点数不足，请充值",
@@ -84,7 +89,7 @@ export const POST = requireApiKey(
       );
     }
 
-    // 2. 调用豆包生成文案
+    // 3. 调用豆包生成文案
     const systemContent = `你是一个专业的文案专家，请根据用户的要求生成高质量文案。${style ? `写作风格要求：${style}。` : ""}请直接输出文案内容，不要附加多余的解释。`;
 
     let content: string;
@@ -101,7 +106,8 @@ export const POST = requireApiKey(
       content = result.content;
       tokensUsed = result.tokensUsed;
     } catch (error) {
-      // 调用失败：记录失败日志（不扣点）
+      // 调用失败：退还预扣积分 + 记录失败日志
+      await refundUserCredits(userId, COPY_CREDITS_COST).catch(() => {});
       const errorMessage =
         error instanceof Error ? error.message : "豆包文案生成失败";
       await logApiCall({
@@ -122,8 +128,12 @@ export const POST = requireApiKey(
       );
     }
 
-    // 3. 成功：扣点 + 记日志
-    await deductCredits(userId, apiKeyId, COPY_CREDITS_COST);
+    // 4. 成功：确认 Key 用量 + 累加 totalUsed + 记日志
+    await prisma.user.update({
+      where: { id: userId },
+      data: { totalUsed: { increment: 1 } },
+    });
+    await confirmKeyUsage(apiKeyId, COPY_CREDITS_COST);
     await logApiCall({
       apiKeyId,
       userId,
