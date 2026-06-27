@@ -15,22 +15,22 @@ export default function NotFound() {
           <div className="mb-6 text-7xl font-bold tracking-tight text-primary-200">
             404
           </div>
-          <h1 className="mb-3 text-2xl font-bold text-neutral-900">
+          <h1 className="mb-3 text-2xl font-bold text-foreground">
             页面走丢了
           </h1>
-          <p className="mb-8 text-sm text-neutral-600">
+          <p className="mb-8 text-sm text-muted-foreground">
             你访问的页面不存在或已被移除，请检查链接是否正确
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
+              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
             >
               返回首页
             </Link>
             <Link
               href="/workspace"
-              className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-6 py-3 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary hover:text-primary"
+              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               浏览工作流
             </Link>

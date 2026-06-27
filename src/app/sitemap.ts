@@ -21,7 +21,7 @@ const STATIC_ROUTES: Array<{
   { path: "/workspace", changeFrequency: "daily", priority: 0.9 },
   { path: "/docs", changeFrequency: "weekly", priority: 0.8 },
   { path: "/courses", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/api-docs", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/dashboard/api-docs", changeFrequency: "weekly", priority: 0.7 },
   { path: "/login", changeFrequency: "yearly", priority: 0.3 },
   { path: "/register", changeFrequency: "yearly", priority: 0.4 },
 ];

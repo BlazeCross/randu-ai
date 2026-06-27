@@ -212,15 +212,15 @@ export default function WelcomePage() {
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         {/* 顶部欢迎横幅 */}
         <div className="mb-10 text-center">
-          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-3xl shadow-lg shadow-primary-600/25">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-gradient-to-br from-primary-500 to-primary-700 text-3xl shadow-primary-600/25">
             <span role="img" aria-label="欢迎">
               🎉
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {profile?.nickname ? `欢迎，${profile.nickname}！` : "欢迎加入燃渡AI！"}
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-base text-neutral-600 sm:text-lg">
+          <p className="mx-auto mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">
             您的账号已创建成功，{isTrialExpired
               ? "试用期已结束，立即升级套餐解锁全部能力"
               : `当前处于 7 天免费试用期，剩余 ${daysRemaining} 天，全功能开放`}
@@ -253,12 +253,12 @@ export default function WelcomePage() {
 
         {/* 完善昵称卡片（仅在未设置时显示） */}
         {!profile?.nickname && (
-          <div className="mb-8 overflow-hidden rounded-2xl border border-primary-200 bg-white shadow-sm">
-            <div className="border-b border-neutral-100 bg-primary-50/50 px-6 py-4">
-              <h2 className="text-base font-semibold text-neutral-900">
+          <div className="mb-8 overflow-hidden rounded-[var(--radius)] border border-primary-200 bg-card">
+            <div className="border-b border-border bg-primary-50/50 px-6 py-4">
+              <h2 className="text-base font-semibold text-foreground">
                 完善你的资料
               </h2>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="mt-1 text-sm text-muted-foreground">
                 设置一个昵称，方便我们在工作流和通知中称呼你（可随时修改）
               </p>
             </div>
@@ -267,7 +267,7 @@ export default function WelcomePage() {
                 <div className="flex-1">
                   <label
                     htmlFor="nickname"
-                    className="mb-1.5 block text-sm font-medium text-neutral-700"
+                    className="mb-1.5 block text-sm font-medium text-foreground"
                   >
                     昵称
                   </label>
@@ -281,16 +281,16 @@ export default function WelcomePage() {
                     }}
                     placeholder="如：燃渡探索者"
                     maxLength={NICKNAME_MAX_LENGTH}
-                    className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {nickname.length}/{NICKNAME_MAX_LENGTH} 字 · 可选，跳过也没关系
                   </p>
                 </div>
                 <button
                   type="submit"
                   disabled={savingNickname || !nickname.trim()}
-                  className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                  className="rounded-[var(--radius-sm)] bg-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
                 >
                   {savingNickname ? "保存中..." : "保存昵称"}
                 </button>
@@ -304,7 +304,7 @@ export default function WelcomePage() {
 
         {/* 功能引导卡片 */}
         <div className="mb-10">
-          <h2 className="mb-5 text-center text-lg font-semibold text-neutral-900">
+          <h2 className="mb-5 text-center text-lg font-semibold text-foreground">
             从这里开始你的 AI 之旅
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -312,12 +312,12 @@ export default function WelcomePage() {
               <Link
                 key={card.title}
                 href={card.href}
-                className="group relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:border-primary hover:shadow-md"
+                className="group relative overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-md"
               >
                 <div className="flex items-start gap-4">
                   {/* 图标 */}
                   <div
-                    className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${card.gradient} text-white shadow-sm`}
+                    className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-br ${card.gradient} text-white`}
                   >
                     <svg
                       className="h-6 w-6"
@@ -331,10 +331,10 @@ export default function WelcomePage() {
                   </div>
                   {/* 内容 */}
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-semibold text-neutral-900">
+                    <h3 className="text-base font-semibold text-foreground">
                       {card.title}
                     </h3>
-                    <p className="mt-1 text-sm text-neutral-600">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       {card.description}
                     </p>
                     <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors group-hover:text-primary-hover">
@@ -361,11 +361,11 @@ export default function WelcomePage() {
         </div>
 
         {/* 底部跳过按钮 */}
-        <div className="flex flex-col items-center gap-3 border-t border-neutral-200 pt-8">
+        <div className="flex flex-col items-center gap-3 border-t border-border pt-8">
           <button
             type="button"
             onClick={() => router.push("/dashboard")}
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-8 py-3 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
+            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-8 py-3 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
           >
             进入个人中心
             <svg
@@ -382,7 +382,7 @@ export default function WelcomePage() {
               />
             </svg>
           </button>
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-muted-foreground">
             引导页仅在注册后展示一次，可随时通过上方卡片访问各功能
           </p>
         </div>

@@ -22,7 +22,7 @@ export default function robots(): MetadataRoute.Robots {
           "/workspace",
           "/docs",
           "/courses",
-          "/api-docs",
+          "/dashboard/api-docs",
           "/workflow",
         ],
         disallow: [

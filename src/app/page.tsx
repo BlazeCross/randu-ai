@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HeroSection from "@/components/home/HeroSection";
+import HeroCarousel from "@/components/home/HeroCarousel";
 import WorkflowCategories from "@/components/home/WorkflowCategories";
 import AdBanner from "@/components/home/AdBanner";
 import PricingSection from "@/components/home/PricingSection";
@@ -60,7 +60,7 @@ export default function Home() {
       <StructuredData />
       <PageViewTracker page="home" />
       <AnnouncementBanner />
-      <HeroSection />
+      <HeroCarousel />
       <WorkflowCategories />
       <AdBanner />
       <PricingSection />

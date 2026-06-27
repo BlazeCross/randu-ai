@@ -46,7 +46,7 @@ const statusConfig: Record<
   string,
   { label: string; bg: string; text: string }
 > = {
-  pending: { label: "等待中", bg: "bg-neutral-100", text: "text-neutral-600" },
+  pending: { label: "等待中", bg: "bg-muted", text: "text-muted-foreground" },
   running: { label: "运行中", bg: "bg-primary-100", text: "text-primary-700" },
   completed: { label: "已完成", bg: "bg-success-100", text: "text-success-700" },
   failed: { label: "失败", bg: "bg-red-100", text: "text-red-600" },
@@ -128,7 +128,7 @@ export default function HistoryPage() {
   // 加载中
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -155,15 +155,15 @@ export default function HistoryPage() {
   // 未登录
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             请先登录
           </h2>
-          <p className="mb-6 text-sm text-neutral-500">登录后查看任务历史</p>
+          <p className="mb-6 text-sm text-muted-foreground">登录后查看任务历史</p>
           <Link
             href="/login"
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -173,19 +173,19 @@ export default function HistoryPage() {
   }
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 面包屑 + 标题 */}
         <div className="mb-6">
-          <nav className="mb-2 text-xs text-neutral-400">
+          <nav className="mb-2 text-xs text-muted-foreground">
             <Link href="/dashboard" className="hover:text-primary">
               个人中心
             </Link>
             <span className="mx-1">/</span>
-            <span className="text-neutral-600">任务历史</span>
+            <span className="text-muted-foreground">任务历史</span>
           </nav>
-          <h1 className="text-2xl font-bold text-neutral-900">任务历史</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-2xl font-bold text-foreground">任务历史</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             {data ? `共 ${data.total} 条记录` : "查看你的任务执行历史"}
           </p>
         </div>
@@ -196,10 +196,10 @@ export default function HistoryPage() {
             <button
               key={opt.value}
               onClick={() => handleFilterChange(opt.value)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-[var(--radius-sm)] px-4 py-1.5 text-sm font-medium transition-colors ${
                 statusFilter === opt.value
                   ? "bg-primary text-white"
-                  : "border border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50"
+                  : "border border-border bg-card text-muted-foreground hover:bg-muted"
               }`}
             >
               {opt.label}
@@ -209,7 +209,7 @@ export default function HistoryPage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4">
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
             <p className="flex-1 text-sm text-red-700">{error}</p>
             <button
               onClick={() => setError(null)}
@@ -221,7 +221,7 @@ export default function HistoryPage() {
         )}
 
         {/* 历史记录列表 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div className="rounded-[var(--radius)] border border-border bg-card">
           {listLoading ? (
             <div className="flex items-center justify-center py-16">
               <svg
@@ -245,7 +245,7 @@ export default function HistoryPage() {
               </svg>
             </div>
           ) : data && data.items.length > 0 ? (
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {data.items.map((item) => {
                 const status =
                   statusConfig[item.status] || statusConfig.pending;
@@ -261,20 +261,20 @@ export default function HistoryPage() {
                 return (
                   <div
                     key={item.id}
-                    className="flex items-start gap-4 px-4 py-4 transition-colors hover:bg-neutral-50 sm:px-6"
+                    className="flex items-start gap-4 px-4 py-4 transition-colors hover:bg-muted sm:px-6"
                   >
                     {/* 缩略图 / 占位 */}
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-neutral-100">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-muted">
                       {previewUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={previewUrl}
                           alt="缩略图"
-                          className="h-12 w-12 rounded-lg object-cover"
+                          className="h-12 w-12 rounded-[var(--radius-sm)] object-cover"
                         />
                       ) : (
                         <svg
-                          className="h-6 w-6 text-neutral-400"
+                          className="h-6 w-6 text-muted-foreground"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -292,7 +292,7 @@ export default function HistoryPage() {
                     {/* 内容区 */}
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-medium text-neutral-900">
+                        <span className="text-sm font-medium text-foreground">
                           {item.workflow?.name ?? "未知工作流"}
                         </span>
                         <span
@@ -306,7 +306,7 @@ export default function HistoryPage() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-neutral-400">
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
                         <span>{formatDate(item.createdAt)}</span>
                         {item.creditsCost > 0 && (
                           <span>消耗 {item.creditsCost} 积分</span>
@@ -329,7 +329,7 @@ export default function HistoryPage() {
                     <div className="flex flex-shrink-0 gap-2">
                       <button
                         onClick={() => setDetail(item)}
-                        className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+                        className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
                       >
                         详情
                       </button>
@@ -338,7 +338,7 @@ export default function HistoryPage() {
                           href={item.outputUrl!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary-hover"
+                          className="rounded-[var(--radius-sm)] bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary-hover"
                         >
                           下载
                         </a>
@@ -351,9 +351,9 @@ export default function HistoryPage() {
           ) : (
             // 空状态
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <svg
-                  className="h-6 w-6 text-neutral-400"
+                  className="h-6 w-6 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -366,7 +366,7 @@ export default function HistoryPage() {
                   />
                 </svg>
               </div>
-              <p className="text-sm text-neutral-500">暂无任务记录</p>
+              <p className="text-sm text-muted-foreground">暂无任务记录</p>
               <Link
                 href="/workspace"
                 className="mt-4 text-sm font-medium text-primary hover:text-primary-hover"
@@ -383,17 +383,17 @@ export default function HistoryPage() {
             <button
               onClick={() => fetchHistory(page - 1, statusFilter)}
               disabled={page <= 1 || listLoading}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
-            <span className="text-sm text-neutral-500">
+            <span className="text-sm text-muted-foreground">
               {page} / {data.totalPages}
             </span>
             <button
               onClick={() => fetchHistory(page + 1, statusFilter)}
               disabled={page >= data.totalPages || listLoading}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>
@@ -404,19 +404,19 @@ export default function HistoryPage() {
       {/* 详情弹窗 */}
       {detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-2xl rounded-[var(--radius)] bg-card p-6 shadow-2xl">
             <div className="mb-4 flex items-start justify-between">
               <div>
-                <h3 className="text-base font-semibold text-neutral-900">
+                <h3 className="text-base font-semibold text-foreground">
                   任务详情
                 </h3>
-                <p className="mt-0.5 text-sm text-neutral-500">
+                <p className="mt-0.5 text-sm text-muted-foreground">
                   {detail.workflow?.name ?? "未知工作流"}
                 </p>
               </div>
               <button
                 onClick={() => setDetail(null)}
-                className="text-neutral-400 hover:text-neutral-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 <svg
                   className="h-5 w-5"
@@ -437,7 +437,7 @@ export default function HistoryPage() {
             {/* Phase 2.8：按 outputType 渲染结果预览 */}
             {detail.outputUrl && detail.status === "completed" ? (
               detail.workflow?.outputType === "image" ? (
-                <div className="mb-4 overflow-hidden rounded-xl bg-neutral-100">
+                <div className="mb-4 overflow-hidden rounded-[var(--radius-sm)] bg-muted">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={detail.outputUrl}
@@ -446,8 +446,8 @@ export default function HistoryPage() {
                   />
                 </div>
               ) : detail.workflow?.outputType === "text" ? (
-                <div className="mb-4 max-h-[300px] overflow-auto rounded-xl bg-neutral-50 p-4">
-                  <pre className="whitespace-pre-wrap break-all font-mono text-xs text-neutral-800">
+                <div className="mb-4 max-h-[300px] overflow-auto rounded-[var(--radius-sm)] bg-background p-4">
+                  <pre className="whitespace-pre-wrap break-all font-mono text-xs text-foreground">
                     {detail.outputUrl}
                   </pre>
                   <button
@@ -456,13 +456,13 @@ export default function HistoryPage() {
                         ?.writeText(detail.outputUrl || "")
                         .catch(() => {});
                     }}
-                    className="mt-3 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                    className="mt-3 rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                   >
                     复制内容
                   </button>
                 </div>
               ) : (
-                <div className="mb-4 overflow-hidden rounded-xl bg-neutral-100">
+                <div className="mb-4 overflow-hidden rounded-[var(--radius-sm)] bg-muted">
                   <video
                     src={detail.outputUrl}
                     controls
@@ -472,14 +472,14 @@ export default function HistoryPage() {
                 </div>
               )
             ) : detail.status === "failed" ? (
-              <div className="mb-4 rounded-xl bg-red-50 p-4">
+              <div className="mb-4 rounded-[var(--radius-sm)] bg-red-50 p-4">
                 <p className="text-sm text-red-700">
                   {detail.errorMessage || "任务执行失败"}
                 </p>
               </div>
             ) : (
-              <div className="mb-4 rounded-xl bg-neutral-50 p-4 text-center">
-                <p className="text-sm text-neutral-500">
+              <div className="mb-4 rounded-[var(--radius-sm)] bg-background p-4 text-center">
+                <p className="text-sm text-muted-foreground">
                   任务{statusConfig[detail.status]?.label ?? "进行中"}
                 </p>
               </div>
@@ -488,50 +488,50 @@ export default function HistoryPage() {
             {/* 详细信息 */}
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <span className="text-neutral-500">任务 ID</span>
-                <p className="mt-0.5 break-all font-mono text-xs text-neutral-900">
+                <span className="text-muted-foreground">任务 ID</span>
+                <p className="mt-0.5 break-all font-mono text-xs text-foreground">
                   {detail.id}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">Coze Task ID</span>
-                <p className="mt-0.5 break-all font-mono text-xs text-neutral-900">
+                <span className="text-muted-foreground">Coze Task ID</span>
+                <p className="mt-0.5 break-all font-mono text-xs text-foreground">
                   {detail.taskId ?? "-"}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">创建时间</span>
-                <p className="mt-0.5 text-neutral-900">
+                <span className="text-muted-foreground">创建时间</span>
+                <p className="mt-0.5 text-foreground">
                   {formatDate(detail.createdAt)}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">完成时间</span>
-                <p className="mt-0.5 text-neutral-900">
+                <span className="text-muted-foreground">完成时间</span>
+                <p className="mt-0.5 text-foreground">
                   {detail.completedAt ? formatDate(detail.completedAt) : "-"}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">积分消耗</span>
-                <p className="mt-0.5 text-neutral-900">
+                <span className="text-muted-foreground">积分消耗</span>
+                <p className="mt-0.5 text-foreground">
                   {detail.creditsCost > 0 ? `${detail.creditsCost}` : "-"}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">Token 消耗</span>
-                <p className="mt-0.5 text-neutral-900">
+                <span className="text-muted-foreground">Token 消耗</span>
+                <p className="mt-0.5 text-foreground">
                   {detail.tokensUsed > 0 ? `${detail.tokensUsed}` : "-"}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">调用来源</span>
-                <p className="mt-0.5 text-neutral-900">
+                <span className="text-muted-foreground">调用来源</span>
+                <p className="mt-0.5 text-foreground">
                   {detail.source === "api" ? "API 调用" : "页面直调"}
                 </p>
               </div>
               <div>
-                <span className="text-neutral-500">工作流分类</span>
-                <p className="mt-0.5 text-neutral-900">
+                <span className="text-muted-foreground">工作流分类</span>
+                <p className="mt-0.5 text-foreground">
                   {detail.workflow?.category ?? "-"}
                 </p>
               </div>
@@ -544,7 +544,7 @@ export default function HistoryPage() {
                   href={detail.outputUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                  className="flex-1 rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                 >
                   下载结果
                 </a>
@@ -555,7 +555,7 @@ export default function HistoryPage() {
                     router.push(`/workspace/${detail.workflow!.id}/use`);
                     setDetail(null);
                   }}
-                  className="flex-1 rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-center text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                  className="flex-1 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   再次使用
                 </button>

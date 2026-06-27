@@ -167,7 +167,7 @@ export default function NotificationsPage() {
   // 加载中
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -194,15 +194,15 @@ export default function NotificationsPage() {
   // 未登录
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             请先登录
           </h2>
-          <p className="mb-6 text-sm text-neutral-500">登录后查看通知</p>
+          <p className="mb-6 text-sm text-muted-foreground">登录后查看通知</p>
           <Link
             href="/login"
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -212,21 +212,21 @@ export default function NotificationsPage() {
   }
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 面包屑 + 标题 */}
         <div className="mb-6">
-          <nav className="mb-2 text-xs text-neutral-400">
+          <nav className="mb-2 text-xs text-muted-foreground">
             <Link href="/dashboard" className="hover:text-primary">
               个人中心
             </Link>
             <span className="mx-1">/</span>
-            <span className="text-neutral-600">通知中心</span>
+            <span className="text-muted-foreground">通知中心</span>
           </nav>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-neutral-900">通知中心</h1>
-              <p className="mt-1 text-sm text-neutral-500">
+              <h1 className="text-2xl font-bold text-foreground">通知中心</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
                 {data && data.unreadCount > 0
                   ? `你有 ${data.unreadCount} 条未读通知`
                   : "暂无未读通知"}
@@ -236,7 +236,7 @@ export default function NotificationsPage() {
               <button
                 onClick={handleMarkAllRead}
                 disabled={markingAll}
-                className="rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
               >
                 {markingAll ? "处理中..." : "全部已读"}
               </button>
@@ -246,7 +246,7 @@ export default function NotificationsPage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4">
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
             <p className="flex-1 text-sm text-red-700">{error}</p>
             <button
               onClick={() => setError(null)}
@@ -258,7 +258,7 @@ export default function NotificationsPage() {
         )}
 
         {/* 通知列表 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div className="rounded-[var(--radius)] border border-border bg-card">
           {listLoading ? (
             <div className="flex items-center justify-center py-16">
               <svg
@@ -282,7 +282,7 @@ export default function NotificationsPage() {
               </svg>
             </div>
           ) : data && data.items.length > 0 ? (
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {data.items.map((item) => {
                 const iconCfg =
                   typeIconConfig[item.type] || typeIconConfig.system;
@@ -290,7 +290,7 @@ export default function NotificationsPage() {
                   <div
                     key={item.id}
                     className={`px-4 py-4 transition-colors sm:px-6 ${
-                      item.isRead ? "bg-white" : "bg-primary-50/30"
+                      item.isRead ? "bg-card" : "bg-primary-50/30"
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -319,8 +319,8 @@ export default function NotificationsPage() {
                           <span
                             className={`text-sm ${
                               item.isRead
-                                ? "font-medium text-neutral-700"
-                                : "font-semibold text-neutral-900"
+                                ? "font-medium text-foreground"
+                                : "font-semibold text-foreground"
                             }`}
                           >
                             {item.title}
@@ -330,12 +330,12 @@ export default function NotificationsPage() {
                           )}
                         </div>
                         {item.content && (
-                          <p className="mt-1 text-sm text-neutral-500">
+                          <p className="mt-1 text-sm text-muted-foreground">
                             {item.content}
                           </p>
                         )}
                         <div className="mt-2 flex items-center gap-3">
-                          <span className="text-xs text-neutral-400">
+                          <span className="text-xs text-muted-foreground">
                             {formatDate(item.createdAt)}
                           </span>
                           {item.link && (
@@ -350,7 +350,7 @@ export default function NotificationsPage() {
                             <button
                               onClick={() => handleMarkRead(item.id)}
                               disabled={markingId === item.id}
-                              className="text-xs text-neutral-400 hover:text-neutral-600 disabled:opacity-50"
+                              className="text-xs text-muted-foreground hover:text-muted-foreground disabled:opacity-50"
                             >
                               {markingId === item.id ? "处理中..." : "标记已读"}
                             </button>
@@ -365,9 +365,9 @@ export default function NotificationsPage() {
           ) : (
             // 空状态
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <svg
-                  className="h-6 w-6 text-neutral-400"
+                  className="h-6 w-6 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -380,7 +380,7 @@ export default function NotificationsPage() {
                   />
                 </svg>
               </div>
-              <p className="text-sm text-neutral-500">暂无通知</p>
+              <p className="text-sm text-muted-foreground">暂无通知</p>
             </div>
           )}
         </div>
@@ -391,17 +391,17 @@ export default function NotificationsPage() {
             <button
               onClick={() => fetchNotifications(page - 1)}
               disabled={page <= 1 || listLoading}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
-            <span className="text-sm text-neutral-500">
+            <span className="text-sm text-muted-foreground">
               {page} / {data.totalPages}
             </span>
             <button
               onClick={() => fetchNotifications(page + 1)}
               disabled={page >= data.totalPages || listLoading}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>

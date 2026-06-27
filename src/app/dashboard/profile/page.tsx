@@ -158,7 +158,7 @@ export default function ProfilePage() {
   // 加载中
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -185,17 +185,17 @@ export default function ProfilePage() {
   // 未登录
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             请先登录
           </h2>
-          <p className="mb-6 text-sm text-neutral-500">
+          <p className="mb-6 text-sm text-muted-foreground">
             登录后即可管理你的个人资料
           </p>
           <Link
             href="/login"
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -205,26 +205,26 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 面包屑 + 标题 */}
         <div className="mb-6">
-          <nav className="mb-2 text-xs text-neutral-400">
+          <nav className="mb-2 text-xs text-muted-foreground">
             <Link href="/dashboard" className="hover:text-primary">
               个人中心
             </Link>
             <span className="mx-1">/</span>
-            <span className="text-neutral-600">资料设置</span>
+            <span className="text-muted-foreground">资料设置</span>
           </nav>
-          <h1 className="text-2xl font-bold text-neutral-900">资料设置</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-2xl font-bold text-foreground">资料设置</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             管理你的头像和昵称
           </p>
         </div>
 
         {/* 头像卡片 */}
-        <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-base font-semibold text-neutral-900">
+        <div className="mb-6 rounded-[var(--radius)] border border-border bg-card p-6">
+          <h2 className="mb-4 text-base font-semibold text-foreground">
             头像
           </h2>
           <div className="flex items-center gap-5">
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                 <img
                   src={user.avatar}
                   alt="头像"
-                  className="h-20 w-20 rounded-full object-cover ring-2 ring-neutral-200"
+                  className="h-20 w-20 rounded-full object-cover ring-2 ring-ring"
                 />
               ) : (
                 <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 ring-2 ring-primary-100">
@@ -282,11 +282,11 @@ export default function ProfilePage() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
               >
                 {uploadingAvatar ? "上传中..." : "更换头像"}
               </button>
-              <p className="mt-2 text-xs text-neutral-400">
+              <p className="mt-2 text-xs text-muted-foreground">
                 支持 JPG/PNG/WebP/GIF，文件大小不超过 2MB
               </p>
               {avatarMsg && (
@@ -303,8 +303,8 @@ export default function ProfilePage() {
         </div>
 
         {/* 昵称卡片 */}
-        <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-base font-semibold text-neutral-900">
+        <div className="mb-6 rounded-[var(--radius)] border border-border bg-card p-6">
+          <h2 className="mb-4 text-base font-semibold text-foreground">
             昵称
           </h2>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -319,9 +319,9 @@ export default function ProfilePage() {
                 }}
                 maxLength={NICKNAME_MAX_LENGTH}
                 placeholder="请输入昵称"
-                className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
               />
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 {nickname.length}/{NICKNAME_MAX_LENGTH} 字
               </p>
             </div>
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                 !nickname.trim() ||
                 (nicknameDirty && nickname.trim() === (user.nickname ?? ""))
               }
-              className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {savingNickname ? "保存中..." : "保存"}
             </button>
@@ -351,26 +351,26 @@ export default function ProfilePage() {
         </div>
 
         {/* 账号信息卡片（只读） */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-base font-semibold text-neutral-900">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+          <h2 className="mb-4 text-base font-semibold text-foreground">
             账号信息
           </h2>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-500">邮箱</span>
-              <span className="text-sm font-medium text-neutral-900">
+              <span className="text-sm text-muted-foreground">邮箱</span>
+              <span className="text-sm font-medium text-foreground">
                 {user.email || "未绑定"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-500">手机号</span>
-              <span className="text-sm font-medium text-neutral-900">
+              <span className="text-sm text-muted-foreground">手机号</span>
+              <span className="text-sm font-medium text-foreground">
                 {user.phone || "未绑定"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-500">注册时间</span>
-              <span className="text-sm font-medium text-neutral-900">
+              <span className="text-sm text-muted-foreground">注册时间</span>
+              <span className="text-sm font-medium text-foreground">
                 {new Date(user.createdAt).toLocaleString("zh-CN", {
                   year: "numeric",
                   month: "2-digit",

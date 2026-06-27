@@ -66,10 +66,10 @@ export default function SubscriptionCard({
   // 已订阅状态
   if (isSubscribed) {
     return (
-      <div className="rounded-2xl border border-success-200 bg-gradient-to-br from-success-50 to-white p-6 shadow-sm">
+      <div className="rounded-[var(--radius)] border border-success-200 bg-gradient-to-br from-success-50 to-card p-6">
         {/* 头部：套餐状态标签 + 套餐名 */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">
+          <h2 className="text-base font-semibold text-foreground">
             订阅状态
           </h2>
           <span className="inline-flex items-center rounded-full bg-success-100 px-3 py-0.5 text-xs font-medium text-success-700">
@@ -81,15 +81,15 @@ export default function SubscriptionCard({
         <div className="space-y-3">
           {/* 当前套餐 */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-500">当前套餐</span>
-            <span className="text-sm font-semibold text-neutral-900">
+            <span className="text-sm text-muted-foreground">当前套餐</span>
+            <span className="text-sm font-semibold text-foreground">
               {subscriptionPlan ?? "未知套餐"}
             </span>
           </div>
 
           {/* 每日调用限额 */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-500">每日调用限额</span>
+            <span className="text-sm text-muted-foreground">每日调用限额</span>
             <span className="text-sm font-semibold text-primary-700">
               {subscribedPlan ? `${subscribedPlan.dailyLimit} 次/天` : "不限"}
             </span>
@@ -98,12 +98,12 @@ export default function SubscriptionCard({
           {/* 套餐功能（如有） */}
           {subscribedPlan && subscribedPlan.features.length > 0 && (
             <div>
-              <span className="text-sm text-neutral-500">套餐权益</span>
+              <span className="text-sm text-muted-foreground">套餐权益</span>
               <ul className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                 {subscribedPlan.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-1.5 text-xs text-neutral-600"
+                    className="flex items-start gap-1.5 text-xs text-muted-foreground"
                   >
                     <svg
                       className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-success-500"
@@ -131,14 +131,14 @@ export default function SubscriptionCard({
           <button
             type="button"
             onClick={onUpgrade}
-            className="inline-flex flex-1 items-center justify-center rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-50"
+            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] border border-primary-200 bg-card px-4 py-2.5 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-50"
           >
             续费
           </button>
           <button
             type="button"
             onClick={onUpgrade}
-            className="inline-flex flex-1 items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             升级套餐
           </button>
@@ -150,10 +150,10 @@ export default function SubscriptionCard({
   // 试用已过期状态
   if (isTrialExpired) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-white p-6 shadow-sm">
+      <div className="rounded-[var(--radius)] border border-red-200 bg-gradient-to-br from-red-50 to-card p-6">
         {/* 头部：试用已过期标签 */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">
+          <h2 className="text-base font-semibold text-foreground">
             订阅状态
           </h2>
           <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-0.5 text-xs font-medium text-red-600">
@@ -163,7 +163,7 @@ export default function SubscriptionCard({
 
         <div className="space-y-3">
           {/* 状态说明 */}
-          <div className="rounded-xl bg-red-50/60 p-4">
+          <div className="rounded-[var(--radius-sm)] bg-red-50/60 p-4">
             <div className="flex items-start gap-2.5">
               <svg
                 className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
@@ -191,8 +191,8 @@ export default function SubscriptionCard({
 
           {/* 试用到期时间 */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-500">试用到期时间</span>
-            <span className="text-sm font-medium text-neutral-900">
+            <span className="text-sm text-muted-foreground">试用到期时间</span>
+            <span className="text-sm font-medium text-foreground">
               {formatDate(user.trialExpiresAt)}
             </span>
           </div>
@@ -202,7 +202,7 @@ export default function SubscriptionCard({
         <button
           type="button"
           onClick={onUpgrade}
-          className="mt-5 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+          className="mt-5 w-full rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
         >
           升级套餐
         </button>
@@ -212,10 +212,10 @@ export default function SubscriptionCard({
 
   // 试用中状态（默认）
   return (
-    <div className="rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm">
+    <div className="rounded-[var(--radius)] border border-primary-200 bg-gradient-to-br from-primary-50 to-card p-6">
       {/* 头部：试用中标签 */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-neutral-900">
+        <h2 className="text-base font-semibold text-foreground">
           订阅状态
         </h2>
         <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-0.5 text-xs font-medium text-primary-700">
@@ -226,15 +226,15 @@ export default function SubscriptionCard({
       <div className="space-y-4">
         {/* 试用到期时间 */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-neutral-500">试用到期时间</span>
-          <span className="text-sm font-medium text-neutral-900">
+          <span className="text-sm text-muted-foreground">试用到期时间</span>
+          <span className="text-sm font-medium text-foreground">
             {formatDate(user.trialExpiresAt)}
           </span>
         </div>
 
         {/* 剩余天数 */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-neutral-500">剩余天数</span>
+          <span className="text-sm text-muted-foreground">剩余天数</span>
           <span
             className={`text-sm font-bold ${
               user.daysRemaining > 0 ? "text-success-600" : "text-red-600"
@@ -247,12 +247,12 @@ export default function SubscriptionCard({
         {/* 试用使用次数 + 进度条 */}
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm text-neutral-500">试用使用次数</span>
-            <span className="text-sm font-medium text-neutral-900">
+            <span className="text-sm text-muted-foreground">试用使用次数</span>
+            <span className="text-sm font-medium text-foreground">
               {trialUsageCount} / {trialLimit}
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
               className={`h-full rounded-full transition-all ${
                 progressPercent >= 100
@@ -271,7 +271,7 @@ export default function SubscriptionCard({
       <button
         type="button"
         onClick={onUpgrade}
-        className="mt-5 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+        className="mt-5 w-full rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
       >
         升级套餐
       </button>

@@ -84,7 +84,7 @@ export default function InvitePage() {
   // 加载中
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -111,17 +111,17 @@ export default function InvitePage() {
   // 未登录
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             请先登录
           </h2>
-          <p className="mb-6 text-sm text-neutral-500">
+          <p className="mb-6 text-sm text-muted-foreground">
             登录后即可查看你的邀请奖励
           </p>
           <Link
             href="/login"
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -131,26 +131,26 @@ export default function InvitePage() {
   }
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 面包屑 + 标题 */}
         <div className="mb-6">
-          <nav className="mb-2 text-xs text-neutral-400">
+          <nav className="mb-2 text-xs text-muted-foreground">
             <Link href="/dashboard" className="hover:text-primary">
               个人中心
             </Link>
             <span className="mx-1">/</span>
-            <span className="text-neutral-600">邀请奖励</span>
+            <span className="text-muted-foreground">邀请奖励</span>
           </nav>
-          <h1 className="text-2xl font-bold text-neutral-900">邀请奖励</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-2xl font-bold text-foreground">邀请奖励</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             邀请好友注册，双方均可获得积分奖励
           </p>
         </div>
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4">
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
             <svg
               className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
               fill="none"
@@ -176,26 +176,26 @@ export default function InvitePage() {
 
         {/* 加载中骨架屏 */}
         {fetchLoading && !inviteInfo ? (
-          <div className="mb-6 h-48 animate-pulse rounded-2xl bg-white shadow-sm" />
+          <div className="mb-6 h-48 animate-pulse rounded-[var(--radius)] bg-card" />
         ) : null}
 
         {/* 邀请码 + 邀请链接卡片 */}
         {inviteInfo && (
           <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* 邀请码（左侧大卡，占 2 列） */}
-            <div className="rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm lg:col-span-2">
-              <h2 className="mb-4 text-base font-semibold text-neutral-900">
+            <div className="rounded-[var(--radius)] border border-primary-200 bg-gradient-to-br from-primary-50 to-white p-6 lg:col-span-2">
+              <h2 className="mb-4 text-base font-semibold text-foreground">
                 我的邀请码
               </h2>
               <div className="flex items-center gap-3">
-                <code className="flex-1 break-all rounded-xl bg-white px-5 py-4 font-mono text-2xl font-bold tracking-[0.3em] text-primary-700 ring-2 ring-primary-100">
+                <code className="flex-1 break-all rounded-[var(--radius-sm)] bg-card px-5 py-4 font-mono text-2xl font-bold tracking-[0.3em] text-primary-700 ring-2 ring-primary-100">
                   {inviteInfo.inviteCode}
                 </code>
                 <button
                   onClick={() =>
                     copyToClipboard(inviteInfo.inviteCode, "code")
                   }
-                  className="flex-shrink-0 rounded-xl bg-primary px-5 py-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover active:scale-[0.98]"
+                  className="flex-shrink-0 rounded-[var(--radius-sm)] bg-primary px-5 py-4 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-[0.98]"
                 >
                   {copiedField === "code" ? "已复制" : "复制"}
                 </button>
@@ -203,20 +203,20 @@ export default function InvitePage() {
 
               {/* 邀请链接 */}
               <div className="mt-5">
-                <label className="mb-1.5 block text-xs font-medium text-neutral-500">
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                   邀请链接
                 </label>
                 <div className="flex items-center gap-2">
                   <input
                     readOnly
                     value={inviteInfo.inviteUrl}
-                    className="w-full truncate rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                    className="w-full truncate rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm text-foreground outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                   />
                   <button
                     onClick={() =>
                       copyToClipboard(inviteInfo.inviteUrl, "url")
                     }
-                    className="flex-shrink-0 rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
+                    className="flex-shrink-0 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
                   >
                     {copiedField === "url" ? "已复制" : "复制链接"}
                   </button>
@@ -225,13 +225,13 @@ export default function InvitePage() {
             </div>
 
             {/* 二维码占位（右侧 1 列） */}
-            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-base font-semibold text-neutral-900">
+            <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+              <h2 className="mb-4 text-base font-semibold text-foreground">
                 扫码邀请
               </h2>
               <div className="flex items-center justify-center">
                 {/* 二维码占位图：使用纯 CSS 绘制的视觉占位 */}
-                <div className="relative h-40 w-40 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50">
+                <div className="relative h-40 w-40 overflow-hidden rounded-[var(--radius-sm)] border border-border bg-background">
                   <div
                     className="h-full w-full opacity-80"
                     style={{
@@ -240,14 +240,14 @@ export default function InvitePage() {
                       backgroundSize: "20px 20px",
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
-                    <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-neutral-500">
+                  <div className="absolute inset-0 flex items-center justify-center bg-card/40 backdrop-blur-[1px]">
+                    <span className="rounded-full bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground">
                       二维码占位
                     </span>
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-center text-xs text-neutral-400">
+              <p className="mt-3 text-center text-xs text-muted-foreground">
                 扫描二维码即可访问邀请链接
               </p>
             </div>
@@ -257,20 +257,20 @@ export default function InvitePage() {
         {/* 邀请统计 */}
         {inviteInfo && (
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <p className="text-sm text-neutral-500">成功邀请人数</p>
-              <p className="mt-2 text-3xl font-bold text-neutral-900">
+            <div className="rounded-[var(--radius)] border border-border bg-card p-5">
+              <p className="text-sm text-muted-foreground">成功邀请人数</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">
                 {inviteInfo.inviteCount}
-                <span className="ml-1 text-sm font-normal text-neutral-400">
+                <span className="ml-1 text-sm font-normal text-muted-foreground">
                   人
                 </span>
               </p>
             </div>
-            <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <p className="text-sm text-neutral-500">获得奖励积分</p>
+            <div className="rounded-[var(--radius)] border border-border bg-card p-5">
+              <p className="text-sm text-muted-foreground">获得奖励积分</p>
               <p className="mt-2 text-3xl font-bold text-success-600">
                 {inviteInfo.inviteReward}
-                <span className="ml-1 text-sm font-normal text-neutral-400">
+                <span className="ml-1 text-sm font-normal text-muted-foreground">
                   积分
                 </span>
               </p>
@@ -279,11 +279,11 @@ export default function InvitePage() {
         )}
 
         {/* 邀请规则说明 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-base font-semibold text-neutral-900">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+          <h2 className="mb-4 text-base font-semibold text-foreground">
             邀请规则
           </h2>
-          <ul className="space-y-3 text-sm text-neutral-600">
+          <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
               <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success-100 text-xs font-bold text-success-700">
                 1
@@ -325,10 +325,10 @@ export default function InvitePage() {
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-600">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
                 !
               </span>
-              <span className="text-neutral-500">
+              <span className="text-muted-foreground">
                 严禁通过机器批量注册、虚假账号等方式刷邀请奖励，违规账号将被扣除奖励积分并封禁。
               </span>
             </li>

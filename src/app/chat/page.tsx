@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrackPageView } from "@/hooks/useTrack";
+import AppShell from "@/components/layout/AppShell";
 
 // 消息类型
 interface ChatMessage {
@@ -436,279 +437,239 @@ export default function ChatPage() {
   // 加载中
   if (authLoading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
-        <svg
-          className="h-10 w-10 animate-spin text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
-        </svg>
-      </main>
+      <AppShell
+        title="智能体对话"
+        subtitle="文本对话 1 积分/次 · AI 生图 5 积分/次"
+        sidebar={<div className="p-3" />}
+      >
+        <div className="flex h-full items-center justify-center bg-background">
+          <svg
+            className="h-10 w-10 animate-spin text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+        </div>
+      </AppShell>
     );
   }
 
   // 未登录
   if (!user || !token) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
-        <div className="text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-            <svg
-              className="h-8 w-8 text-primary"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-              />
-            </svg>
-          </div>
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
-            请先登录
-          </h2>
-          <p className="mb-6 text-sm text-neutral-500">
-            登录后即可使用智能体对话
-          </p>
-          <button
-            onClick={() => router.push("/login")}
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
-          >
-            前往登录
-          </button>
-        </div>
-      </main>
-    );
-  }
-
-  return (
-    <main className="flex flex-1 flex-col bg-neutral-50">
-      {/* 顶部标题栏 */}
-      <div className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white">
+      <AppShell
+        title="智能体对话"
+        subtitle="文本对话 1 积分/次 · AI 生图 5 积分/次"
+        sidebar={<div className="p-3" />}
+      >
+        <div className="flex h-full items-center justify-center bg-background px-4">
+          <div className="text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent">
               <svg
-                className="h-6 w-6"
+                className="h-8 w-8 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                strokeWidth={1.8}
+                strokeWidth={1.5}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                 />
               </svg>
-            </span>
-            <div>
-              <h1 className="text-lg font-bold text-neutral-900">智能体对话</h1>
-              <p className="text-xs text-neutral-500">
-                文本对话 1 积分/次 · AI 生图 5 积分/次
-              </p>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* 积分余额 */}
-            {creditsBalance !== null && (
-              <span className="hidden items-center gap-1 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 sm:flex">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                  />
-                </svg>
-                {creditsBalance} 积分
-              </span>
-            )}
-            {messages.length > 0 && (
-              <button
-                onClick={handleClear}
-                className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
-              >
-                清空对话
-              </button>
-            )}
+            <h2 className="mb-2 text-xl font-semibold text-foreground">
+              请先登录
+            </h2>
+            <p className="mb-6 text-sm text-muted-foreground">
+              登录后即可使用智能体对话
+            </p>
+            <button
+              onClick={() => router.push("/login")}
+              className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-all hover:bg-primary-hover"
+            >
+              前往登录
+            </button>
           </div>
         </div>
-      </div>
+      </AppShell>
+    );
+  }
 
-      {/* 消息列表 */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
-          {/* 空状态：欢迎语 */}
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100">
-                <svg
-                  className="h-8 w-8 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  />
-                </svg>
-              </div>
-              <h2 className="mb-2 text-lg font-semibold text-neutral-900">
-                你好，我是燃渡AI助手
-              </h2>
-              <p className="mb-6 max-w-md text-sm text-neutral-500">
-                我可以帮你回答问题、撰写文案、提供建议。直接输入"画一张..."还可以生成图片哦！
-              </p>
-              {/* 快捷提问 */}
-              <div className="flex flex-wrap justify-center gap-2">
-                {[
-                  "帮我写一段产品介绍",
-                  "画一只穿着汉服的猫",
-                  "推荐三本好看的科幻小说",
-                  "如何提高编程能力？",
-                ].map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => setInput(q)}
-                    className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-600 transition-colors hover:bg-neutral-50"
-                  >
-                    {q}
-                  </button>
-                ))}
+  return (
+    <AppShell
+      title="智能体对话"
+      subtitle="文本对话 1 积分/次 · AI 生图 5 积分/次"
+      sidebar={
+        <div className="flex flex-col gap-2 p-3">
+          {/* 新对话按钮 */}
+          <button
+            onClick={handleClear}
+            className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
+          >
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.7}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            新对话
+          </button>
+
+          {/* 快捷提问 */}
+          <div className="mt-4">
+            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              快捷提问
+            </div>
+            {[
+              "帮我写一段产品介绍",
+              "画一只穿着汉服的猫",
+              "推荐三本好看的科幻小说",
+              "如何提高编程能力？",
+            ].map((q) => (
+              <button
+                key={q}
+                onClick={() => setInput(q)}
+                className="block w-full rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+
+          {/* 积分余额 (底部) */}
+          {creditsBalance !== null && (
+            <div className="mt-auto rounded-[var(--radius-sm)] bg-muted p-3">
+              <div className="text-xs text-muted-foreground">积分余额</div>
+              <div className="text-lg font-semibold text-foreground">
+                {creditsBalance} 点
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-3 ${
-                    msg.role === "user" ? "flex-row-reverse" : ""
-                  }`}
-                >
-                  {/* 头像 */}
+          )}
+        </div>
+      }
+    >
+      <div className="flex h-full flex-col">
+        {/* 消息列表 */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+            {/* 空状态：欢迎语 */}
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-accent">
+                  <svg
+                    className="h-8 w-8 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="mb-2 text-lg font-semibold text-foreground">
+                  你好，我是燃渡AI助手
+                </h2>
+                <p className="mb-6 max-w-md text-sm text-muted-foreground">
+                  我可以帮你回答问题、撰写文案、提供建议。直接输入"画一张..."还可以生成图片哦！
+                </p>
+                {/* 快捷提问 */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {[
+                    "帮我写一段产品介绍",
+                    "画一只穿着汉服的猫",
+                    "推荐三本好看的科幻小说",
+                    "如何提高编程能力？",
+                  ].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => setInput(q)}
+                      className="rounded-full border border-border bg-background px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((msg) => (
                   <div
-                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${
-                      msg.role === "user"
-                        ? "bg-primary-100 text-primary-700"
-                        : "bg-gradient-to-br from-primary-500 to-primary-700 text-white"
+                    key={msg.id}
+                    className={`flex gap-3 ${
+                      msg.role === "user" ? "flex-row-reverse" : ""
                     }`}
                   >
-                    {msg.role === "user" ? "我" : "AI"}
-                  </div>
-                  {/* 消息内容 */}
-                  <div
-                    className={`group flex max-w-[80%] flex-col ${
-                      msg.role === "user" ? "items-end" : "items-start"
-                    }`}
-                  >
+                    {/* 头像 */}
                     <div
-                      className={`rounded-2xl px-4 py-2.5 text-sm ${
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                         msg.role === "user"
-                          ? "bg-primary text-white"
-                          : "bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200"
+                          ? "bg-accent text-accent-foreground"
+                          : "bg-gradient-to-br from-primary-500 to-primary-700 text-white"
                       }`}
                     >
-                      {/* 图片类型消息 */}
-                      {msg.type === "image" && msg.imageUrl ? (
-                        <div className="space-y-2">
-                          <p className="whitespace-pre-wrap break-words">
-                            {msg.content}
-                          </p>
-                          <div className="overflow-hidden rounded-xl">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={msg.imageUrl}
-                              alt="AI 生成图片"
-                              className="max-w-full rounded-xl"
-                            />
-                          </div>
-                          <a
-                            href={msg.imageUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-1 text-xs font-medium ${
-                              msg.role === "user"
-                                ? "text-primary-100"
-                                : "text-primary hover:text-primary-hover"
-                            }`}
-                          >
-                            <svg
-                              className="h-3.5 w-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                              />
-                            </svg>
-                            下载图片
-                          </a>
-                        </div>
-                      ) : (
-                        <p className="whitespace-pre-wrap break-words">
-                          {msg.content}
-                        </p>
-                      )}
+                      {msg.role === "user" ? "我" : "AI"}
                     </div>
-                    {/* 时间 + 操作按钮（仅 AI 消息显示操作按钮） */}
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="text-[10px] text-neutral-400">
-                        {formatTime(msg.createdAt)}
-                      </span>
-                      {msg.role === "assistant" && (
-                        <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                          {/* 复制按钮 */}
-                          <button
-                            onClick={() => handleCopy(msg)}
-                            className="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
-                            aria-label="复制"
-                            title="复制"
-                          >
-                            {copiedId === msg.id ? (
-                              <svg
-                                className="h-3.5 w-3.5 text-green-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            ) : (
+                    {/* 消息内容 */}
+                    <div
+                      className={`group flex max-w-[80%] flex-col ${
+                        msg.role === "user" ? "items-end" : "items-start"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-[var(--radius)] px-4 py-2.5 text-sm ${
+                          msg.role === "user"
+                            ? "bg-primary text-white"
+                            : "bg-card text-foreground shadow-sm ring-1 ring-border"
+                        }`}
+                      >
+                        {/* 图片类型消息 */}
+                        {msg.type === "image" && msg.imageUrl ? (
+                          <div className="space-y-2">
+                            <p className="whitespace-pre-wrap break-words">
+                              {msg.content}
+                            </p>
+                            <div className="overflow-hidden rounded-[var(--radius-sm)]">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={msg.imageUrl}
+                                alt="AI 生成图片"
+                                className="max-w-full rounded-[var(--radius-sm)]"
+                              />
+                            </div>
+                            <a
+                              href={msg.imageUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`inline-flex items-center gap-1 text-xs font-medium ${
+                                msg.role === "user"
+                                  ? "text-primary-100"
+                                  : "text-primary hover:text-primary-hover"
+                              }`}
+                            >
                               <svg
                                 className="h-3.5 w-3.5"
                                 fill="none"
@@ -719,85 +680,118 @@ export default function ChatPage() {
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                                 />
                               </svg>
-                            )}
-                          </button>
-                          {/* 重新生成按钮 */}
-                          <button
-                            onClick={() => handleRegenerate(msg.id)}
-                            disabled={sending}
-                            className="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-40"
-                            aria-label="重新生成"
-                            title="重新生成"
-                          >
-                            <svg
-                              className="h-3.5 w-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
+                              下载图片
+                            </a>
+                          </div>
+                        ) : (
+                          <p className="whitespace-pre-wrap break-words">
+                            {msg.content}
+                          </p>
+                        )}
+                      </div>
+                      {/* 时间 + 操作按钮（仅 AI 消息显示操作按钮） */}
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatTime(msg.createdAt)}
+                        </span>
+                        {msg.role === "assistant" && (
+                          <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                            {/* 复制按钮 */}
+                            <button
+                              onClick={() => handleCopy(msg)}
+                              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                              aria-label="复制"
+                              title="复制"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
+                              {copiedId === msg.id ? (
+                                <svg
+                                  className="h-3.5 w-3.5 text-green-500"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="h-3.5 w-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                            {/* 重新生成按钮 */}
+                            <button
+                              onClick={() => handleRegenerate(msg.id)}
+                              disabled={sending}
+                              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
+                              aria-label="重新生成"
+                              title="重新生成"
+                            >
+                              <svg
+                                className="h-3.5 w-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-              {/* 发送中加载态 */}
-              {sending && (
-                <div className="flex gap-3">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-sm font-medium text-white">
-                    AI
-                  </div>
-                  <div className="flex items-center rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-neutral-200">
-                    <div className="flex gap-1">
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-neutral-400 [animation-delay:-0.3s]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-neutral-400 [animation-delay:-0.15s]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-neutral-400" />
+                {/* 发送中加载态 */}
+                {sending && (
+                  <div className="flex gap-3">
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-sm font-medium text-white">
+                      AI
+                    </div>
+                    <div className="flex items-center rounded-[var(--radius)] bg-card px-4 py-3 shadow-sm ring-1 ring-border">
+                      <div className="flex gap-1">
+                        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+                        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+                        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+                )}
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
-      </div>
 
-      {/* 错误提示 */}
-      {error && (
-        <div className="mx-auto w-full max-w-4xl px-4 sm:px-6">
-          <div className="mb-2 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3">
-            <svg
-              className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p className="flex-1 text-sm text-red-700">{error}</p>
-            <button
-              onClick={() => setError(null)}
-              className="text-red-400 hover:text-red-600"
-            >
+        {/* 错误提示 */}
+        {error && (
+          <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 flex-none">
+            <div className="mb-2 flex items-start gap-3 rounded-[var(--radius-sm)] border border-destructive/30 bg-destructive/10 p-3">
               <svg
-                className="h-4 w-4"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -806,51 +800,116 @@ export default function ChatPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 输入区 */}
-      <div className="border-t border-neutral-200 bg-white">
-        <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
-          <div className="flex items-end gap-2">
-            {/* 隐藏的文件上传 input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-
-            {/* 语音输入按钮（不支持时隐藏） */}
-            {speechSupported && (
+              <p className="flex-1 text-sm text-destructive">{error}</p>
               <button
-                onClick={toggleRecording}
-                disabled={sending}
-                className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-all disabled:opacity-50 ${
-                  isRecording
-                    ? "bg-red-500 text-white animate-pulse"
-                    : "border border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50"
-                }`}
-                aria-label={isRecording ? "停止录音" : "开始语音输入"}
-                title={isRecording ? "停止录音" : "语音输入"}
+                onClick={() => setError(null)}
+                className="text-destructive/70 hover:text-destructive"
               >
-                {isRecording ? (
-                  // 停止 / 录音中方块图标
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 输入区 */}
+        <div className="flex-none border-t border-border bg-background">
+          <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
+            <div className="flex items-end gap-2">
+              {/* 隐藏的文件上传 input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+
+              {/* 语音输入按钮（不支持时隐藏） */}
+              {speechSupported && (
+                <button
+                  onClick={toggleRecording}
+                  disabled={sending}
+                  className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] transition-all disabled:opacity-50 ${
+                    isRecording
+                      ? "bg-destructive text-white animate-pulse"
+                      : "border border-border bg-background text-muted-foreground hover:bg-muted"
+                  }`}
+                  aria-label={isRecording ? "停止录音" : "开始语音输入"}
+                  title={isRecording ? "停止录音" : "语音输入"}
+                >
+                  {isRecording ? (
+                    // 停止 / 录音中方块图标
+                    <svg
+                      className="h-5 w-5"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <rect x="6" y="6" width="12" height="12" rx="2" />
+                    </svg>
+                  ) : (
+                    // 麦克风图标
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                      />
+                    </svg>
+                  )}
+                </button>
+              )}
+
+              {/* 文件上传按钮 */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || sending}
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-background text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                aria-label="上传图片"
+                title="上传图片"
+              >
+                {uploading ? (
                   <svg
-                    className="h-5 w-5"
-                    fill="currentColor"
+                    className="h-5 w-5 animate-spin"
+                    fill="none"
                     viewBox="0 0 24 24"
                   >
-                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                 ) : (
-                  // 麦克风图标
+                  // 回形针图标
                   <svg
                     className="h-5 w-5"
                     fill="none"
@@ -861,115 +920,69 @@ export default function ChatPage() {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
                     />
                   </svg>
                 )}
               </button>
-            )}
 
-            {/* 文件上传按钮 */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading || sending}
-              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-neutral-300 bg-white text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
-              aria-label="上传图片"
-              title="上传图片"
-            >
-              {uploading ? (
-                <svg
-                  className="h-5 w-5 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="输入消息，Enter 发送，Shift+Enter 换行..."
+                rows={1}
+                maxLength={4000}
+                className="flex-1 resize-none rounded-[var(--radius-sm)] border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                style={{ maxHeight: "120px" }}
+                disabled={sending}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || sending}
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-primary text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                aria-label="发送"
+              >
+                {sending ? (
+                  <svg
+                    className="h-5 w-5 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
                     stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-              ) : (
-                // 回形针图标
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                  />
-                </svg>
-              )}
-            </button>
-
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="输入消息，Enter 发送，Shift+Enter 换行..."
-              rows={1}
-              maxLength={4000}
-              className="flex-1 resize-none rounded-xl border border-neutral-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              style={{ maxHeight: "120px" }}
-              disabled={sending}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || sending}
-              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
-              aria-label="发送"
-            >
-              {sending ? (
-                <svg
-                  className="h-5 w-5 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  />
-                </svg>
-              )}
-            </button>
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }

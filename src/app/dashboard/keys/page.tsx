@@ -45,8 +45,8 @@ const keyStatusConfig: Record<
   },
   inactive: {
     label: "停用",
-    bg: "bg-neutral-100",
-    text: "text-neutral-600",
+    bg: "bg-muted",
+    text: "text-muted-foreground",
   },
   revoked: {
     label: "已吊销",
@@ -320,7 +320,7 @@ export default function KeysPage() {
   // 加载中
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -347,17 +347,17 @@ export default function KeysPage() {
   // 未登录
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             请先登录
           </h2>
-          <p className="mb-6 text-sm text-neutral-500">
+          <p className="mb-6 text-sm text-muted-foreground">
             登录后即可管理你的 API Key
           </p>
           <Link
             href="/login"
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -367,29 +367,29 @@ export default function KeysPage() {
   }
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 面包屑 + 标题 */}
         <div className="mb-6">
-          <nav className="mb-2 text-xs text-neutral-400">
+          <nav className="mb-2 text-xs text-muted-foreground">
             <Link href="/dashboard" className="hover:text-primary">
               个人中心
             </Link>
             <span className="mx-1">/</span>
-            <span className="text-neutral-600">API Key 管理</span>
+            <span className="text-muted-foreground">API Key 管理</span>
           </nav>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-neutral-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 API Key 管理
               </h1>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 管理用于调用对外 API 的密钥
               </p>
             </div>
             <button
               onClick={() => setShowCreateForm((v) => !v)}
-              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+              className="rounded-[var(--radius-sm)] bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
             >
               {showCreateForm ? "取消" : "创建新 Key"}
             </button>
@@ -397,17 +397,17 @@ export default function KeysPage() {
         </div>
 
         {/* 余额提示 */}
-        <div className="mb-6 rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 to-white p-5 shadow-sm">
+        <div className="mb-6 rounded-[var(--radius)] border border-primary-200 bg-gradient-to-br from-primary-50 to-white p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-neutral-500">当前余额</p>
+              <p className="text-sm text-muted-foreground">当前余额</p>
               <p className="mt-1 text-2xl font-bold text-primary-700">
                 {user.credits} 点
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-neutral-500">累计调用</p>
-              <p className="mt-1 text-lg font-semibold text-neutral-900">
+              <p className="text-sm text-muted-foreground">累计调用</p>
+              <p className="mt-1 text-lg font-semibold text-foreground">
                 {user.totalUsed} 次
               </p>
             </div>
@@ -416,13 +416,13 @@ export default function KeysPage() {
 
         {/* 创建表单 */}
         {showCreateForm && (
-          <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-base font-semibold text-neutral-900">
+          <div className="mb-6 rounded-[var(--radius)] border border-border bg-card p-6">
+            <h2 className="mb-4 text-base font-semibold text-foreground">
               创建新 API Key
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="sm:col-span-3">
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
                   Key 名称
                 </label>
                 <input
@@ -431,14 +431,14 @@ export default function KeysPage() {
                   onChange={(e) => setNewKeyName(e.target.value)}
                   maxLength={30}
                   placeholder="例如：生产环境调用"
-                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   用于标识 Key 的用途，最多 30 字
                 </p>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
                   QPS 限制（次/秒）
                 </label>
                 <input
@@ -449,14 +449,14 @@ export default function KeysPage() {
                   onChange={(e) =>
                     setNewQpsLimit(Number(e.target.value) || 0)
                   }
-                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   0 = 不限制，范围 0-100
                 </p>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
                   每日限额（次/天）
                 </label>
                 <input
@@ -467,9 +467,9 @@ export default function KeysPage() {
                   onChange={(e) =>
                     setNewDailyLimit(Number(e.target.value) || 0)
                   }
-                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   0 = 不限制，范围 0-100000
                 </p>
               </div>
@@ -477,7 +477,7 @@ export default function KeysPage() {
                 <button
                   onClick={handleCreate}
                   disabled={creating || !newKeyName.trim()}
-                  className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-[var(--radius-sm)] bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {creating ? "创建中..." : "创建"}
                 </button>
@@ -488,7 +488,7 @@ export default function KeysPage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4">
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
             <svg
               className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
               fill="none"
@@ -513,7 +513,7 @@ export default function KeysPage() {
         )}
 
         {/* Key 列表 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div className="rounded-[var(--radius)] border border-border bg-card">
           {listLoading ? (
             <div className="flex items-center justify-center py-16">
               <svg
@@ -537,7 +537,7 @@ export default function KeysPage() {
               </svg>
             </div>
           ) : keys.length > 0 ? (
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {keys.map((key) => {
                 const status =
                   keyStatusConfig[key.status] || keyStatusConfig.active;
@@ -545,13 +545,13 @@ export default function KeysPage() {
                 return (
                   <div
                     key={key.id}
-                    className="px-4 py-4 transition-colors hover:bg-neutral-50 sm:px-6"
+                    className="px-4 py-4 transition-colors hover:bg-muted sm:px-6"
                   >
                     <div className="flex items-start justify-between gap-4">
                       {/* 左侧：Key 信息 */}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-semibold text-neutral-900">
+                          <span className="text-sm font-semibold text-foreground">
                             {key.name}
                           </span>
                           <span
@@ -562,12 +562,12 @@ export default function KeysPage() {
                         </div>
                         {/* Key 前缀（用于识别） */}
                         <div className="mt-1.5 flex items-center gap-1.5">
-                          <code className="rounded bg-neutral-100 px-2 py-0.5 font-mono text-xs text-neutral-600">
+                          <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">
                             {key.keyPrefix}••••••••
                           </code>
                           <button
                             onClick={() => copyToClipboard(key.keyPrefix)}
-                            className="text-neutral-400 hover:text-primary-600"
+                            className="text-muted-foreground hover:text-primary-600"
                             title="复制前缀"
                           >
                             <svg
@@ -586,12 +586,12 @@ export default function KeysPage() {
                           </button>
                         </div>
                         {/* 用量统计 */}
-                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-400">
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           <span>
-                            调用 <strong className="text-neutral-600">{key.totalCalls}</strong> 次
+                            调用 <strong className="text-muted-foreground">{key.totalCalls}</strong> 次
                           </span>
                           <span>
-                            消耗 <strong className="text-neutral-600">{key.creditsUsed}</strong> 点
+                            消耗 <strong className="text-muted-foreground">{key.creditsUsed}</strong> 点
                           </span>
                           {key.lastUsedAt && (
                             <span>最近使用 {formatDate(key.lastUsedAt)}</span>
@@ -604,7 +604,7 @@ export default function KeysPage() {
                         </div>
                         {/* 频率限制（Phase 3.4） */}
                         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-                          <span className="inline-flex items-center gap-1 text-neutral-400">
+                          <span className="inline-flex items-center gap-1 text-muted-foreground">
                             <svg
                               className="h-3 w-3"
                               fill="none"
@@ -619,11 +619,11 @@ export default function KeysPage() {
                               />
                             </svg>
                             QPS：
-                            <strong className="text-neutral-600">
+                            <strong className="text-muted-foreground">
                               {key.qpsLimit === 0 ? "不限" : `${key.qpsLimit}/s`}
                             </strong>
                           </span>
-                          <span className="inline-flex items-center gap-1 text-neutral-400">
+                          <span className="inline-flex items-center gap-1 text-muted-foreground">
                             <svg
                               className="h-3 w-3"
                               fill="none"
@@ -638,7 +638,7 @@ export default function KeysPage() {
                               />
                             </svg>
                             每日：
-                            <strong className="text-neutral-600">
+                            <strong className="text-muted-foreground">
                               {key.dailyLimit === 0
                                 ? "不限"
                                 : `${key.dailyUsed}/${key.dailyLimit}`}
@@ -653,7 +653,7 @@ export default function KeysPage() {
                           <button
                             onClick={() => openEditLimit(key)}
                             disabled={actionKeyId === key.id}
-                            className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900 disabled:opacity-50"
+                            className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:opacity-50"
                           >
                             限额
                           </button>
@@ -662,7 +662,7 @@ export default function KeysPage() {
                               setConfirmAction({ type: "reset", key })
                             }
                             disabled={actionKeyId === key.id}
-                            className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900 disabled:opacity-50"
+                            className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:opacity-50"
                           >
                             重置
                           </button>
@@ -671,7 +671,7 @@ export default function KeysPage() {
                               setConfirmAction({ type: "revoke", key })
                             }
                             disabled={actionKeyId === key.id}
-                            className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+                            className="rounded-[var(--radius-sm)] border border-red-300 bg-card px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
                           >
                             吊销
                           </button>
@@ -685,9 +685,9 @@ export default function KeysPage() {
           ) : (
             // 空状态
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <svg
-                  className="h-6 w-6 text-neutral-400"
+                  className="h-6 w-6 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -700,8 +700,8 @@ export default function KeysPage() {
                   />
                 </svg>
               </div>
-              <p className="text-sm text-neutral-500">暂无 API Key</p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="text-sm text-muted-foreground">暂无 API Key</p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 创建 Key 后即可通过 X-API-Key 调用对外 API
               </p>
             </div>
@@ -712,7 +712,7 @@ export default function KeysPage() {
       {/* 明文 Key 展示弹窗（创建/重置后一次性显示） */}
       {createdKey && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-lg rounded-[var(--radius)] bg-card p-6 shadow-2xl">
             <div className="mb-4 flex items-start gap-3">
               <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100">
                 <svg
@@ -730,10 +730,10 @@ export default function KeysPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-base font-semibold text-neutral-900">
+                <h3 className="text-base font-semibold text-foreground">
                   Key 已生成
                 </h3>
-                <p className="mt-0.5 text-sm text-neutral-500">
+                <p className="mt-0.5 text-sm text-muted-foreground">
                   请立即复制保存，关闭后无法再次查看
                 </p>
               </div>
@@ -741,16 +741,16 @@ export default function KeysPage() {
 
             {/* Key 明文 */}
             <div className="mb-4">
-              <label className="mb-1.5 block text-xs font-medium text-neutral-500">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                 API Key（明文）
               </label>
               <div className="flex items-center gap-2">
-                <code className="flex-1 break-all rounded-xl bg-neutral-100 px-4 py-3 font-mono text-sm text-neutral-900">
+                <code className="flex-1 break-all rounded-[var(--radius-sm)] bg-muted px-4 py-3 font-mono text-sm text-foreground">
                   {createdKey.key}
                 </code>
                 <button
                   onClick={() => copyToClipboard(createdKey.key)}
-                  className="flex-shrink-0 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                  className="flex-shrink-0 rounded-[var(--radius-sm)] bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                 >
                   {copied ? "已复制" : "复制"}
                 </button>
@@ -758,11 +758,11 @@ export default function KeysPage() {
             </div>
 
             {/* 使用说明 */}
-            <div className="mb-5 rounded-xl bg-neutral-50 p-4">
-              <p className="text-xs font-medium text-neutral-600">
+            <div className="mb-5 rounded-[var(--radius-sm)] bg-background p-4">
+              <p className="text-xs font-medium text-muted-foreground">
                 使用方式：
               </p>
-              <p className="mt-1 font-mono text-xs text-neutral-500">
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
                 curl -H &quot;X-API-Key: {createdKey.key}&quot; \\<br />
                 &nbsp;&nbsp;https://randuai.cn/api/external/generate/copy
               </p>
@@ -773,7 +773,7 @@ export default function KeysPage() {
                 setCreatedKey(null);
                 setCopied(false);
               }}
-              className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
             >
               我已保存，关闭
             </button>
@@ -784,31 +784,31 @@ export default function KeysPage() {
       {/* 确认弹窗：吊销 / 重置 */}
       {confirmAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="mb-2 text-base font-semibold text-neutral-900">
+          <div className="w-full max-w-md rounded-[var(--radius)] bg-card p-6 shadow-2xl">
+            <h3 className="mb-2 text-base font-semibold text-foreground">
               {confirmAction.type === "revoke"
                 ? "确认吊销此 Key？"
                 : "确认重置此 Key？"}
             </h3>
-            <p className="mb-5 text-sm text-neutral-500">
+            <p className="mb-5 text-sm text-muted-foreground">
               {confirmAction.type === "revoke"
                 ? `吊销后，使用此 Key 的所有 API 请求将立即失败（返回 401）。此操作不可撤销。`
                 : `重置后，将生成新的明文 Key，旧 Key 立即失效。请确保已通知所有使用方更新。`}
             </p>
-            <div className="mb-5 rounded-xl bg-neutral-50 p-3">
-              <p className="text-xs text-neutral-500">Key 名称</p>
-              <p className="mt-0.5 text-sm font-medium text-neutral-900">
+            <div className="mb-5 rounded-[var(--radius-sm)] bg-background p-3">
+              <p className="text-xs text-muted-foreground">Key 名称</p>
+              <p className="mt-0.5 text-sm font-medium text-foreground">
                 {confirmAction.key.name}
               </p>
-              <p className="mt-2 text-xs text-neutral-500">Key 前缀</p>
-              <code className="mt-0.5 block font-mono text-xs text-neutral-600">
+              <p className="mt-2 text-xs text-muted-foreground">Key 前缀</p>
+              <code className="mt-0.5 block font-mono text-xs text-muted-foreground">
                 {confirmAction.key.keyPrefix}••••••••
               </code>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmAction(null)}
-                className="flex-1 rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex-1 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
               >
                 取消
               </button>
@@ -819,7 +819,7 @@ export default function KeysPage() {
                     : handleReset(confirmAction.key.id)
                 }
                 disabled={actionKeyId === confirmAction.key.id}
-                className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50 ${
+                className={`flex-1 rounded-[var(--radius-sm)] px-4 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50 ${
                   confirmAction.type === "revoke"
                     ? "bg-red-600 hover:bg-red-700"
                     : "bg-primary hover:bg-primary-hover"
@@ -839,26 +839,26 @@ export default function KeysPage() {
       {/* 编辑频率限制 / Webhook 弹窗 */}
       {editLimitKey && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="mb-2 text-base font-semibold text-neutral-900">
+          <div className="w-full max-w-md rounded-[var(--radius)] bg-card p-6 shadow-2xl">
+            <h3 className="mb-2 text-base font-semibold text-foreground">
               频率限制 / Webhook
             </h3>
-            <p className="mb-5 text-sm text-neutral-500">
+            <p className="mb-5 text-sm text-muted-foreground">
               调整 QPS 限制、每日调用限额，配置 Webhook 回调地址。
             </p>
-            <div className="mb-5 rounded-xl bg-neutral-50 p-3">
-              <p className="text-xs text-neutral-500">Key 名称</p>
-              <p className="mt-0.5 text-sm font-medium text-neutral-900">
+            <div className="mb-5 rounded-[var(--radius-sm)] bg-background p-3">
+              <p className="text-xs text-muted-foreground">Key 名称</p>
+              <p className="mt-0.5 text-sm font-medium text-foreground">
                 {editLimitKey.name}
               </p>
-              <p className="mt-2 text-xs text-neutral-500">Key 前缀</p>
-              <code className="mt-0.5 block font-mono text-xs text-neutral-600">
+              <p className="mt-2 text-xs text-muted-foreground">Key 前缀</p>
+              <code className="mt-0.5 block font-mono text-xs text-muted-foreground">
                 {editLimitKey.keyPrefix}••••••••
               </code>
             </div>
             <div className="mb-5 space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
                   QPS 限制（次/秒）
                 </label>
                 <input
@@ -869,14 +869,14 @@ export default function KeysPage() {
                   onChange={(e) =>
                     setEditQpsLimit(Number(e.target.value) || 0)
                   }
-                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   0 = 不限制，范围 0-100
                 </p>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
                   每日限额（次/天）
                 </label>
                 <input
@@ -887,14 +887,14 @@ export default function KeysPage() {
                   onChange={(e) =>
                     setEditDailyLimit(Number(e.target.value) || 0)
                   }
-                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   0 = 不限制，范围 0-100000
                 </p>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="mb-1.5 block text-sm font-medium text-foreground">
                   Webhook 回调地址
                 </label>
                 <input
@@ -902,9 +902,9 @@ export default function KeysPage() {
                   value={editWebhookUrl}
                   onChange={(e) => setEditWebhookUrl(e.target.value)}
                   placeholder="https://your-server.com/webhook"
-                  className="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   任务完成时主动通知此地址（HMAC-SHA256 签名）。留空 = 仅轮询。
                 </p>
                 {editLimitKey.webhookUrl && !newWebhookSecret && (
@@ -917,7 +917,7 @@ export default function KeysPage() {
 
             {/* 首次生成的 webhookSecret 明文展示（仅一次） */}
             {newWebhookSecret && (
-              <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <div className="mb-5 rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 p-4">
                 <p className="text-sm font-semibold text-amber-900">
                   Webhook 签名密钥（仅显示一次）
                 </p>
@@ -925,14 +925,14 @@ export default function KeysPage() {
                   请立即复制保存。此密钥用于校验回调请求的 X-Webhook-Signature
                   头，丢失后只能重新设置 Webhook 地址来重新生成。
                 </p>
-                <code className="mt-3 block break-all rounded-lg bg-white p-3 font-mono text-xs text-neutral-900">
+                <code className="mt-3 block break-all rounded-[var(--radius-sm)] bg-card p-3 font-mono text-xs text-foreground">
                   {newWebhookSecret}
                 </code>
                 <div className="mt-3 flex gap-2">
                   <button
                     type="button"
                     onClick={() => copyToClipboard(newWebhookSecret)}
-                    className="flex-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-amber-700"
+                    className="flex-1 rounded-[var(--radius-sm)] bg-amber-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-amber-700"
                   >
                     {copied ? "已复制" : "复制密钥"}
                   </button>
@@ -942,7 +942,7 @@ export default function KeysPage() {
                       setNewWebhookSecret(null);
                       setEditLimitKey(null);
                     }}
-                    className="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
+                    className="flex-1 rounded-[var(--radius-sm)] border border-amber-300 bg-card px-3 py-2 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
                   >
                     我已保存，关闭
                   </button>
@@ -957,14 +957,14 @@ export default function KeysPage() {
                   setNewWebhookSecret(null);
                 }}
                 disabled={savingLimit}
-                className="flex-1 rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+                className="flex-1 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
               >
                 取消
               </button>
               <button
                 onClick={handleSaveLimit}
                 disabled={savingLimit || !!newWebhookSecret}
-                className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                className="flex-1 rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
               >
                 {savingLimit ? "保存中..." : "保存"}
               </button>

@@ -30,6 +30,26 @@ const INVITEE_REWARD_CREDITS = 50;
 // 注册接口防批量限流：每分钟 3 次（IP 维度）
 const REGISTER_RATE_LIMIT_PER_MIN = 3;
 
+// 可选头像风格（DiceBear API，新用户注册时随机分配一个）
+const AVATAR_STYLES = [
+  "bottts-neutral",
+  "thumbs",
+  "shapes",
+  "identicon",
+] as const;
+
+/**
+ * 生成随机头像 URL（DiceBear API）
+ * 新用户注册时随机分配一个头像，后续可在个人资料页手动更改。
+ * 若 DiceBear 不可达，Avatar 组件会自动回退到渐变背景 + 首字。
+ */
+function generateRandomAvatar(): string {
+  const style =
+    AVATAR_STYLES[Math.floor(Math.random() * AVATAR_STYLES.length)];
+  const seed = Math.random().toString(36).slice(2, 10);
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}`;
+}
+
 export async function POST(request: Request) {
   try {
     // IP 限流（防批量注册）
@@ -146,6 +166,7 @@ export async function POST(request: Request) {
           email: normalizedEmail ?? null,
           phone: normalizedPhone ?? null,
           passwordHash,
+          avatar: generateRandomAvatar(),
           trialExpiresAt,
           credits: initialCredits,
           inviterId: inviterId ?? null,

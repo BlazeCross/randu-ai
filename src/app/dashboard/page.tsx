@@ -54,8 +54,8 @@ const statusConfig: Record<
 > = {
   pending: {
     label: "等待中",
-    bg: "bg-neutral-100",
-    text: "text-neutral-600",
+    bg: "bg-muted",
+    text: "text-muted-foreground",
   },
   running: {
     label: "运行中",
@@ -129,7 +129,7 @@ export default function DashboardPage() {
   // 加载中：显示加载动画
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -156,11 +156,11 @@ export default function DashboardPage() {
   // 未登录：提示登录
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <svg
-              className="h-8 w-8 text-neutral-400"
+              className="h-8 w-8 text-muted-foreground"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -173,15 +173,15 @@ export default function DashboardPage() {
               />
             </svg>
           </div>
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             请先登录
           </h2>
-          <p className="mb-6 text-sm text-neutral-500">
+          <p className="mb-6 text-sm text-muted-foreground">
             登录后即可查看个人中心和使用记录
           </p>
           <button
             onClick={() => router.push("/login")}
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
           >
             前往登录
           </button>
@@ -201,47 +201,53 @@ export default function DashboardPage() {
   const trialLimitReached = !isSubscribed && trialUsageCount >= trialLimit;
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 页面标题 */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">个人中心</h1>
-            <p className="mt-1 text-sm text-neutral-500">
+            <h1 className="text-2xl font-bold text-foreground">个人中心</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               管理你的账号、试用状态和使用记录
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard/history"
-              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
             >
               任务历史
             </Link>
             <Link
               href="/dashboard/orders"
-              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
             >
               订单管理
             </Link>
             <Link
               href="/dashboard/invite"
-              className="rounded-lg border border-success-300 bg-success-50 px-4 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-100"
+              className="rounded-[var(--radius-sm)] border border-success-300 bg-success-50 px-4 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-100"
             >
               邀请奖励
             </Link>
             <Link
               href="/dashboard/keys"
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
+              className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
             >
               API Key 管理
+            </Link>
+            <Link
+              href="/dashboard/api-docs"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+            >
+              API 文档
             </Link>
             <button
               onClick={() => {
                 logout();
                 router.push("/login");
               }}
-              className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
               退出登录
             </button>
@@ -251,7 +257,7 @@ export default function DashboardPage() {
         {/* 试用过期/次数用完提示横幅：已订阅用户不显示 */}
         {!isSubscribed && (isTrialExpired || trialLimitReached) && (
           <div
-            className={`mb-6 flex flex-col items-start justify-between gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center ${
+            className={`mb-6 flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border p-5 sm:flex-row sm:items-center ${
               isTrialExpired
                 ? "border-red-200 bg-red-50"
                 : "border-amber-200 bg-amber-50"
@@ -299,7 +305,7 @@ export default function DashboardPage() {
               onClick={() =>
                 setUpgradeReason(isTrialExpired ? "expired" : "limit_reached")
               }
-              className={`inline-flex flex-shrink-0 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors ${
+              className={`inline-flex flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] px-5 py-2.5 text-sm font-semibold text-white transition-colors ${
                 isTrialExpired
                   ? "bg-red-600 hover:bg-red-700"
                   : "bg-primary hover:bg-primary-hover"
@@ -313,35 +319,35 @@ export default function DashboardPage() {
         {/* 顶部：用户信息卡片 + 订阅状态卡片 */}
         <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* 用户信息卡片 */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-base font-semibold text-neutral-900">
+          <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+            <h2 className="mb-4 text-base font-semibold text-foreground">
               账号信息
             </h2>
             <div className="space-y-3">
               {/* 邮箱 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-neutral-500">邮箱</span>
-                <span className="text-sm font-medium text-neutral-900">
+                <span className="text-sm text-muted-foreground">邮箱</span>
+                <span className="text-sm font-medium text-foreground">
                   {user.email || "未绑定"}
                 </span>
               </div>
               {/* 手机号 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-neutral-500">手机号</span>
-                <span className="text-sm font-medium text-neutral-900">
+                <span className="text-sm text-muted-foreground">手机号</span>
+                <span className="text-sm font-medium text-foreground">
                   {user.phone || "未绑定"}
                 </span>
               </div>
               {/* 注册时间 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-neutral-500">注册时间</span>
-                <span className="text-sm font-medium text-neutral-900">
+                <span className="text-sm text-muted-foreground">注册时间</span>
+                <span className="text-sm font-medium text-foreground">
                   {formatDate(user.createdAt)}
                 </span>
               </div>
               {/* 套餐状态 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-neutral-500">套餐状态</span>
+                <span className="text-sm text-muted-foreground">套餐状态</span>
                 {isSubscribed ? (
                   <span className="inline-flex items-center rounded-full bg-success-100 px-3 py-0.5 text-xs font-medium text-success-700">
                     已订阅
@@ -380,23 +386,23 @@ export default function DashboardPage() {
         </div>
 
         {/* 使用记录列表 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
-          <div className="border-b border-neutral-200 px-4 py-4 sm:px-6">
-            <h2 className="text-base font-semibold text-neutral-900">
+        <div className="rounded-[var(--radius)] border border-border bg-card">
+          <div className="border-b border-border px-4 py-4 sm:px-6">
+            <h2 className="text-base font-semibold text-foreground">
               使用记录
             </h2>
           </div>
 
           {usageLoading ? (
             // 使用记录加载中：骨架屏列表
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {Array.from({ length: 5 }).map((_, i) => (
                 <SkeletonListItem key={i} />
               ))}
             </div>
           ) : usageData && usageData.usageLogs.length > 0 ? (
             // 使用记录列表
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {usageData.usageLogs.map((log) => {
                 const status =
                   statusConfig[log.status] || statusConfig.pending;
@@ -404,11 +410,11 @@ export default function DashboardPage() {
                   <Link
                     key={log.id}
                     href="/dashboard/history"
-                    className="flex items-center justify-between px-4 py-4 transition-colors hover:bg-neutral-50 sm:px-6"
+                    className="flex items-center justify-between px-4 py-4 transition-colors hover:bg-muted sm:px-6"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-medium text-neutral-900">
+                        <span className="text-sm font-medium text-foreground">
                           {log.workflow?.name ?? "未知工作流"}
                         </span>
                         {log.source === "api" && (
@@ -417,7 +423,7 @@ export default function DashboardPage() {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 text-xs text-neutral-400">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {formatDate(log.createdAt)}
                         {log.creditsCost > 0 &&
                           ` · 消耗 ${log.creditsCost} 积分`}
@@ -436,9 +442,9 @@ export default function DashboardPage() {
           ) : (
             // 无使用记录
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <svg
-                  className="h-6 w-6 text-neutral-400"
+                  className="h-6 w-6 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -451,7 +457,7 @@ export default function DashboardPage() {
                   />
                 </svg>
               </div>
-              <p className="text-sm text-neutral-500">暂无使用记录</p>
+              <p className="text-sm text-muted-foreground">暂无使用记录</p>
               <Link
                 href="/workspace"
                 className="mt-4 text-sm font-medium text-primary hover:text-primary-hover"

@@ -27,13 +27,13 @@ export default function GlobalError({
         <div className="mb-6 text-7xl font-bold tracking-tight text-primary-200">
           500
         </div>
-        <h1 className="mb-3 text-2xl font-bold text-neutral-900">
+        <h1 className="mb-3 text-2xl font-bold text-foreground">
           出错了，服务器开小差了
         </h1>
-        <p className="mb-8 text-sm text-neutral-600">
+        <p className="mb-8 text-sm text-muted-foreground">
           抱歉，页面加载过程中出现了未预期的错误。
           {error.digest && (
-            <span className="mt-2 block font-mono text-xs text-neutral-400">
+            <span className="mt-2 block font-mono text-xs text-muted-foreground">
               错误代码：{error.digest}
             </span>
           )}
@@ -42,7 +42,7 @@ export default function GlobalError({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
+            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
           >
             <svg
               className="mr-2 h-4 w-4"
@@ -61,7 +61,7 @@ export default function GlobalError({
           </button>
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-6 py-3 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary hover:text-primary"
+            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
           >
             返回首页
           </Link>

@@ -74,8 +74,8 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
   // 数组类型
   if (schema.type === "array" && schema.items) {
     return (
-      <div className={depth > 0 ? "ml-4 border-l border-neutral-200 pl-3" : ""}>
-        <p className="text-xs text-neutral-500">数组元素：</p>
+      <div className={depth > 0 ? "ml-4 border-l border-border pl-3" : ""}>
+        <p className="text-xs text-muted-foreground">数组元素：</p>
         <SchemaTable schema={schema.items} depth={depth + 1} />
       </div>
     );
@@ -85,7 +85,7 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
   const props = schema.properties;
   if (!props) {
     return (
-      <div className="text-xs text-neutral-500">
+      <div className="text-xs text-muted-foreground">
         {schema.type || "any"}
         {schema.enum && ` · 可选值：${schema.enum.join(" / ")}`}
         {schema.description && ` · ${schema.description}`}
@@ -96,10 +96,10 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
   const required = new Set(schema.required ?? []);
 
   return (
-    <div className={depth > 0 ? "ml-4 border-l border-neutral-200 pl-3" : ""}>
+    <div className={depth > 0 ? "ml-4 border-l border-border pl-3" : ""}>
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-neutral-200 text-left text-neutral-500">
+          <tr className="border-b border-border text-left text-muted-foreground">
             <th className="py-1.5 pr-2 font-medium">字段</th>
             <th className="py-1.5 pr-2 font-medium">类型</th>
             <th className="py-1.5 pr-2 font-medium">说明</th>
@@ -107,8 +107,8 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
         </thead>
         <tbody>
           {Object.entries(props).map(([key, prop]) => (
-            <tr key={key} className="border-b border-neutral-100 last:border-0">
-              <td className="py-1.5 pr-2 font-mono text-neutral-900">
+            <tr key={key} className="border-b border-border last:border-0">
+              <td className="py-1.5 pr-2 font-mono text-foreground">
                 {key}
                 {required.has(key) && (
                   <span className="ml-1 text-red-500" title="必填">
@@ -116,19 +116,19 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
                   </span>
                 )}
               </td>
-              <td className="py-1.5 pr-2 font-mono text-neutral-600">
+              <td className="py-1.5 pr-2 font-mono text-muted-foreground">
                 {prop.type === "array" ? "array" : prop.type ?? "object"}
                 {prop.nullable && " | null"}
                 {prop.enum && (
-                  <div className="mt-0.5 text-[10px] text-neutral-400">
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">
                     enum: {prop.enum.join(", ")}
                   </div>
                 )}
               </td>
-              <td className="py-1.5 pr-2 text-neutral-600">
+              <td className="py-1.5 pr-2 text-muted-foreground">
                 {prop.description}
                 {prop.default !== undefined && (
-                  <span className="ml-1 text-neutral-400">
+                  <span className="ml-1 text-muted-foreground">
                     默认: <code className="font-mono">{String(prop.default)}</code>
                   </span>
                 )}
@@ -136,7 +136,7 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
                 {prop.maximum !== undefined && ` · max: ${prop.maximum}`}
                 {prop.maxLength !== undefined && ` · 最大长度: ${prop.maxLength}`}
                 {prop.example !== undefined && (
-                  <div className="mt-0.5 text-[10px] text-neutral-400">
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">
                     示例: {String(prop.example)}
                   </div>
                 )}
@@ -175,26 +175,26 @@ function OperationCard({
   const fullUrl = `${baseUrl}${path}`;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+    <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-neutral-50"
+        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-muted"
       >
         <span
-          className={`inline-flex h-7 w-16 items-center justify-center rounded-md border text-xs font-bold uppercase ${HTTP_METHOD_COLORS[method] ?? "bg-neutral-100 text-neutral-700 border-neutral-200"}`}
+          className={`inline-flex h-7 w-16 items-center justify-center rounded-[var(--radius-sm)] border text-xs font-bold uppercase ${HTTP_METHOD_COLORS[method] ?? "bg-muted text-foreground border-border"}`}
         >
           {method}
         </span>
-        <code className="font-mono text-sm text-neutral-900">{path}</code>
+        <code className="font-mono text-sm text-foreground">{path}</code>
         <span className="ml-auto flex items-center gap-3">
           {operation.summary && (
-            <span className="hidden text-sm text-neutral-600 sm:inline">
+            <span className="hidden text-sm text-muted-foreground sm:inline">
               {operation.summary}
             </span>
           )}
           <svg
-            className={`h-4 w-4 flex-shrink-0 text-neutral-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+            className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -206,23 +206,23 @@ function OperationCard({
       </button>
 
       {expanded && (
-        <div className="space-y-5 border-t border-neutral-100 px-5 py-5">
+        <div className="space-y-5 border-t border-border px-5 py-5">
           {/* 描述 */}
           {operation.description && (
-            <p className="text-sm text-neutral-700">{operation.description}</p>
+            <p className="text-sm text-foreground">{operation.description}</p>
           )}
 
           {/* 完整 URL */}
           <div>
-            <p className="mb-1 text-xs font-medium text-neutral-500">完整地址</p>
-            <code className="block break-all rounded-lg bg-neutral-900 px-3 py-2 font-mono text-xs text-neutral-100">
+            <p className="mb-1 text-xs font-medium text-muted-foreground">完整地址</p>
+            <code className="block break-all rounded-[var(--radius-sm)] bg-neutral-900 px-3 py-2 font-mono text-xs text-neutral-100">
               {method.toUpperCase()} {fullUrl}
             </code>
           </div>
 
           {/* 鉴权 */}
           {operation.security && (
-            <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <div className="rounded-[var(--radius-sm)] bg-amber-50 px-3 py-2 text-xs text-amber-800">
               鉴权：X-API-Key 请求头（在
               <Link href="/dashboard/keys" className="underline">
                 {" "}
@@ -235,7 +235,7 @@ function OperationCard({
           {/* 查询参数 */}
           {operation.parameters && operation.parameters.length > 0 && (
             <div>
-              <p className="mb-2 text-sm font-medium text-neutral-700">查询参数</p>
+              <p className="mb-2 text-sm font-medium text-foreground">查询参数</p>
               <SchemaTable
                 schema={{
                   type: "object",
@@ -256,7 +256,7 @@ function OperationCard({
           {/* 请求体 */}
           {requestBodySchema && (
             <div>
-              <p className="mb-2 text-sm font-medium text-neutral-700">
+              <p className="mb-2 text-sm font-medium text-foreground">
                 请求体
                 {operation.requestBody?.required && (
                   <span className="ml-1 text-xs text-red-500">必填</span>
@@ -269,7 +269,7 @@ function OperationCard({
           {/* 响应 */}
           {responseSchema && (
             <div>
-              <p className="mb-2 text-sm font-medium text-neutral-700">
+              <p className="mb-2 text-sm font-medium text-foreground">
                 响应（200）
               </p>
               <SchemaTable schema={responseSchema} />
@@ -280,20 +280,20 @@ function OperationCard({
           {operation.responses &&
             Object.entries(operation.responses).filter(([code]) => code !== "200").length > 0 && (
               <div>
-                <p className="mb-2 text-sm font-medium text-neutral-700">其他响应</p>
+                <p className="mb-2 text-sm font-medium text-foreground">其他响应</p>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(operation.responses)
                     .filter(([code]) => code !== "200")
                     .map(([code, resp]) => (
                       <span
                         key={code}
-                        className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-600"
+                        className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-background px-2.5 py-1 text-xs text-muted-foreground"
                       >
-                        <code className="font-mono font-medium text-neutral-900">
+                        <code className="font-mono font-medium text-foreground">
                           {code}
                         </code>
                         {resp.description && (
-                          <span className="text-neutral-500">{resp.description}</span>
+                          <span className="text-muted-foreground">{resp.description}</span>
                         )}
                       </span>
                     ))}
@@ -353,21 +353,21 @@ export default function ApiDocsClient() {
   const baseUrl = spec?.servers?.[0]?.url ?? "";
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       {/* 面包屑 */}
-      <div className="border-b border-neutral-200 bg-white">
+      <div className="border-b border-border bg-card">
         <nav
           aria-label="面包屑"
           className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8"
         >
-          <ol className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <li>
               <Link href="/" className="hover:text-primary">
                 首页
               </Link>
             </li>
             <li aria-hidden>/</li>
-            <li className="font-medium text-neutral-900" aria-current="page">
+            <li className="font-medium text-foreground" aria-current="page">
               API 文档
             </li>
           </ol>
@@ -377,11 +377,11 @@ export default function ApiDocsClient() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 页面标题 */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             API 文档
           </h1>
           {spec ? (
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               {spec.info.description} ·{" "}
               <span className="font-mono">v{spec.info.version}</span>
               {baseUrl && (
@@ -393,7 +393,7 @@ export default function ApiDocsClient() {
               )}
             </p>
           ) : (
-            <p className="mt-2 text-sm text-neutral-600">加载中...</p>
+            <p className="mt-2 text-sm text-muted-foreground">加载中...</p>
           )}
 
           {/* 快速入口 */}
@@ -402,7 +402,7 @@ export default function ApiDocsClient() {
               href="/api/docs/openapi.json"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-400"
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-border"
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -411,7 +411,7 @@ export default function ApiDocsClient() {
             </a>
             <Link
               href="/dashboard/keys"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-400"
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-border"
             >
               管理 API Key
             </Link>
@@ -419,7 +419,7 @@ export default function ApiDocsClient() {
               href="https://github.com/BlazeCross/randu-ai/tree/main/sdks"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-400"
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-border"
             >
               <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.81 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -430,13 +430,13 @@ export default function ApiDocsClient() {
         </div>
 
         {/* 鉴权说明 */}
-        <div className="mb-8 rounded-2xl border border-primary-100 bg-primary-50/50 p-5">
+        <div className="mb-8 rounded-[var(--radius)] border border-primary-100 bg-primary-50/50 p-5">
           <h2 className="mb-2 text-sm font-semibold text-primary-900">鉴权方式</h2>
           <p className="text-xs text-primary-800">
-            所有接口使用 HTTP Header <code className="rounded bg-white px-1.5 py-0.5 font-mono">X-API-Key</code> 鉴权。
+            所有接口使用 HTTP Header <code className="rounded bg-card px-1.5 py-0.5 font-mono">X-API-Key</code> 鉴权。
             在个人中心创建 API Key 后获得明文 Key，每次请求需在 Header 中携带：
           </p>
-          <pre className="mt-3 overflow-x-auto rounded-lg bg-neutral-900 p-3 text-xs text-neutral-100">
+          <pre className="mt-3 overflow-x-auto rounded-[var(--radius-sm)] bg-neutral-900 p-3 text-xs text-neutral-100">
             <code>{`X-API-Key: sk_your_api_key_here
 Content-Type: application/json`}</code>
           </pre>
@@ -451,7 +451,7 @@ Content-Type: application/json`}</code>
             </svg>
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+          <div className="rounded-[var(--radius)] border border-red-200 bg-red-50 p-6 text-center">
             <p className="text-sm text-red-700">{error}</p>
           </div>
         ) : !spec ? null : (
@@ -461,10 +461,10 @@ Content-Type: application/json`}</code>
               <div className="mb-6 flex flex-wrap gap-2">
                 <button
                   onClick={() => setActiveTag("all")}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors ${
                     activeTag === "all"
                       ? "bg-primary text-white"
-                      : "border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+                      : "border border-border bg-card text-foreground hover:bg-muted"
                   }`}
                 >
                   全部
@@ -473,10 +473,10 @@ Content-Type: application/json`}</code>
                   <button
                     key={tag.name}
                     onClick={() => setActiveTag(tag.name)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors ${
                       activeTag === tag.name
                         ? "bg-primary text-white"
-                        : "border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+                        : "border border-border bg-card text-foreground hover:bg-muted"
                     }`}
                   >
                     {tag.name}
@@ -496,7 +496,7 @@ Content-Type: application/json`}</code>
                 .filter(([tag]) => activeTag === "all" || activeTag === tag)
                 .map(([tag, ops]) => (
                   <section key={tag}>
-                    <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+                    <h2 className="mb-3 text-lg font-semibold text-foreground">
                       {tag}
                     </h2>
                     <div className="space-y-3">
@@ -515,18 +515,18 @@ Content-Type: application/json`}</code>
             </div>
 
             {/* 错误码参考 */}
-            <div className="mt-10 rounded-2xl border border-neutral-200 bg-white p-6">
-              <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+            <div className="mt-10 rounded-[var(--radius)] border border-border bg-card p-6">
+              <h2 className="mb-3 text-lg font-semibold text-foreground">
                 错误码参考
               </h2>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
+                  <tr className="border-b border-border text-left text-xs text-muted-foreground">
                     <th className="py-2 pr-3 font-medium">HTTP 状态码</th>
                     <th className="py-2 pr-3 font-medium">含义</th>
                   </tr>
                 </thead>
-                <tbody className="text-neutral-700">
+                <tbody className="text-foreground">
                   {[
                     ["200", "请求成功"],
                     ["400", "请求参数错误"],
@@ -538,9 +538,9 @@ Content-Type: application/json`}</code>
                     ["500", "服务器内部错误"],
                     ["502", "上游服务（火山方舟 / Coze）调用失败"],
                   ].map(([code, meaning]) => (
-                    <tr key={code} className="border-b border-neutral-100 last:border-0">
+                    <tr key={code} className="border-b border-border last:border-0">
                       <td className="py-2 pr-3">
-                        <code className="font-mono text-neutral-900">{code}</code>
+                        <code className="font-mono text-foreground">{code}</code>
                       </td>
                       <td className="py-2 pr-3">{meaning}</td>
                     </tr>
@@ -550,18 +550,18 @@ Content-Type: application/json`}</code>
             </div>
 
             {/* 频率限制说明 */}
-            <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
-              <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+            <div className="mt-6 rounded-[var(--radius)] border border-border bg-card p-6">
+              <h2 className="mb-3 text-lg font-semibold text-foreground">
                 频率限制
               </h2>
-              <p className="mb-3 text-sm text-neutral-600">
+              <p className="mb-3 text-sm text-muted-foreground">
                 每个 API Key 有独立的 QPS 限制和每日调用上限，可在
                 <Link href="/dashboard/keys" className="mx-1 text-primary underline">
                   API Key 管理
                 </Link>
                 页面调整：
               </p>
-              <ul className="space-y-1.5 text-sm text-neutral-700">
+              <ul className="space-y-1.5 text-sm text-foreground">
                 <li>· QPS 限制：每秒最大请求数，默认 5 次/秒，0 表示不限制</li>
                 <li>· 每日限额：每日最大调用次数，默认 1000 次/天，0 表示不限制</li>
                 <li>· 触发限流时返回 429，响应头包含 Retry-After（建议重试等待秒数）</li>

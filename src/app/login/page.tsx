@@ -69,19 +69,19 @@ export default function LoginPage() {
               </span>
             </h1>
           </Link>
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             欢迎回来，请登录你的账号
           </p>
         </div>
 
         {/* 登录卡片 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl shadow-primary-600/5 sm:p-8">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-xl shadow-primary-600/5 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 账号输入框 */}
             <div>
               <label
                 htmlFor="account"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
                 账号
               </label>
@@ -92,7 +92,7 @@ export default function LoginPage() {
                 onChange={(e) => setAccount(e.target.value)}
                 placeholder="邮箱或手机号"
                 autoComplete="username"
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
                 密码
               </label>
@@ -112,12 +112,12 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="请输入密码"
                   autoComplete="current-password"
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 pr-12 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-muted-foreground"
                   aria-label={showPassword ? "隐藏密码" : "显示密码"}
                 >
                   {showPassword ? (
@@ -162,7 +162,7 @@ export default function LoginPage() {
 
             {/* 错误提示 */}
             {error && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-[var(--radius-sm)] bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
@@ -171,7 +171,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+              className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-3 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
             >
               {loading ? (
                 <>
@@ -205,7 +205,7 @@ export default function LoginPage() {
         </div>
 
         {/* 底部注册链接 */}
-        <p className="mt-6 text-center text-sm text-neutral-500">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           还没有账号？
           <Link
             href="/register"

@@ -57,7 +57,7 @@ const statusConfig: Record<string, { label: string; bg: string; text: string }> 
   pending: { label: "待支付", bg: "bg-amber-100", text: "text-amber-700" },
   paid: { label: "已支付", bg: "bg-success-100", text: "text-success-700" },
   failed: { label: "失败", bg: "bg-red-100", text: "text-red-600" },
-  refunded: { label: "已退款", bg: "bg-neutral-100", text: "text-neutral-600" },
+  refunded: { label: "已退款", bg: "bg-muted", text: "text-muted-foreground" },
 };
 
 // 类型标签
@@ -165,7 +165,7 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
       </main>
     );
@@ -173,9 +173,9 @@ export default function OrdersPage() {
 
   if (!user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
+      <main className="flex flex-1 items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">请先登录</h2>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">请先登录</h2>
           <Link href="/login" className="text-sm text-primary hover:text-primary-hover">
             前往登录 →
           </Link>
@@ -187,21 +187,21 @@ export default function OrdersPage() {
   const paymentEnabled = packages?.paymentEnabled ?? false;
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 面包屑 */}
-        <nav className="mb-6 flex items-center gap-1.5 text-sm text-neutral-500">
-          <Link href="/dashboard" className="hover:text-neutral-900">
+        <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Link href="/dashboard" className="hover:text-foreground">
             个人中心
           </Link>
-          <span className="text-neutral-300">/</span>
-          <span className="font-medium text-neutral-900">订单管理</span>
+          <span className="text-muted-foreground">/</span>
+          <span className="font-medium text-foreground">订单管理</span>
         </nav>
 
         {/* 套餐订阅区 */}
         <section className="mb-8">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-neutral-900">套餐订阅</h2>
+            <h2 className="text-lg font-semibold text-foreground">套餐订阅</h2>
             {!paymentEnabled && (
               <span className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-700">
                 支付功能暂未开放
@@ -215,12 +215,12 @@ export default function OrdersPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`flex flex-col rounded-2xl border bg-white p-5 shadow-sm ${
-                    isCurrent ? "border-success-300 bg-success-50/30" : "border-neutral-200"
+                  className={`flex flex-col rounded-[var(--radius)] border bg-card p-5 ${
+                    isCurrent ? "border-success-300 bg-success-50/30" : "border-border"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-semibold text-neutral-900">
+                    <h3 className="text-base font-semibold text-foreground">
                       {plan.name}
                     </h3>
                     {isCurrent && (
@@ -230,17 +230,17 @@ export default function OrdersPage() {
                     )}
                   </div>
                   <div className="mt-3 flex items-baseline">
-                    <span className="text-3xl font-bold text-neutral-900">
+                    <span className="text-3xl font-bold text-foreground">
                       ¥{plan.monthlyPrice}
                     </span>
-                    <span className="ml-1 text-sm text-neutral-500">/月</span>
+                    <span className="ml-1 text-sm text-muted-foreground">/月</span>
                   </div>
                   <p className="mt-1 text-xs text-primary-700">
                     每日 {plan.dailyLimit} 次调用
                   </p>
                   <ul className="mt-4 flex-1 space-y-2">
                     {plan.features.slice(0, 4).map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-neutral-600">
+                      <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
                         <svg
                           className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-success-500"
                           fill="none"
@@ -260,12 +260,12 @@ export default function OrdersPage() {
                     onClick={() =>
                       handleCreatePayment("subscription", { planName: plan.name }, key)
                     }
-                    className={`mt-4 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    className={`mt-4 w-full rounded-[var(--radius-sm)] px-4 py-2.5 text-sm font-semibold transition-colors ${
                       isCurrent
-                        ? "cursor-not-allowed bg-neutral-100 text-neutral-400"
+                        ? "cursor-not-allowed bg-muted text-muted-foreground"
                         : paymentEnabled
                           ? "bg-primary text-white hover:bg-primary-hover disabled:opacity-50"
-                          : "cursor-not-allowed bg-neutral-100 text-neutral-400"
+                          : "cursor-not-allowed bg-muted text-muted-foreground"
                     }`}
                   >
                     {creatingKey === key
@@ -283,8 +283,8 @@ export default function OrdersPage() {
         {/* 积分充值区 */}
         <section className="mb-8">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-neutral-900">积分充值</h2>
-            <span className="text-sm text-neutral-500">
+            <h2 className="text-lg font-semibold text-foreground">积分充值</h2>
+            <span className="text-sm text-muted-foreground">
               当前积分：<strong className="text-primary-700">{user.credits}</strong>
             </span>
           </div>
@@ -294,10 +294,10 @@ export default function OrdersPage() {
               return (
                 <div
                   key={pkg.id}
-                  className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
+                  className="flex flex-col rounded-[var(--radius)] border border-border bg-card p-4"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-neutral-900">
+                    <span className="text-lg font-bold text-foreground">
                       {pkg.credits}
                     </span>
                     {pkg.bonus && (
@@ -306,7 +306,7 @@ export default function OrdersPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-neutral-500">积分</p>
+                  <p className="text-xs text-muted-foreground">积分</p>
                   <div className="mt-3 flex items-baseline">
                     <span className="text-xl font-bold text-primary-700">
                       ¥{pkg.price}
@@ -318,10 +318,10 @@ export default function OrdersPage() {
                     onClick={() =>
                       handleCreatePayment("credits", { packageId: pkg.id }, key)
                     }
-                    className={`mt-3 w-full rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                    className={`mt-3 w-full rounded-[var(--radius-sm)] px-3 py-2 text-xs font-semibold transition-colors ${
                       paymentEnabled
                         ? "bg-primary text-white hover:bg-primary-hover disabled:opacity-50"
-                        : "cursor-not-allowed bg-neutral-100 text-neutral-400"
+                        : "cursor-not-allowed bg-muted text-muted-foreground"
                     }`}
                   >
                     {creatingKey === key ? "创建中..." : "立即充值"}
@@ -333,13 +333,13 @@ export default function OrdersPage() {
         </section>
 
         {/* 订单列表 */}
-        <section className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-4 sm:px-6">
-            <h2 className="text-base font-semibold text-neutral-900">历史订单</h2>
+        <section className="rounded-[var(--radius)] border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-4 sm:px-6">
+            <h2 className="text-base font-semibold text-foreground">历史订单</h2>
             <button
               onClick={() => fetchOrders()}
               disabled={ordersLoading}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               刷新
             </button>
@@ -352,26 +352,26 @@ export default function OrdersPage() {
           )}
 
           {ordersLoading ? (
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {Array.from({ length: 5 }).map((_, i) => (
                 <SkeletonListItem key={i} />
               ))}
             </div>
           ) : orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-sm text-neutral-500">暂无订单</p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="text-sm text-muted-foreground">暂无订单</p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 选择上方套餐或积分包即可创建订单
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-border">
               {orders.map((order) => {
                 const status = statusConfig[order.status] || statusConfig.pending;
                 const type = typeConfig[order.type] || {
                   label: order.type,
-                  bg: "bg-neutral-100",
-                  text: "text-neutral-600",
+                  bg: "bg-muted",
+                  text: "text-muted-foreground",
                 };
                 return (
                   <div
@@ -392,17 +392,17 @@ export default function OrdersPage() {
                             {status.label}
                           </span>
                           {order.plan && (
-                            <span className="text-sm font-medium text-neutral-900">
+                            <span className="text-sm font-medium text-foreground">
                               {order.plan.name}
                             </span>
                           )}
                           {order.credits > 0 && (
-                            <span className="text-xs text-neutral-600">
+                            <span className="text-xs text-muted-foreground">
                               {order.credits} 积分
                             </span>
                           )}
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-400">
+                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
                           <span className="font-mono">{order.orderNo}</span>
                           <span>{formatDate(order.createdAt)}</span>
                           {order.paidAt && (
@@ -411,7 +411,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-base font-bold text-neutral-900">
+                        <div className="text-base font-bold text-foreground">
                           ¥{order.amount.toFixed(2)}
                         </div>
                         {order.status === "pending" && (

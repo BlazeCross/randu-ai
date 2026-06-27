@@ -190,13 +190,13 @@ function RegisterContent() {
               </span>
             </h1>
           </Link>
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             创建账号，开启 AI 工作流之旅
           </p>
         </div>
 
         {/* 试用期说明 */}
-        <div className="mb-4 flex items-center gap-3 rounded-xl border border-success-200 bg-success-50 px-4 py-3">
+        <div className="mb-4 flex items-center gap-3 rounded-[var(--radius-sm)] border border-success-200 bg-success-50 px-4 py-3">
           <svg
             className="h-5 w-5 flex-shrink-0 text-success-500"
             fill="none"
@@ -216,15 +216,15 @@ function RegisterContent() {
         </div>
 
         {/* 注册卡片 */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl shadow-primary-600/5 sm:p-8">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-xl shadow-primary-600/5 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 邮箱输入框（可选） */}
             <div>
               <label
                 htmlFor="email"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
-                邮箱 <span className="text-neutral-400">（可选）</span>
+                邮箱 <span className="text-muted-foreground">（可选）</span>
               </label>
               <input
                 id="email"
@@ -233,7 +233,7 @@ function RegisterContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="请输入邮箱"
                 autoComplete="email"
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -241,9 +241,9 @@ function RegisterContent() {
             <div>
               <label
                 htmlFor="phone"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
-                手机号 <span className="text-neutral-400">（可选）</span>
+                手机号 <span className="text-muted-foreground">（可选）</span>
               </label>
               <input
                 id="phone"
@@ -252,9 +252,9 @@ function RegisterContent() {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="请输入手机号"
                 autoComplete="tel"
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 邮箱和手机号至少填写一个
               </p>
             </div>
@@ -263,7 +263,7 @@ function RegisterContent() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
                 密码
               </label>
@@ -275,12 +275,12 @@ function RegisterContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="至少 6 位密码"
                   autoComplete="new-password"
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 pr-12 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-muted-foreground"
                   aria-label={showPassword ? "隐藏密码" : "显示密码"}
                 >
                   {showPassword ? (
@@ -325,7 +325,7 @@ function RegisterContent() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
                 确认密码
               </label>
@@ -336,7 +336,7 @@ function RegisterContent() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="请再次输入密码"
                 autoComplete="new-password"
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -344,9 +344,9 @@ function RegisterContent() {
             <div>
               <label
                 htmlFor="inviteCode"
-                className="mb-1.5 block text-sm font-medium text-neutral-700"
+                className="mb-1.5 block text-sm font-medium text-foreground"
               >
-                邀请码 <span className="text-neutral-400">（可选）</span>
+                邀请码 <span className="text-muted-foreground">（可选）</span>
               </label>
               <input
                 id="inviteCode"
@@ -358,17 +358,17 @@ function RegisterContent() {
                 placeholder="请输入邀请码"
                 maxLength={8}
                 autoComplete="off"
-                className={`w-full rounded-xl border bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:outline-none focus:ring-2 ${
+                className={`w-full rounded-[var(--radius-sm)] border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:outline-none focus:ring-2 ${
                   inviteStatus.state === "valid"
                     ? "border-success-400 focus:border-success focus:ring-success/20"
                     : inviteStatus.state === "invalid"
                       ? "border-red-300 focus:border-red-500 focus:ring-red/20"
-                      : "border-neutral-300 focus:border-primary focus:ring-primary/20"
+                      : "border-border focus:border-primary focus:ring-primary/20"
                 }`}
               />
               {/* 邀请码状态提示 */}
               {inviteStatus.state === "checking" && (
-                <p className="mt-1.5 flex items-center gap-1 text-xs text-neutral-500">
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
                   <svg
                     className="h-3 w-3 animate-spin"
                     fill="none"
@@ -408,9 +408,9 @@ function RegisterContent() {
                   </svg>
                   邀请码有效
                   {inviteStatus.inviterNickname && (
-                    <span className="text-neutral-500">
+                    <span className="text-muted-foreground">
                       ，邀请人：
-                      <strong className="text-neutral-700">
+                      <strong className="text-foreground">
                         {inviteStatus.inviterNickname}
                       </strong>
                     </span>
@@ -439,7 +439,7 @@ function RegisterContent() {
                 </p>
               )}
               {inviteStatus.state === "idle" && (
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   有邀请码？填写后注册可获额外 50 积分奖励
                 </p>
               )}
@@ -447,7 +447,7 @@ function RegisterContent() {
 
             {/* 错误提示 */}
             {error && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-[var(--radius-sm)] bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
@@ -456,7 +456,7 @@ function RegisterContent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+              className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-3 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
             >
               {loading ? (
                 <>
@@ -489,7 +489,7 @@ function RegisterContent() {
         </div>
 
         {/* 底部登录链接 */}
-        <p className="mt-6 text-center text-sm text-neutral-500">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           已有账号？
           <Link
             href="/login"

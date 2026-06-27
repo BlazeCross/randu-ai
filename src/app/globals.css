@@ -1,34 +1,130 @@
 @import "tailwindcss";
 
+/* ============================================================
+ * 燃渡AI 设计系统 v2.0（基于 Doubao Design Library）
+ * 极简 · 冷调 · 技术感 · 平静
+ * 核心原则：边框优先于阴影、紧凑仪表盘密度、单一圆角 token
+ * ============================================================ */
+
 :root {
+  /* ---- 核心表面 ---- */
   --background: #ffffff;
-  --foreground: #171717;
-  /* 字体变量默认值（移除 Google Fonts 依赖） */
-  --font-geist-sans: Arial, Helvetica, sans-serif;
-  --font-geist-mono: "Courier New", Courier, monospace;
+  --foreground: #0e1115;
+  --card: #ffffff;
+  --card-foreground: #0e1115;
+  --popover: #f9f9fa;
+  --popover-foreground: #0e1115;
+
+  /* ---- 语义品牌 ---- */
+  --primary: #0065fd;
+  --primary-foreground: #ffffff;
+  --secondary: #eff1f4;
+  --secondary-foreground: #333942;
+  --muted: #eff1f4;
+  --muted-foreground: #7f8d9f;
+  --accent: #e5e9ff;
+  --accent-foreground: #00266b;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e7eaef;
+  --input: #e7eaef;
+  --ring: #557fff;
+
+  /* ---- 数据可视化与侧栏 ---- */
+  --chart-1: #557fff;
+  --chart-2: #0065fd;
+  --chart-3: #0057da;
+  --chart-4: #0043ad;
+  --chart-5: #002e7d;
+  --sidebar: #eff1f4;
+  --sidebar-foreground: #0e1115;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #d4daff;
+  --sidebar-accent-foreground: #00266b;
+  --sidebar-border: #e7eaef;
+  --sidebar-ring: #0065fd;
+
+  /* ---- 字体 ---- */
+  --font-sans: "Stack Sans Text", "PingFang SC", "Microsoft YaHei", ui-sans-serif, sans-serif, system-ui;
+  --font-serif: "Source Serif 4", serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+
+  /* ---- 圆角与间距（Doubao token） ---- */
+  --radius: 1.2rem;          /* 基础圆角，用于卡片/面板 */
+  --radius-sm: 10px;         /* 控件圆角，用于输入框/按钮容器 */
+  --radius-lg: 14px;         /* 大圆角，用于侧栏/面板 */
+  --radius-full: 999px;      /* 胶囊，用于按钮/标签/头像 */
+  --spacing: 0.24rem;        /* 紧凑仪表盘间距单位 */
+
+  /* ---- 兼容旧组件的中性灰梯度（映射到 Doubao 色系） ---- */
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #eff1f4;
+  --color-neutral-200: #e7eaef;
+  --color-neutral-300: #d4dae3;
+  --color-neutral-400: #9aa6b5;
+  --color-neutral-500: #7f8d9f;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #333942;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #0e1115;
 }
 
+/* ============================================================
+ * Tailwind v4 主题映射
+ * 让 bg-primary / text-muted-foreground / border-border
+ * / bg-sidebar / bg-card 等工具类可用
+ * ============================================================ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
 
-  /* 主色 - 科技蓝 #2563EB */
-  --color-primary: #2563eb;
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* 保留旧 primary-50~900 梯度供现有组件使用 */
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
+  --color-primary-200: #e5e9ff;
   --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-hover: #1d4ed8;
+  --color-primary-400: #557fff;
+  --color-primary-500: #0065fd;
+  --color-primary-600: #0057da;
+  --color-primary-700: #0043ad;
+  --color-primary-800: #002e7d;
+  --color-primary-900: #00266b;
+  --color-primary-hover: #0057da;
 
-  /* 辅助色 - 成功绿 #10B981 */
+  /* 保留 success 色系 */
   --color-success: #10b981;
   --color-success-50: #ecfdf5;
   --color-success-100: #d1fae5;
@@ -42,148 +138,180 @@
   --color-success-900: #064e3b;
   --color-success-hover: #059669;
 
-  /* 中性灰 */
-  --color-neutral-50: #f9fafb;
-  --color-neutral-100: #f3f4f6;
-  --color-neutral-200: #e5e7eb;
-  --color-neutral-300: #d1d5db;
-  --color-neutral-400: #9ca3af;
-  --color-neutral-500: #6b7280;
-  --color-neutral-600: #4b5563;
-  --color-neutral-700: #374151;
-  --color-neutral-800: #1f2937;
-  --color-neutral-900: #111827;
-
-  /* 暗色模式中性灰覆盖（Phase 2.13）
-   * 设计取舍：当前所有组件使用 light 主题设计（bg-white / text-neutral-900），
-   * 暂不引入 dark: 变体。当系统切换至深色模式时，通过 CSS 变量映射
-   * 让中性灰自适应深色，避免出现「深色 body + 白色卡片」的不一致。
-   * 后续若需完整暗色模式，再为各组件补齐 dark: 变体。
-   */
+  /* 保留中性灰梯度供现有组件使用 */
+  --color-neutral-50: var(--color-neutral-50);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-300: var(--color-neutral-300);
+  --color-neutral-400: var(--color-neutral-400);
+  --color-neutral-500: var(--color-neutral-500);
+  --color-neutral-600: var(--color-neutral-600);
+  --color-neutral-700: var(--color-neutral-700);
+  --color-neutral-800: var(--color-neutral-800);
+  --color-neutral-900: var(--color-neutral-900);
 }
 
-/* 暗色模式：当用户系统开启深色模式时，映射中性灰为深色系
- * 这样 bg-neutral-50/100 → 深色背景，text-neutral-900 → 浅色文字
- * 保持整体视觉一致，避免半暗半亮的割裂感
- */
+/* ============================================================
+ * 暗色模式（系统跟随，token 级完整映射）
+ * 不再使用中性灰反转 hack，直接映射 Doubao 暗色 token
+ * ============================================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0e1115;
+    --foreground: #eff1f4;
+    --card: #0e1115;
+    --card-foreground: #eff1f4;
+    --popover: #22252a;
+    --popover-foreground: #e5e5e5;
 
-    /* 暗色模式：反转中性灰梯度（50 最暗，900 最亮） */
-    --color-neutral-50: #0a0a0a;
-    --color-neutral-100: #171717;
-    --color-neutral-200: #1f1f1f;
+    --primary: #0065fd;
+    --primary-foreground: #ffffff;
+    --secondary: #22252a;
+    --secondary-foreground: #e5e5e5;
+    --muted: #161a20;
+    --muted-foreground: #afbbcb;
+    --accent: #00266b;
+    --accent-foreground: #bfdbfe;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #333942;
+    --input: #333942;
+    --ring: #00266b;
+
+    --chart-1: #60a5fa;
+    --chart-2: #3b82f6;
+    --chart-3: #2563eb;
+    --chart-4: #1d4ed8;
+    --chart-5: #1e40af;
+    --sidebar: #171717;
+    --sidebar-foreground: #e5e5e5;
+    --sidebar-primary: #0065fd;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #00266b;
+    --sidebar-accent-foreground: #bfdbfe;
+    --sidebar-border: #404040;
+    --sidebar-ring: #00266b;
+
+    /* 中性灰映射为暗色梯度 */
+    --color-neutral-50: #0e1115;
+    --color-neutral-100: #161a20;
+    --color-neutral-200: #1f2937;
     --color-neutral-300: #2a2a2a;
     --color-neutral-400: #525252;
-    --color-neutral-500: #737373;
-    --color-neutral-600: #a3a3a3;
-    --color-neutral-700: #d4d4d4;
+    --color-neutral-500: #afbbcb;
+    --color-neutral-600: #d4d4d4;
+    --color-neutral-700: #e5e5e5;
     --color-neutral-800: #ededed;
     --color-neutral-900: #f5f5f5;
 
-    /* primary 色在暗色模式下提亮一些以保持对比度 */
+    /* primary 在暗色模式提亮以保持对比度 */
     --color-primary: #60a5fa;
     --color-primary-hover: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
   }
 
-  /* 暗色模式：覆盖 Tailwind 的 bg-white / text-white 工具类
-   * 当前组件大量使用 bg-white 作为卡片/容器背景，
-   * 在暗色模式下需映射为深色，否则会出现「白卡片嵌在深色背景」的割裂感。
-   * text-white 主要用于按钮文字（primary 背景上的白字），保持不变。
-   */
+  /* 暗色模式：覆盖 bg-white 工具类（现有组件大量使用）
+   * 映射到 Doubao 暗色 card 表面，避免「白卡片嵌在深色背景」 */
   .bg-white {
-    background-color: var(--color-neutral-100) !important;
+    background-color: var(--card) !important;
   }
-
-  /* 暗色模式：白底半透明背景（如导航栏 backdrop-blur）也需调整为深色半透明 */
   .bg-white\/80 {
-    background-color: rgba(23, 23, 23, 0.8) !important;
+    background-color: rgba(14, 17, 21, 0.8) !important;
   }
-
   .bg-white\/90 {
-    background-color: rgba(23, 23, 23, 0.9) !important;
+    background-color: rgba(14, 17, 21, 0.9) !important;
   }
-
   .bg-white\/95 {
-    background-color: rgba(23, 23, 23, 0.95) !important;
+    background-color: rgba(14, 17, 21, 0.95) !important;
   }
-
   .bg-white\/70 {
-    background-color: rgba(23, 23, 23, 0.7) !important;
+    background-color: rgba(14, 17, 21, 0.7) !important;
   }
 
-  /* 暗色模式：边框颜色调整为深色系 */
+  /* 暗色模式：边框适配 */
   .border-neutral-200 {
-    border-color: var(--color-neutral-800) !important;
+    border-color: var(--sidebar-border) !important;
   }
-
   .border-neutral-300 {
     border-color: var(--color-neutral-700) !important;
   }
 }
 
+/* ============================================================
+ * 基础样式
+ * ============================================================ */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* 自定义滚动条（Doubao 风格） */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted-foreground) 28%, transparent);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--muted-foreground) 45%, transparent);
+}
+
+/* ============================================================
+ * 动画类（保留原有，供工作流进度条、卡片入场、弹窗使用）
+ * ============================================================ */
 
 /* 工作流任务进度条动画：模拟从 0% 到 95% 缓慢推进（约 4 分钟） */
 @keyframes workflow-progress {
-  0% {
-    width: 0%;
-  }
-  100% {
-    width: 95%;
-  }
+  0% { width: 0%; }
+  100% { width: 95%; }
 }
-
-/* 进度条动画工具类 */
 .animate-workflow-progress {
   animation: workflow-progress 240s ease-out forwards;
 }
 
 /* 淡入动画：用于卡片、提示等元素入场 */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
 
 /* 弹窗入场动画：用于模态框、提示弹窗 */
 @keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
-
 .animate-scale-in {
   animation: scale-in 0.2s ease-out;
 }
 
-/* 触摸反馈：可点击元素的按压缩放（配合 active: 使用） */
+/* 触摸反馈：可点击元素的按压缩放 */
 .tap-feedback {
   transition: transform 0.15s ease;
 }
-
 .tap-feedback:active {
   transform: scale(0.97);
+}
+
+/* 轮播图淡入切换 */
+@keyframes carousel-fade {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+.animate-carousel-fade {
+  animation: carousel-fade 0.6s ease-out;
 }
 
 /* 尊重用户「减少动态效果」的系统偏好 */
