@@ -6,6 +6,7 @@ import {
   generateOrderNo,
   isAlipayConfigured,
 } from "@/lib/alipay";
+import { getPlanByName } from "@/lib/plans";
 
 // 积分包配置（一次性购买，单位：元）
 // 价格梯度：购买越多越优惠
@@ -84,7 +85,7 @@ export const POST = requireAuth(async (request, { userId }) => {
   let credits = 0;
 
   if (type === "subscription") {
-    // 订阅套餐
+    // 订阅套餐 / 点数包套餐
     const planName =
       typeof body.planName === "string" ? body.planName.trim() : "";
     if (!planName) {
@@ -108,6 +109,18 @@ export const POST = requireAuth(async (request, { userId }) => {
     planId = plan.id;
     amount = Number(plan.monthlyPrice);
     subject = `燃渡AI ${plan.name} 套餐订阅`;
+
+    // 检查是否为点数包套餐（通过本地常量识别）
+    // 点数包套餐需要在支付成功后发放积分并设置有效期
+    const planInfo = getPlanByName(plan.name);
+    if (planInfo?.type === "credits_pack" && planInfo.credits) {
+      // 点数包：改用 credits 类型，记录积分数量
+      // （覆盖外层 type 变量需要重新声明，这里通过 credits 字段传递）
+      credits = planInfo.credits;
+      // 注意：type 仍为 "subscription"，但 credits > 0，
+      // 回调中将通过 credits > 0 判断为点数包
+      subject = `燃渡AI ${plan.name} 点数包`;
+    }
   } else {
     // 积分充值
     const packageId =

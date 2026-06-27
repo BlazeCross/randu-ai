@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAlipayConfigured } from "@/lib/alipay";
+import { getPlanByName } from "@/lib/plans";
 
 // 积分包配置（与 /api/payment/create 保持一致）
 // 这里独立定义避免循环依赖
@@ -25,6 +26,10 @@ interface PlanItem {
   monthlyPrice: number;
   dailyLimit: number;
   features: string[];
+  // Phase 17.2：点数包套餐扩展字段
+  type: "subscription" | "credits_pack";
+  credits?: number;
+  validDays?: number;
 }
 
 /**
@@ -32,8 +37,8 @@ interface PlanItem {
  *
  * 响应：
  * - paymentEnabled: 支付功能是否已开通
- * - plans: 套餐列表（从数据库读取）
- * - creditsPackages: 积分包列表（硬编码）
+ * - plans: 套餐列表（从数据库读取，含订阅套餐和点数包套餐）
+ * - creditsPackages: 积分包列表（硬编码，按量购买）
  */
 export async function GET() {
   // 查询所有套餐
@@ -48,17 +53,25 @@ export async function GET() {
     },
   });
 
-  const planItems: PlanItem[] = plans.map((p) => ({
-    id: p.id,
-    name: p.name,
-    monthlyPrice: Number(p.monthlyPrice),
-    dailyLimit: p.dailyLimit,
-    features: Array.isArray(p.features)
-      ? (p.features as unknown as string[]).filter(
-          (f): f is string => typeof f === "string",
-        )
-      : [],
-  }));
+  const planItems: PlanItem[] = plans.map((p) => {
+    // 通过本地常量识别套餐类型（数据库无 type 列）
+    const planInfo = getPlanByName(p.name);
+    const type = planInfo?.type ?? "subscription";
+    return {
+      id: p.id,
+      name: p.name,
+      monthlyPrice: Number(p.monthlyPrice),
+      dailyLimit: p.dailyLimit,
+      features: Array.isArray(p.features)
+        ? (p.features as unknown as string[]).filter(
+            (f): f is string => typeof f === "string",
+          )
+        : [],
+      type,
+      credits: planInfo?.credits,
+      validDays: planInfo?.validDays,
+    };
+  });
 
   return NextResponse.json({
     paymentEnabled: isAlipayConfigured(),

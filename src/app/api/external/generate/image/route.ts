@@ -9,6 +9,8 @@ import {
   getClientIp,
 } from "@/lib/apiKey";
 import { generateImage } from "@/lib/volcengine";
+import { moderateText } from "@/lib/moderation";
+import { checkAntiAbuse, refundAntiAbuseCredits } from "@/lib/userAntiAbuse";
 
 // 单张图片消耗点数（Seedream 文生图约 0.1 元/张）
 const IMAGE_CREDITS_PER_PIECE = 5;
@@ -72,6 +74,15 @@ export const POST = requireApiKey(
       );
     }
 
+    // 内容审核（输入）
+    const inputModeration = moderateText(prompt);
+    if (!inputModeration.passed) {
+      return NextResponse.json(
+        { message: `输入内容包含违规信息（${inputModeration.category}），请修改后重试` },
+        { status: 400 },
+      );
+    }
+
     // 校验数量
     if (!Number.isInteger(n) || n < 1 || n > MAX_IMAGE_COUNT) {
       return NextResponse.json(
@@ -96,6 +107,30 @@ export const POST = requireApiKey(
         { message: "账号不可用" },
         { status: 403 },
       );
+    }
+
+    // 单用户防刷检查（每分钟 10 次 + 每日积分上限 + IP 多账号检测）
+    const clientIp = getClientIp(request);
+    const antiAbuse = checkAntiAbuse(userId, creditsCost, clientIp);
+    if (!antiAbuse.allowed) {
+      if (antiAbuse.reason === "user_rate") {
+        return NextResponse.json(
+          {
+            message: "请求过于频繁，请稍后再试（每分钟限制 10 次调用）",
+            retryAfterMs: antiAbuse.retryAfterMs,
+          },
+          { status: 429 },
+        );
+      }
+      if (antiAbuse.reason === "daily_credits") {
+        return NextResponse.json(
+          {
+            message: "今日积分消耗已达上限，请明日再试",
+            resetAt: antiAbuse.resetAt,
+          },
+          { status: 429 },
+        );
+      }
     }
 
     // 2. 预扣费（原子操作，防并发超扣）
@@ -123,8 +158,9 @@ export const POST = requireApiKey(
       urls = result.urls;
       apiCost = result.cost;
     } catch (error) {
-      // 调用失败：退还预扣积分 + 记录失败日志
+      // 调用失败：退还预扣积分 + 回滚防刷积分 + 记录失败日志
       await refundUserCredits(userId, creditsCost).catch(() => {});
+      refundAntiAbuseCredits(userId, creditsCost);
       const errorMessage =
         error instanceof Error ? error.message : "Seedream 生图失败";
       await logApiCall({
@@ -146,8 +182,9 @@ export const POST = requireApiKey(
     }
 
     if (urls.length === 0) {
-      // 模型返回成功但未包含图片 URL → 退还预扣积分
+      // 模型返回成功但未包含图片 URL → 退还预扣积分 + 回滚防刷积分
       await refundUserCredits(userId, creditsCost).catch(() => {});
+      refundAntiAbuseCredits(userId, creditsCost);
       await logApiCall({
         apiKeyId,
         userId,

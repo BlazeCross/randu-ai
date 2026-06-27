@@ -53,12 +53,74 @@
   --color-neutral-700: #374151;
   --color-neutral-800: #1f2937;
   --color-neutral-900: #111827;
+
+  /* 暗色模式中性灰覆盖（Phase 2.13）
+   * 设计取舍：当前所有组件使用 light 主题设计（bg-white / text-neutral-900），
+   * 暂不引入 dark: 变体。当系统切换至深色模式时，通过 CSS 变量映射
+   * 让中性灰自适应深色，避免出现「深色 body + 白色卡片」的不一致。
+   * 后续若需完整暗色模式，再为各组件补齐 dark: 变体。
+   */
 }
 
+/* 暗色模式：当用户系统开启深色模式时，映射中性灰为深色系
+ * 这样 bg-neutral-50/100 → 深色背景，text-neutral-900 → 浅色文字
+ * 保持整体视觉一致，避免半暗半亮的割裂感
+ */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    /* 暗色模式：反转中性灰梯度（50 最暗，900 最亮） */
+    --color-neutral-50: #0a0a0a;
+    --color-neutral-100: #171717;
+    --color-neutral-200: #1f1f1f;
+    --color-neutral-300: #2a2a2a;
+    --color-neutral-400: #525252;
+    --color-neutral-500: #737373;
+    --color-neutral-600: #a3a3a3;
+    --color-neutral-700: #d4d4d4;
+    --color-neutral-800: #ededed;
+    --color-neutral-900: #f5f5f5;
+
+    /* primary 色在暗色模式下提亮一些以保持对比度 */
+    --color-primary: #60a5fa;
+    --color-primary-hover: #93c5fd;
+  }
+
+  /* 暗色模式：覆盖 Tailwind 的 bg-white / text-white 工具类
+   * 当前组件大量使用 bg-white 作为卡片/容器背景，
+   * 在暗色模式下需映射为深色，否则会出现「白卡片嵌在深色背景」的割裂感。
+   * text-white 主要用于按钮文字（primary 背景上的白字），保持不变。
+   */
+  .bg-white {
+    background-color: var(--color-neutral-100) !important;
+  }
+
+  /* 暗色模式：白底半透明背景（如导航栏 backdrop-blur）也需调整为深色半透明 */
+  .bg-white\/80 {
+    background-color: rgba(23, 23, 23, 0.8) !important;
+  }
+
+  .bg-white\/90 {
+    background-color: rgba(23, 23, 23, 0.9) !important;
+  }
+
+  .bg-white\/95 {
+    background-color: rgba(23, 23, 23, 0.95) !important;
+  }
+
+  .bg-white\/70 {
+    background-color: rgba(23, 23, 23, 0.7) !important;
+  }
+
+  /* 暗色模式：边框颜色调整为深色系 */
+  .border-neutral-200 {
+    border-color: var(--color-neutral-800) !important;
+  }
+
+  .border-neutral-300 {
+    border-color: var(--color-neutral-700) !important;
   }
 }
 

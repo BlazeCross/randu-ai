@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
-import { preDeductUserCredits, refundUserCredits } from "@/lib/apiKey";
+import { preDeductUserCredits, refundUserCredits, getClientIp } from "@/lib/apiKey";
 import {
   chatCompletion,
   generateImage,
   type ChatMessage,
 } from "@/lib/volcengine";
+import { moderateText } from "@/lib/moderation";
+import { checkAntiAbuse, refundAntiAbuseCredits } from "@/lib/userAntiAbuse";
 
 // 对话积分消耗
 const TEXT_CHAT_CREDITS = 1;
@@ -84,6 +86,15 @@ export const POST = requireAuth(async (request, { userId }) => {
     );
   }
 
+  // 内容审核（输入）
+  const inputModeration = moderateText(userInput);
+  if (!inputModeration.passed) {
+    return NextResponse.json(
+      { message: `输入内容包含违规信息（${inputModeration.category}），请修改后重试` },
+      { status: 400 },
+    );
+  }
+
   // 查询用户（获取积分余额与订阅状态）
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -112,6 +123,30 @@ export const POST = requireAuth(async (request, { userId }) => {
   );
 
   const creditsCost = isImageRequest ? IMAGE_GEN_CREDITS : TEXT_CHAT_CREDITS;
+
+  // 单用户防刷检查（每分钟 10 次 + 每日积分上限 + IP 多账号检测）
+  const clientIp = getClientIp(request);
+  const antiAbuse = checkAntiAbuse(userId, creditsCost, clientIp);
+  if (!antiAbuse.allowed) {
+    if (antiAbuse.reason === "user_rate") {
+      return NextResponse.json(
+        {
+          message: `请求过于频繁，请稍后再试（每分钟限制 10 次调用）`,
+          retryAfterMs: antiAbuse.retryAfterMs,
+        },
+        { status: 429 },
+      );
+    }
+    if (antiAbuse.reason === "daily_credits") {
+      return NextResponse.json(
+        {
+          message: `今日积分消耗已达上限（5000 积分），请明日再试`,
+          resetAt: antiAbuse.resetAt,
+        },
+        { status: 429 },
+      );
+    }
+  }
 
   // 预扣费（原子操作，防并发超扣）
   const preDeducted = await preDeductUserCredits(userId, creditsCost);
@@ -167,6 +202,18 @@ export const POST = requireAuth(async (request, { userId }) => {
 
       const result = await chatCompletion({ messages });
 
+      // 内容审核（输出）
+      const outputModeration = moderateText(result.content || "");
+      if (!outputModeration.passed) {
+        // 命中敏感词，不展示，退还积分 + 回滚防刷积分计数
+        await refundUserCredits(userId, creditsCost).catch(() => {});
+        refundAntiAbuseCredits(userId, creditsCost);
+        return NextResponse.json(
+          { message: "AI 回复内容审核未通过，已退还积分，请重新提问" },
+          { status: 451 },
+        );
+      }
+
       // 确认扣费：累加使用次数（积分已在预扣时扣减）
       await prisma.user.update({
         where: { id: userId },
@@ -182,8 +229,9 @@ export const POST = requireAuth(async (request, { userId }) => {
       });
     }
   } catch (error) {
-    // 调用失败：退还预扣积分
+    // 调用失败：退还预扣积分 + 回滚防刷积分计数
     await refundUserCredits(userId, creditsCost).catch(() => {});
+    refundAntiAbuseCredits(userId, creditsCost);
     console.error("[POST /api/chat] 失败:", error);
     const msg = error instanceof Error ? error.message : "智能体调用失败";
     return NextResponse.json(

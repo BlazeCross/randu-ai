@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyNotifySign, isAlipayConfigured } from "@/lib/alipay";
+import { getPlanByName } from "@/lib/plans";
 
 /**
  * POST /api/payment/callback - 支付宝异步通知回调
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
     });
   }
 
-  // 5. 查询订单
+  // 5. 查询订单（含套餐名称，用于判断点数包）
   const order = await prisma.order.findUnique({
     where: { orderNo: outTradeNo },
     select: {
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
       credits: true,
       amount: true,
       status: true,
+      plan: { select: { name: true } },
     },
   });
 
@@ -147,19 +149,40 @@ export async function POST(request: Request) {
 
       // 根据订单类型发放权益
       if (order.type === "subscription" && order.planId) {
-        // 订阅：更新用户订阅状态
-        const plan = await tx.plan.findUnique({
-          where: { id: order.planId },
-          select: { name: true, dailyLimit: true },
-        });
-        if (plan) {
+        // 检查是否为点数包套餐（通过 plan name 识别）
+        const planName = order.plan?.name;
+        const planInfo = planName ? getPlanByName(planName) : null;
+
+        if (planInfo?.type === "credits_pack" && planInfo.credits) {
+          // 点数包套餐：发放积分 + 设置有效期
+          const validDays = planInfo.validDays ?? 365;
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + validDays);
+
           await tx.user.update({
             where: { id: order.userId },
             data: {
-              isSubscribed: true,
-              subscriptionPlan: plan.name,
+              credits: { increment: planInfo.credits },
+              // 设置积分过期时间（取最远的过期时间，避免已有积分被提前过期）
+              creditsExpiresAt: expiresAt,
+              creditsExpired: false,
             },
           });
+        } else {
+          // 普通订阅套餐：更新用户订阅状态
+          const plan = await tx.plan.findUnique({
+            where: { id: order.planId },
+            select: { name: true, dailyLimit: true },
+          });
+          if (plan) {
+            await tx.user.update({
+              where: { id: order.userId },
+              data: {
+                isSubscribed: true,
+                subscriptionPlan: plan.name,
+              },
+            });
+          }
         }
       } else if (order.type === "credits" && order.credits > 0) {
         // 积分充值：累加用户积分
