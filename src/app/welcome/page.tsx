@@ -197,7 +197,7 @@ export default function WelcomePage() {
   // loading 时显示骨架
   if (loading || !user) {
     return (
-      <main className="flex flex-1 items-center justify-center bg-gradient-to-b from-primary-50 via-white to-white">
+      <main className="flex flex-1 items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
       </main>
     );
@@ -208,11 +208,11 @@ export default function WelcomePage() {
   const daysRemaining = profile?.daysRemaining ?? 0;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white">
+    <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         {/* 顶部欢迎横幅 */}
         <div className="mb-10 text-center">
-          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-gradient-to-br from-primary-500 to-primary-700 text-3xl shadow-primary-600/25">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-primary text-3xl">
             <span role="img" aria-label="欢迎">
               🎉
             </span>
@@ -226,8 +226,8 @@ export default function WelcomePage() {
               : `当前处于 7 天免费试用期，剩余 ${daysRemaining} 天，全功能开放`}
           </p>
           {profile && (
-            <div className="mt-4 inline-flex items-center gap-4 rounded-full border border-success-200 bg-success-50 px-4 py-2 text-sm">
-              <span className="flex items-center gap-1.5 text-success-700">
+            <div className="mt-4 inline-flex items-center gap-4 rounded-full border border-success/30 bg-success/10 px-4 py-2 text-sm">
+              <span className="flex items-center gap-1.5 text-success">
                 <svg
                   className="h-4 w-4"
                   fill="none"
@@ -243,8 +243,8 @@ export default function WelcomePage() {
                 </svg>
                 积分余额：<strong className="font-semibold">{profile.credits}</strong>
               </span>
-              <span className="text-success-200">|</span>
-              <span className="text-success-700">
+              <span className="text-success/30">|</span>
+              <span className="text-success">
                 累计使用：<strong className="font-semibold">{profile.totalUsed ?? 0}</strong> 次
               </span>
             </div>
@@ -253,8 +253,8 @@ export default function WelcomePage() {
 
         {/* 完善昵称卡片（仅在未设置时显示） */}
         {!profile?.nickname && (
-          <div className="mb-8 overflow-hidden rounded-[var(--radius)] border border-primary-200 bg-card">
-            <div className="border-b border-border bg-primary-50/50 px-6 py-4">
+          <div className="mb-8 overflow-hidden rounded-[var(--radius)] border border-primary/30 bg-card">
+            <div className="border-b border-border bg-primary/5 px-6 py-4">
               <h2 className="text-base font-semibold text-foreground">
                 完善你的资料
               </h2>
@@ -290,13 +290,13 @@ export default function WelcomePage() {
                 <button
                   type="submit"
                   disabled={savingNickname || !nickname.trim()}
-                  className="rounded-[var(--radius-sm)] bg-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                  className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
                 >
                   {savingNickname ? "保存中..." : "保存昵称"}
                 </button>
               </form>
               {nicknameError && (
-                <p className="mt-2 text-sm text-red-600">{nicknameError}</p>
+                <p className="mt-2 text-sm text-destructive">{nicknameError}</p>
               )}
             </div>
           </div>
@@ -312,7 +312,7 @@ export default function WelcomePage() {
               <Link
                 key={card.title}
                 href={card.href}
-                className="group relative overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-md"
+                className="group relative overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-primary hover:bg-accent/10"
               >
                 <div className="flex items-start gap-4">
                   {/* 图标 */}
@@ -365,7 +365,7 @@ export default function WelcomePage() {
           <button
             type="button"
             onClick={() => router.push("/dashboard")}
-            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-8 py-3 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-white transition-all hover:bg-primary-hover"
           >
             进入个人中心
             <svg

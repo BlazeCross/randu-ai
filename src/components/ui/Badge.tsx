@@ -25,7 +25,7 @@ export interface BadgeProps
 const BADGE_STYLES: Record<BadgeVariant, string> = {
   default: "bg-muted text-foreground",
   primary: "bg-accent text-accent-foreground",
-  success: "bg-success/15 text-success-700",
+  success: "bg-success/15 text-success",
   danger: "bg-destructive/15 text-destructive",
   outline: "border border-border text-foreground",
 };

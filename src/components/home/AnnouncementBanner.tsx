@@ -89,10 +89,10 @@ export default function AnnouncementBanner() {
     : {};
 
   return (
-    <div className="border-b border-primary-100 bg-gradient-to-r from-primary-50 to-success-50">
+    <div className="border-b border-border bg-accent">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
         {/* 左侧喇叭图标 */}
-        <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700">
+        <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-muted text-accent-foreground">
           <svg
             className="h-3.5 w-3.5"
             fill="none"
@@ -113,20 +113,20 @@ export default function AnnouncementBanner() {
           {...wrapperProps}
           className="flex min-w-0 flex-1 items-center gap-2 text-sm"
         >
-          <span className="font-semibold text-primary-800">
+          <span className="font-semibold text-foreground">
             {announcement.title}
           </span>
           {announcement.content && (
             <>
-              <span className="text-primary-300">·</span>
-              <span className="truncate text-primary-700">
+              <span className="text-muted-foreground">·</span>
+              <span className="truncate text-accent-foreground">
                 {announcement.content}
               </span>
             </>
           )}
           {announcement.link && (
             <svg
-              className="h-3 w-3 flex-shrink-0 text-primary-500"
+              className="h-3 w-3 flex-shrink-0 text-primary"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -146,7 +146,7 @@ export default function AnnouncementBanner() {
           type="button"
           onClick={handleDismiss}
           aria-label="关闭公告"
-          className="flex-shrink-0 rounded-full p-1 text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-700"
+          className="flex-shrink-0 rounded-full p-1 text-primary transition-colors hover:bg-muted hover:text-accent-foreground"
         >
           <svg
             className="h-3.5 w-3.5"

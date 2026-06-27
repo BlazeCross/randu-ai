@@ -43,7 +43,7 @@ function formatDate(dateStr: string): string {
  * - 已订阅：显示当前套餐名 + 每日调用限额 + 续费/升级按钮
  * - 未订阅且试用过期：显示"试用已过期" + 升级套餐按钮
  *
- * 使用 Tailwind 主题色（primary/success/neutral）保证视觉一致性。
+ * 使用 Doubao Design Token 保证视觉一致性与暗色模式兼容。
  */
 export default function SubscriptionCard({
   user,
@@ -66,13 +66,13 @@ export default function SubscriptionCard({
   // 已订阅状态
   if (isSubscribed) {
     return (
-      <div className="rounded-[var(--radius)] border border-success-200 bg-gradient-to-br from-success-50 to-card p-6">
+      <div className="rounded-[var(--radius)] border border-success/30 bg-success/10 p-6">
         {/* 头部：套餐状态标签 + 套餐名 */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">
             订阅状态
           </h2>
-          <span className="inline-flex items-center rounded-full bg-success-100 px-3 py-0.5 text-xs font-medium text-success-700">
+          <span className="inline-flex items-center rounded-full bg-success/15 px-3 py-0.5 text-xs font-medium text-success">
             已订阅
             {subscriptionPlan && ` · ${subscriptionPlan}`}
           </span>
@@ -90,7 +90,7 @@ export default function SubscriptionCard({
           {/* 每日调用限额 */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">每日调用限额</span>
-            <span className="text-sm font-semibold text-primary-700">
+            <span className="text-sm font-semibold text-primary">
               {subscribedPlan ? `${subscribedPlan.dailyLimit} 次/天` : "不限"}
             </span>
           </div>
@@ -131,14 +131,14 @@ export default function SubscriptionCard({
           <button
             type="button"
             onClick={onUpgrade}
-            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] border border-primary-200 bg-card px-4 py-2.5 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-50"
+            className="inline-flex flex-1 items-center justify-center rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             续费
           </button>
           <button
             type="button"
             onClick={onUpgrade}
-            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
           >
             升级套餐
           </button>
@@ -150,23 +150,23 @@ export default function SubscriptionCard({
   // 试用已过期状态
   if (isTrialExpired) {
     return (
-      <div className="rounded-[var(--radius)] border border-red-200 bg-gradient-to-br from-red-50 to-card p-6">
+      <div className="rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-6">
         {/* 头部：试用已过期标签 */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">
             订阅状态
           </h2>
-          <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-0.5 text-xs font-medium text-red-600">
+          <span className="inline-flex items-center rounded-full bg-destructive/15 px-3 py-0.5 text-xs font-medium text-destructive">
             试用已过期
           </span>
         </div>
 
         <div className="space-y-3">
           {/* 状态说明 */}
-          <div className="rounded-[var(--radius-sm)] bg-red-50/60 p-4">
+          <div className="rounded-[var(--radius-sm)] bg-destructive/10 p-4">
             <div className="flex items-start gap-2.5">
               <svg
-                className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -179,10 +179,10 @@ export default function SubscriptionCard({
                 />
               </svg>
               <div>
-                <p className="text-sm font-semibold text-red-900">
+                <p className="text-sm font-semibold text-foreground">
                   试用已过期
                 </p>
-                <p className="mt-0.5 text-xs text-red-700">
+                <p className="mt-0.5 text-xs text-destructive">
                   您的试用期已结束，升级套餐即可继续使用全部功能
                 </p>
               </div>
@@ -202,7 +202,7 @@ export default function SubscriptionCard({
         <button
           type="button"
           onClick={onUpgrade}
-          className="mt-5 w-full rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+          className="mt-5 w-full rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
         >
           升级套餐
         </button>
@@ -212,13 +212,13 @@ export default function SubscriptionCard({
 
   // 试用中状态（默认）
   return (
-    <div className="rounded-[var(--radius)] border border-primary-200 bg-gradient-to-br from-primary-50 to-card p-6">
+    <div className="rounded-[var(--radius)] border border-primary/30 bg-primary/10 p-6">
       {/* 头部：试用中标签 */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-base font-semibold text-foreground">
           订阅状态
         </h2>
-        <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-0.5 text-xs font-medium text-primary-700">
+        <span className="inline-flex items-center rounded-full bg-accent px-3 py-0.5 text-xs font-medium text-accent-foreground">
           试用中
         </span>
       </div>
@@ -237,7 +237,7 @@ export default function SubscriptionCard({
           <span className="text-sm text-muted-foreground">剩余天数</span>
           <span
             className={`text-sm font-bold ${
-              user.daysRemaining > 0 ? "text-success-600" : "text-red-600"
+              user.daysRemaining > 0 ? "text-success" : "text-destructive"
             }`}
           >
             {user.daysRemaining} 天
@@ -256,9 +256,9 @@ export default function SubscriptionCard({
             <div
               className={`h-full rounded-full transition-all ${
                 progressPercent >= 100
-                  ? "bg-red-500"
+                  ? "bg-destructive"
                   : progressPercent >= 80
-                    ? "bg-amber-500"
+                    ? "bg-accent"
                     : "bg-primary"
               }`}
               style={{ width: `${progressPercent}%` }}
@@ -271,7 +271,7 @@ export default function SubscriptionCard({
       <button
         type="button"
         onClick={onUpgrade}
-        className="mt-5 w-full rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+        className="mt-5 w-full rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
       >
         升级套餐
       </button>

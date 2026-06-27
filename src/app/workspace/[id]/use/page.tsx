@@ -456,7 +456,7 @@ export default function WorkflowUsePage() {
             </p>
             <Link
               href="/workspace"
-              className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+              className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
             >
               返回工作台
             </Link>
@@ -487,7 +487,7 @@ export default function WorkflowUsePage() {
             <button
               type="button"
               onClick={() => router.push("/login")}
-              className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
+              className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-hover"
             >
               前往登录
             </button>
@@ -499,10 +499,10 @@ export default function WorkflowUsePage() {
               <>
                 {/* 试用已过期 */}
                 {trialExpired ? (
-                  <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border border-red-200 bg-red-50 p-5 sm:flex-row sm:items-center">
+                  <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-5 sm:flex-row sm:items-center">
                     <div className="flex items-start gap-3">
                       <svg
-                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
+                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -515,10 +515,10 @@ export default function WorkflowUsePage() {
                         />
                       </svg>
                       <div>
-                        <p className="text-sm font-semibold text-red-900">
+                        <p className="text-sm font-semibold text-foreground">
                           试用已过期，请升级套餐继续使用
                         </p>
-                        <p className="mt-0.5 text-xs text-red-700">
+                        <p className="mt-0.5 text-xs text-destructive">
                           您的 7 天试用期已结束，升级后即可无限制使用
                         </p>
                       </div>
@@ -526,7 +526,7 @@ export default function WorkflowUsePage() {
                     <button
                       type="button"
                       onClick={() => setUpgradeReason("expired")}
-                      className="inline-flex flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+                      className="inline-flex flex-shrink-0 items-center justify-center rounded-full bg-destructive px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[color-mix(in_srgb,var(--destructive)_90%,#000)]"
                     >
                       升级套餐
                     </button>
@@ -536,15 +536,15 @@ export default function WorkflowUsePage() {
                   <div
                     className={`mb-6 rounded-[var(--radius)] border p-5 ${
                       trialLimitReached
-                        ? "border-amber-200 bg-amber-50"
-                        : "border-primary-200 bg-primary-50/50"
+                        ? "border-accent bg-accent"
+                        : "border-primary/30 bg-primary/10"
                     }`}
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-3">
                         <svg
                           className={`h-5 w-5 flex-shrink-0 ${
-                            trialLimitReached ? "text-amber-600" : "text-primary-600"
+                            trialLimitReached ? "text-accent-foreground" : "text-primary"
                           }`}
                           fill="none"
                           stroke="currentColor"
@@ -560,7 +560,7 @@ export default function WorkflowUsePage() {
                         <div>
                           <p
                             className={`text-sm font-semibold ${
-                              trialLimitReached ? "text-amber-900" : "text-foreground"
+                              trialLimitReached ? "text-foreground" : "text-foreground"
                             }`}
                           >
                             {trialLimitReached
@@ -569,7 +569,7 @@ export default function WorkflowUsePage() {
                           </p>
                           <p
                             className={`mt-0.5 text-xs ${
-                              trialLimitReached ? "text-amber-700" : "text-muted-foreground"
+                              trialLimitReached ? "text-accent-foreground" : "text-muted-foreground"
                             }`}
                           >
                             {trialLimitReached
@@ -582,7 +582,7 @@ export default function WorkflowUsePage() {
                         <button
                           type="button"
                           onClick={() => setUpgradeReason("limit_reached")}
-                          className="inline-flex flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                          className="inline-flex flex-shrink-0 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                         >
                           升级套餐
                         </button>
@@ -594,9 +594,9 @@ export default function WorkflowUsePage() {
                         <div
                           className={`h-full rounded-full transition-all ${
                             trialLimitReached
-                              ? "bg-amber-500"
+                              ? "bg-accent"
                               : trialUsageCount / trialLimit >= 0.8
-                                ? "bg-amber-500"
+                                ? "bg-accent"
                                 : "bg-primary"
                           }`}
                           style={{
@@ -640,7 +640,7 @@ export default function WorkflowUsePage() {
                       onUploadError={handleUploadError}
                     />
                     {uploadError && (
-                      <p className="mt-3 text-sm text-red-600">{uploadError}</p>
+                      <p className="mt-3 text-sm text-destructive">{uploadError}</p>
                     )}
                   </div>
 
@@ -649,7 +649,7 @@ export default function WorkflowUsePage() {
                     type="button"
                     onClick={handleLegacyGenerate}
                     disabled={!legacyCanGenerate}
-                    className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3.5 text-base font-semibold text-white shadow-primary-600/20 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                    className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3.5 text-base font-semibold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {submitting ? (
                       <>
@@ -690,10 +690,10 @@ export default function WorkflowUsePage() {
 
               {/* 进度展示区 */}
               {showProgress && (
-                <div className="animate-fade-in rounded-[var(--radius)] border border-primary-200 bg-primary-50/50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-primary/30 bg-primary/10 p-6">
                   {/* 状态指示 + 已等待时间 */}
                   <div className="mb-4 flex items-center justify-between">
-                    <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-0.5 text-xs font-medium text-primary-700">
+                    <span className="inline-flex items-center rounded-full bg-accent px-3 py-0.5 text-xs font-medium text-accent-foreground">
                       {currentStatusLabel}
                     </span>
                     {isPolling && (
@@ -722,10 +722,10 @@ export default function WorkflowUsePage() {
 
               {/* 结果展示区 */}
               {isCompleted && (
-                <div className="animate-fade-in rounded-[var(--radius)] border border-success-200 bg-success-50/50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-success/30 bg-success/10 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
-                      className="h-5 w-5 text-success-600"
+                      className="h-5 w-5 text-success"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -783,7 +783,7 @@ export default function WorkflowUsePage() {
                                 void navigator.clipboard.writeText(outputUrl);
                               }
                             }}
-                            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                            className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                           >
                             <svg
                               className="mr-2 h-4 w-4"
@@ -805,7 +805,7 @@ export default function WorkflowUsePage() {
                           <a
                             href={outputUrl}
                             download
-                            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                            className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                           >
                             <svg
                               className="mr-2 h-4 w-4"
@@ -827,7 +827,7 @@ export default function WorkflowUsePage() {
                         <button
                           type="button"
                           onClick={handleReset}
-                          className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                          className="inline-flex flex-1 items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
                         >
                           重新生成
                         </button>
@@ -836,7 +836,7 @@ export default function WorkflowUsePage() {
                   ) : (
                     <>
                       {/* outputUrl 为空的异常情况 */}
-                      <p className="mb-4 text-sm text-red-700">
+                      <p className="mb-4 text-sm text-destructive">
                         结果获取失败，请重试
                       </p>
                       {debugInfo && (
@@ -852,7 +852,7 @@ export default function WorkflowUsePage() {
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                        className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                       >
                         重试
                       </button>
@@ -863,10 +863,10 @@ export default function WorkflowUsePage() {
 
               {/* 失败提示 */}
               {isFailed && (
-                <div className="animate-fade-in rounded-[var(--radius)] border border-red-200 bg-red-50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
-                      className="h-5 w-5 text-red-600"
+                      className="h-5 w-5 text-destructive"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -891,10 +891,10 @@ export default function WorkflowUsePage() {
 
               {/* 超时提示 */}
               {isTimeout && (
-                <div className="animate-fade-in rounded-[var(--radius)] border border-amber-200 bg-amber-50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-accent bg-accent p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
-                      className="h-5 w-5 text-amber-600"
+                      className="h-5 w-5 text-accent-foreground"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -953,7 +953,7 @@ export default function WorkflowUsePage() {
                     href={workflow.feishuDocUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                    className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
                   >
                     查看详细教程
                     <svg

@@ -121,7 +121,7 @@ export default function InvitePage() {
           </p>
           <Link
             href="/login"
-            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -150,9 +150,9 @@ export default function InvitePage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-4">
             <svg
-              className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
+              className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -164,10 +164,10 @@ export default function InvitePage() {
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="flex-1 text-sm text-red-700">{error}</p>
+            <p className="flex-1 text-sm text-destructive">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="text-red-400 hover:text-red-600"
+              className="text-destructive/60 hover:text-destructive"
             >
               ✕
             </button>
@@ -183,19 +183,19 @@ export default function InvitePage() {
         {inviteInfo && (
           <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* 邀请码（左侧大卡，占 2 列） */}
-            <div className="rounded-[var(--radius)] border border-primary-200 bg-gradient-to-br from-primary-50 to-white p-6 lg:col-span-2">
+            <div className="rounded-[var(--radius)] border border-primary/30 bg-gradient-to-br from-primary/5 to-background p-6 lg:col-span-2">
               <h2 className="mb-4 text-base font-semibold text-foreground">
                 我的邀请码
               </h2>
               <div className="flex items-center gap-3">
-                <code className="flex-1 break-all rounded-[var(--radius-sm)] bg-card px-5 py-4 font-mono text-2xl font-bold tracking-[0.3em] text-primary-700 ring-2 ring-primary-100">
+                <code className="flex-1 break-all rounded-[var(--radius-sm)] bg-card px-5 py-4 font-mono text-2xl font-bold tracking-[0.3em] text-primary ring-2 ring-primary/20">
                   {inviteInfo.inviteCode}
                 </code>
                 <button
                   onClick={() =>
                     copyToClipboard(inviteInfo.inviteCode, "code")
                   }
-                  className="flex-shrink-0 rounded-[var(--radius-sm)] bg-primary px-5 py-4 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-[0.98]"
+                  className="flex-shrink-0 rounded-full bg-primary px-5 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
                 >
                   {copiedField === "code" ? "已复制" : "复制"}
                 </button>
@@ -268,7 +268,7 @@ export default function InvitePage() {
             </div>
             <div className="rounded-[var(--radius)] border border-border bg-card p-5">
               <p className="text-sm text-muted-foreground">获得奖励积分</p>
-              <p className="mt-2 text-3xl font-bold text-success-600">
+              <p className="mt-2 text-3xl font-bold text-success">
                 {inviteInfo.inviteReward}
                 <span className="ml-1 text-sm font-normal text-muted-foreground">
                   积分
@@ -285,7 +285,7 @@ export default function InvitePage() {
           </h2>
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success-100 text-xs font-bold text-success-700">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success/15 text-xs font-bold text-success">
                 1
               </span>
               <span>
@@ -293,31 +293,31 @@ export default function InvitePage() {
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success-100 text-xs font-bold text-success-700">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success/15 text-xs font-bold text-success">
                 2
               </span>
               <span>
                 好友注册成功后，你将获得
-                <strong className="mx-1 text-success-700">
+                <strong className="mx-1 text-success">
                   {INVITER_REWARD} 积分
                 </strong>
                 奖励，多邀多得，上不封顶。
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success-100 text-xs font-bold text-success-700">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success/15 text-xs font-bold text-success">
                 3
               </span>
               <span>
                 被邀请的好友首次注册将额外获得
-                <strong className="mx-1 text-success-700">
+                <strong className="mx-1 text-success">
                   {INVITEE_REWARD} 积分
                 </strong>
                 奖励（与注册赠送 500 积分不冲突，叠加发放）。
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success-100 text-xs font-bold text-success-700">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success/15 text-xs font-bold text-success">
                 4
               </span>
               <span>

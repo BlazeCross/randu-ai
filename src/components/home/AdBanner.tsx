@@ -17,13 +17,13 @@ const slides = [
     badge: "持续更新",
     gradient: "from-success-500 to-success-700",
     badgeBg: "bg-card",
-    badgeText: "text-success-700",
+    badgeText: "text-success",
   },
   {
     title: "B端专属解决方案",
     description: "企业级定制服务，专属工作流、私有化部署、一对一技术支持",
     badge: "企业服务",
-    gradient: "from-neutral-800 to-neutral-900",
+    gradient: "from-foreground to-background",
     badgeBg: "bg-primary-500",
     badgeText: "text-white",
   },
@@ -52,7 +52,7 @@ export default function AdBanner() {
   return (
     <section className="bg-background py-10 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl shadow-xl shadow-neutral-900/5">
+        <div className="relative overflow-hidden rounded-[var(--radius-lg)]">
           {/* 轮播容器 */}
           <div className="relative h-64 sm:h-72 lg:h-80">
             {slides.map((slide, index) => (

@@ -47,9 +47,9 @@ const statusConfig: Record<
   { label: string; bg: string; text: string }
 > = {
   pending: { label: "等待中", bg: "bg-muted", text: "text-muted-foreground" },
-  running: { label: "运行中", bg: "bg-primary-100", text: "text-primary-700" },
-  completed: { label: "已完成", bg: "bg-success-100", text: "text-success-700" },
-  failed: { label: "失败", bg: "bg-red-100", text: "text-red-600" },
+  running: { label: "运行中", bg: "bg-accent", text: "text-accent-foreground" },
+  completed: { label: "已完成", bg: "bg-success/15", text: "text-success" },
+  failed: { label: "失败", bg: "bg-destructive/15", text: "text-destructive" },
 };
 
 // 筛选选项
@@ -163,7 +163,7 @@ export default function HistoryPage() {
           <p className="mb-6 text-sm text-muted-foreground">登录后查看任务历史</p>
           <Link
             href="/login"
-            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -209,11 +209,11 @@ export default function HistoryPage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
-            <p className="flex-1 text-sm text-red-700">{error}</p>
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-4">
+            <p className="flex-1 text-sm text-destructive">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="text-red-400 hover:text-red-600"
+              className="text-destructive/70 hover:text-destructive"
             >
               ✕
             </button>
@@ -301,7 +301,7 @@ export default function HistoryPage() {
                           {status.label}
                         </span>
                         {isApiCall && (
-                          <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                          <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
                             API
                           </span>
                         )}
@@ -319,7 +319,7 @@ export default function HistoryPage() {
                         )}
                       </div>
                       {item.status === "failed" && item.errorMessage && (
-                        <p className="mt-1 truncate text-xs text-red-500">
+                        <p className="mt-1 truncate text-xs text-destructive">
                           {item.errorMessage}
                         </p>
                       )}
@@ -329,7 +329,7 @@ export default function HistoryPage() {
                     <div className="flex flex-shrink-0 gap-2">
                       <button
                         onClick={() => setDetail(item)}
-                        className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
+                        className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
                       >
                         详情
                       </button>
@@ -338,7 +338,7 @@ export default function HistoryPage() {
                           href={item.outputUrl!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="rounded-[var(--radius-sm)] bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary-hover"
+                          className="rounded-[var(--radius-sm)] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
                         >
                           下载
                         </a>
@@ -403,7 +403,7 @@ export default function HistoryPage() {
 
       {/* 详情弹窗 */}
       {detail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4">
           <div className="w-full max-w-2xl rounded-[var(--radius)] bg-card p-6 shadow-2xl">
             <div className="mb-4 flex items-start justify-between">
               <div>
@@ -472,8 +472,8 @@ export default function HistoryPage() {
                 </div>
               )
             ) : detail.status === "failed" ? (
-              <div className="mb-4 rounded-[var(--radius-sm)] bg-red-50 p-4">
-                <p className="text-sm text-red-700">
+              <div className="mb-4 rounded-[var(--radius-sm)] bg-destructive/10 p-4">
+                <p className="text-sm text-destructive">
                   {detail.errorMessage || "任务执行失败"}
                 </p>
               </div>
@@ -544,7 +544,7 @@ export default function HistoryPage() {
                   href={detail.outputUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                  className="flex-1 rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
                 >
                   下载结果
                 </a>
@@ -555,7 +555,7 @@ export default function HistoryPage() {
                     router.push(`/workspace/${detail.workflow!.id}/use`);
                     setDetail(null);
                   }}
-                  className="flex-1 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                  className="flex-1 rounded-full border border-border bg-card px-4 py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   再次使用
                 </button>

@@ -10,7 +10,7 @@ export default function NotFound() {
   return (
     <>
       <Navbar />
-      <main className="flex flex-1 items-center justify-center bg-gradient-to-b from-primary-50 via-white to-white px-4 py-12">
+      <main className="flex flex-1 items-center justify-center bg-background px-4 py-12">
         <div className="w-full max-w-md text-center">
           <div className="mb-6 text-7xl font-bold tracking-tight text-primary-200">
             404
@@ -24,13 +24,13 @@ export default function NotFound() {
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98]"
+              className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-hover"
             >
               返回首页
             </Link>
             <Link
               href="/workspace"
-              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               浏览工作流
             </Link>

@@ -76,7 +76,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-foreground/50 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="新用户引导"
@@ -144,7 +144,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                     key={f.label}
                     className="flex items-start gap-3 rounded-[var(--radius-sm)] border border-border bg-background p-3"
                   >
-                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
+                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
                       <svg
                         className="h-4 w-4"
                         fill="none"
@@ -171,8 +171,8 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
             )}
 
             {step === 1 && (
-              <div className="flex flex-col items-center rounded-[var(--radius-sm)] border border-primary-200 bg-primary-50 p-6 text-center">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-100 text-primary-700">
+              <div className="flex flex-col items-center rounded-[var(--radius-sm)] border border-primary/30 bg-primary/5 p-6 text-center">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-primary">
                   <svg
                     className="h-7 w-7"
                     fill="none"
@@ -187,7 +187,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                     />
                   </svg>
                 </span>
-                <p className="mt-3 text-3xl font-bold text-primary-700">500</p>
+                <p className="mt-3 text-3xl font-bold text-primary">500</p>
                 <p className="text-sm font-medium text-primary-800">赠送到账积分</p>
                 <p className="mt-1 text-xs text-primary-600">
                   可在工作台用于执行工作流、生成视频与图片等
@@ -200,9 +200,9 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                 <Link
                   href="/dashboard"
                   onClick={onClose}
-                  className="group flex flex-col items-start rounded-[var(--radius-sm)] border border-border bg-card p-4 transition-colors hover:border-primary-300 hover:bg-primary-50"
+                  className="group flex flex-col items-start rounded-[var(--radius-sm)] border border-border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-accent"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-primary-700 transition-colors group-hover:bg-primary-200">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-primary transition-colors group-hover:bg-accent">
                     <svg
                       className="h-5 w-5"
                       fill="none"
@@ -225,9 +225,9 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                 <Link
                   href="/chat"
                   onClick={onClose}
-                  className="group flex flex-col items-start rounded-[var(--radius-sm)] border border-border bg-card p-4 transition-colors hover:border-primary-300 hover:bg-primary-50"
+                  className="group flex flex-col items-start rounded-[var(--radius-sm)] border border-border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-accent"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-primary-700 transition-colors group-hover:bg-primary-200">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-primary transition-colors group-hover:bg-accent">
                     <svg
                       className="h-5 w-5"
                       fill="none"

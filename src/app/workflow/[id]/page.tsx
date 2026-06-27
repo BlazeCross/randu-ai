@@ -169,7 +169,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
             <div className="flex flex-col gap-2">
               <Link
                 href={`/workspace/${workflow.id}/use`}
-                className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
               >
                 立即使用
                 <svg
@@ -191,7 +191,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
                   href={workflow.feishuDocUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                  className="inline-flex items-center justify-center rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   查看教程
                 </a>

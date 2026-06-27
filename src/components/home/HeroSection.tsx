@@ -28,7 +28,7 @@ export default function HeroSection() {
       <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
         <div className="mx-auto max-w-3xl text-center">
           {/* 顶部标签 */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-card/80 px-4 py-1.5 text-sm font-medium text-primary-700 backdrop-blur">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-card/80 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-success-500" />
@@ -55,7 +55,7 @@ export default function HeroSection() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/register"
-              className="group inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl hover:shadow-primary-600/30 active:scale-[0.98]"
+              className="group inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
             >
               立即体验
               <svg

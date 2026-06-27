@@ -58,13 +58,13 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-gradient-to-b from-primary-50 via-white to-white px-4 py-12">
+    <main className="flex flex-1 items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         {/* 品牌 Logo */}
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-primary-600 to-success-500 bg-clip-text text-transparent">
+              <span className="text-foreground font-bold">
                 燃渡AI
               </span>
             </h1>
@@ -75,7 +75,7 @@ export default function LoginPage() {
         </div>
 
         {/* 登录卡片 */}
-        <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-xl shadow-primary-600/5 sm:p-8">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 账号输入框 */}
             <div>
@@ -162,7 +162,7 @@ export default function LoginPage() {
 
             {/* 错误提示 */}
             {error && (
-              <div className="rounded-[var(--radius-sm)] bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-[var(--radius-sm)] bg-destructive/10 px-4 py-3 text-sm text-destructive">
                 {error}
               </div>
             )}
@@ -171,7 +171,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-3 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+              className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-base font-semibold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>

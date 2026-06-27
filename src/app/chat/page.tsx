@@ -625,7 +625,7 @@ export default function ChatPage() {
                   >
                     {/* 头像 */}
                     <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${
+                      className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                         msg.role === "user"
                           ? "bg-accent text-accent-foreground"
                           : "bg-gradient-to-br from-primary-500 to-primary-700 text-white"
@@ -643,7 +643,7 @@ export default function ChatPage() {
                         className={`rounded-[var(--radius)] px-4 py-2.5 text-sm ${
                           msg.role === "user"
                             ? "bg-primary text-white"
-                            : "bg-card text-foreground shadow-sm ring-1 ring-border"
+                            : "bg-card text-foreground border border-border"
                         }`}
                       >
                         {/* 图片类型消息 */}
@@ -768,10 +768,10 @@ export default function ChatPage() {
                 {/* 发送中加载态 */}
                 {sending && (
                   <div className="flex gap-3">
-                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-sm font-medium text-white">
+                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-medium text-white">
                       AI
                     </div>
-                    <div className="flex items-center rounded-[var(--radius)] bg-card px-4 py-3 shadow-sm ring-1 ring-border">
+                    <div className="flex items-center rounded-[var(--radius)] bg-card border border-border px-4 py-3">
                       <div className="flex gap-1">
                         <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
                         <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
@@ -829,7 +829,7 @@ export default function ChatPage() {
         {/* 输入区 */}
         <div className="flex-none border-t border-border bg-background">
           <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-2 border border-border rounded-[22px] bg-card p-3.5 pb-2.5 transition-all focus-within:border-[var(--ring)] focus-within:ring-[3px] focus-within:ring-[color-mix(in_srgb,var(--ring)_18%,transparent)]">
               {/* 隐藏的文件上传 input */}
               <input
                 ref={fileInputRef}
@@ -933,14 +933,14 @@ export default function ChatPage() {
                 placeholder="输入消息，Enter 发送，Shift+Enter 换行..."
                 rows={1}
                 maxLength={4000}
-                className="flex-1 resize-none rounded-[var(--radius-sm)] border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="flex-1 resize-none bg-transparent outline-none px-1 py-1 text-sm"
                 style={{ maxHeight: "120px" }}
                 disabled={sending}
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || sending}
-                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-primary text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
                 aria-label="发送"
               >
                 {sending ? (

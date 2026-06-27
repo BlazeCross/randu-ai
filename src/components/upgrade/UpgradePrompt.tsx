@@ -85,14 +85,14 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
   return (
     // 遮罩层：点击空白处关闭
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4 py-6"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="upgrade-prompt-title"
     >
       <div
-        className="animate-scale-in relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[var(--radius)] bg-card shadow-2xl"
+        className="animate-scale-in relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[var(--radius)] border border-border bg-card shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 关闭按钮 */}
@@ -119,7 +119,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
 
         {/* 头部：标题与说明 */}
         <div className="border-b border-border px-6 py-8 text-center sm:px-10">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-100">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent">
             <svg
               className="h-7 w-7 text-primary"
               fill="none"
@@ -154,8 +154,8 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
                 key={plan.name}
                 className={`relative flex flex-col rounded-[var(--radius)] border p-5 transition-all ${
                   plan.highlighted
-                    ? "border-primary-600 bg-primary-50/40 shadow-primary-600/10"
-                    : "border-border bg-card"
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-card hover:border-primary/30"
                 }`}
               >
                 {/* 推荐标签 */}
@@ -181,7 +181,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
                 </div>
 
                 {/* 每日次数 */}
-                <p className="mt-1 text-xs font-medium text-primary-700">
+                <p className="mt-1 text-xs font-medium text-primary">
                   {plan.dailyLimit}
                 </p>
 
@@ -214,10 +214,10 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
                 <button
                   type="button"
                   onClick={handleUpgrade}
-                  className={`mt-5 w-full rounded-[var(--radius-sm)] px-4 py-2.5 text-sm font-semibold transition-colors ${
+                  className={`mt-5 w-full rounded-full px-4 py-2.5 text-sm font-semibold transition-colors ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary-hover"
-                      : "bg-muted text-foreground hover:bg-muted"
+                      : "border border-border bg-background text-foreground hover:bg-muted"
                   }`}
                 >
                   立即升级

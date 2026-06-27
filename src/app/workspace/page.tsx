@@ -215,7 +215,7 @@ export default function WorkspacePage() {
             {workflows.map((workflow) => (
               <article
                 key={workflow.id}
-                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
+                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))]"
               >
                 {/* 图标 */}
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-accent text-2xl transition-colors group-hover:bg-accent">

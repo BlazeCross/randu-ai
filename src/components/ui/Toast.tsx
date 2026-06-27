@@ -118,24 +118,24 @@ const TOAST_STYLES: Record<
   { wrapper: string; iconBg: string; iconColor: string }
 > = {
   success: {
-    wrapper: "border-success-200 bg-success-50 text-success-800",
-    iconBg: "bg-success-100",
-    iconColor: "text-success-600",
+    wrapper: "border-success/30 bg-success/10 text-success",
+    iconBg: "bg-success/15",
+    iconColor: "text-success",
   },
   error: {
-    wrapper: "border-red-200 bg-red-50 text-red-800",
-    iconBg: "bg-red-100",
-    iconColor: "text-red-600",
+    wrapper: "border-destructive/30 bg-destructive/10 text-destructive",
+    iconBg: "bg-destructive/15",
+    iconColor: "text-destructive",
   },
   info: {
-    wrapper: "border-primary-200 bg-primary-50 text-primary-800",
-    iconBg: "bg-primary-100",
-    iconColor: "text-primary-600",
+    wrapper: "border-primary/30 bg-primary/10 text-primary",
+    iconBg: "bg-accent",
+    iconColor: "text-primary",
   },
   warning: {
-    wrapper: "border-amber-200 bg-amber-50 text-amber-800",
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
+    wrapper: "border-accent bg-accent text-accent-foreground",
+    iconBg: "bg-accent",
+    iconColor: "text-accent-foreground",
   },
 };
 

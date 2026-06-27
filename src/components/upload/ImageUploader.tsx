@@ -242,7 +242,7 @@ export default function ImageUploader({
             type="button"
             onClick={handleDelete}
             disabled={uploading}
-            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="删除图片"
           >
             <svg
@@ -292,8 +292,8 @@ export default function ImageUploader({
           className={[
             "group flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius)] border-2 border-dashed px-6 py-12 text-center transition-all duration-200",
             isDragOver
-              ? "scale-[1.01] border-primary border-solid bg-primary-50 shadow-primary-600/10"
-              : "border-border bg-background hover:scale-[1.01] hover:border-primary hover:bg-primary-50/50 hover:shadow-md",
+              ? "scale-[1.01] border-primary border-solid bg-primary/10"
+              : "border-border bg-background hover:scale-[1.01] hover:border-primary hover:bg-primary/10",
             uploading ? "pointer-events-none opacity-70" : "",
           ].join(" ")}
         >
@@ -309,8 +309,8 @@ export default function ImageUploader({
                 className={[
                   "mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius)] transition-all duration-200",
                   isDragOver
-                    ? "scale-110 bg-primary-100"
-                    : "bg-muted group-hover:bg-primary-100",
+                    ? "scale-110 bg-accent"
+                    : "bg-muted group-hover:bg-accent",
                 ].join(" ")}
               >
                 <svg

@@ -24,7 +24,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         className={cx(
           "bg-card border border-border rounded-[var(--radius)] transition",
           hover &&
-            "cursor-pointer hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] hover:-translate-y-0.5",
+            "cursor-pointer hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))]",
           className,
         )}
         {...rest}

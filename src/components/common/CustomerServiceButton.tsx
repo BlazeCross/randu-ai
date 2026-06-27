@@ -55,7 +55,7 @@ export default function CustomerServiceButton() {
         <div className="animate-scale-in absolute bottom-16 right-0 w-[calc(100vw-2rem)] max-w-xs origin-bottom-right rounded-[var(--radius)] border border-border bg-card p-4 shadow-2xl sm:bottom-20 sm:w-80">
           {/* 头部 */}
           <div className="flex items-center gap-2 border-b border-border pb-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-primary-100 text-primary-700">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-accent text-primary">
               <svg
                 className="h-4 w-4"
                 fill="none"

@@ -179,7 +179,7 @@ export default function DynamicForm({
       <button
         type="submit"
         disabled={submitting || disabled}
-        className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3.5 text-base font-semibold text-white shadow-primary-600/20 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+        className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3.5 text-base font-semibold text-primary-foreground transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
       >
         {submitting ? (
           <>

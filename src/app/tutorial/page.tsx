@@ -281,7 +281,7 @@ export default function TutorialPage() {
                       href={doc.feishuDocUrl as string}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
+                      className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))]"
                     >
                       <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-accent text-2xl">
                         {doc.icon || "📘"}

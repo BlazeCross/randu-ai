@@ -432,7 +432,7 @@ export default function AdminUserDetailPage() {
       {/* Modal */}
       {modal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm"
           onClick={() => setModal(null)}
         >
           <div

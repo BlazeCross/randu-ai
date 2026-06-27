@@ -195,7 +195,7 @@ export default function ProfilePage() {
           </p>
           <Link
             href="/login"
-            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -239,13 +239,13 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 ring-2 ring-primary-100">
-                  <span className="text-2xl font-bold text-primary-700">
+                  <span className="text-2xl font-bold text-primary">
                     {(user.nickname || user.email || user.phone || "U").charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
               {uploadingAvatar && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/40">
                   <svg
                     className="h-6 w-6 animate-spin text-white"
                     fill="none"
@@ -292,7 +292,7 @@ export default function ProfilePage() {
               {avatarMsg && (
                 <p
                   className={`mt-2 text-xs ${
-                    avatarMsg.type === "success" ? "text-success-600" : "text-red-600"
+                    avatarMsg.type === "success" ? "text-success" : "text-destructive"
                   }`}
                 >
                   {avatarMsg.text}
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                 !nickname.trim() ||
                 (nicknameDirty && nickname.trim() === (user.nickname ?? ""))
               }
-              className="rounded-[var(--radius-sm)] bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {savingNickname ? "保存中..." : "保存"}
             </button>
@@ -341,8 +341,8 @@ export default function ProfilePage() {
             <p
               className={`mt-2 text-xs ${
                 nicknameMsg.type === "success"
-                  ? "text-success-600"
-                  : "text-red-600"
+                  ? "text-success"
+                  : "text-destructive"
               }`}
             >
               {nicknameMsg.text}

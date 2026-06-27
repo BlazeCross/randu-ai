@@ -59,18 +59,18 @@ const statusConfig: Record<
   },
   running: {
     label: "运行中",
-    bg: "bg-primary-100",
-    text: "text-primary-700",
+    bg: "bg-accent",
+    text: "text-accent-foreground",
   },
   completed: {
     label: "已完成",
-    bg: "bg-success-100",
-    text: "text-success-700",
+    bg: "bg-success/15",
+    text: "text-success",
   },
   failed: {
     label: "失败",
-    bg: "bg-red-100",
-    text: "text-red-600",
+    bg: "bg-destructive/15",
+    text: "text-destructive",
   },
 };
 
@@ -181,7 +181,7 @@ export default function DashboardPage() {
           </p>
           <button
             onClick={() => router.push("/login")}
-            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
           >
             前往登录
           </button>
@@ -214,32 +214,31 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard/history"
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
             >
               任务历史
             </Link>
             <Link
               href="/dashboard/orders"
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
             >
               订单管理
             </Link>
             <Link
               href="/dashboard/invite"
-              className="rounded-[var(--radius-sm)] border border-success-300 bg-success-50 px-4 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-100"
+              className="rounded-full border border-accent bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_80%,var(--background))]"
             >
               邀请奖励
             </Link>
             <Link
               href="/dashboard/keys"
-              className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
             >
               API Key 管理
             </Link>
             <Link
               href="/dashboard/api-docs"
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
-            >
+              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"            >
               API 文档
             </Link>
             <button
@@ -247,7 +246,7 @@ export default function DashboardPage() {
                 logout();
                 router.push("/login");
               }}
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
               退出登录
             </button>
@@ -259,14 +258,14 @@ export default function DashboardPage() {
           <div
             className={`mb-6 flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border p-5 sm:flex-row sm:items-center ${
               isTrialExpired
-                ? "border-red-200 bg-red-50"
-                : "border-amber-200 bg-amber-50"
+                ? "border-destructive/30 bg-destructive/10"
+                : "border-accent bg-accent"
             }`}
           >
             <div className="flex items-start gap-3">
               <svg
                 className={`mt-0.5 h-5 w-5 flex-shrink-0 ${
-                  isTrialExpired ? "text-red-600" : "text-amber-600"
+                  isTrialExpired ? "text-destructive" : "text-accent-foreground"
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -282,7 +281,7 @@ export default function DashboardPage() {
               <div>
                 <p
                   className={`text-sm font-semibold ${
-                    isTrialExpired ? "text-red-900" : "text-amber-900"
+                    isTrialExpired ? "text-foreground" : "text-foreground"
                   }`}
                 >
                   {isTrialExpired
@@ -291,7 +290,7 @@ export default function DashboardPage() {
                 </p>
                 <p
                   className={`mt-0.5 text-xs ${
-                    isTrialExpired ? "text-red-700" : "text-amber-700"
+                    isTrialExpired ? "text-destructive" : "text-accent-foreground"
                   }`}
                 >
                   {isTrialExpired
@@ -305,9 +304,9 @@ export default function DashboardPage() {
               onClick={() =>
                 setUpgradeReason(isTrialExpired ? "expired" : "limit_reached")
               }
-              className={`inline-flex flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] px-5 py-2.5 text-sm font-semibold text-white transition-colors ${
+              className={`inline-flex flex-shrink-0 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-colors ${
                 isTrialExpired
-                  ? "bg-red-600 hover:bg-red-700"
+                  ? "bg-destructive hover:bg-[color-mix(in_srgb,var(--destructive)_90%,#000)]"
                   : "bg-primary hover:bg-primary-hover"
               }`}
             >
@@ -349,16 +348,16 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">套餐状态</span>
                 {isSubscribed ? (
-                  <span className="inline-flex items-center rounded-full bg-success-100 px-3 py-0.5 text-xs font-medium text-success-700">
+                  <span className="inline-flex items-center rounded-full bg-success/15 px-3 py-0.5 text-xs font-medium text-success">
                     已订阅
                     {user.subscriptionPlan && ` · ${user.subscriptionPlan}`}
                   </span>
                 ) : isTrialExpired ? (
-                  <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-0.5 text-xs font-medium text-red-600">
+                  <span className="inline-flex items-center rounded-full bg-destructive/15 px-3 py-0.5 text-xs font-medium text-destructive">
                     试用已过期
                   </span>
                 ) : (
-                  <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-0.5 text-xs font-medium text-primary-700">
+                  <span className="inline-flex items-center rounded-full bg-accent px-3 py-0.5 text-xs font-medium text-accent-foreground">
                     试用中
                   </span>
                 )}
@@ -418,7 +417,7 @@ export default function DashboardPage() {
                           {log.workflow?.name ?? "未知工作流"}
                         </span>
                         {log.source === "api" && (
-                          <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                          <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
                             API
                           </span>
                         )}

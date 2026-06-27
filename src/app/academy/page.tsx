@@ -140,7 +140,7 @@ export default function AcademyPage() {
               <Link
                 key={entry.href}
                 href={entry.href}
-                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
+                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-primary hover:bg-accent/10"
               >
                 <div className="mb-4 flex items-center justify-between">
                   <span className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-accent text-2xl">
@@ -183,7 +183,7 @@ export default function AcademyPage() {
             {upcomingTracks.map((track) => (
               <div
                 key={track.title}
-                className="group rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-primary/40 hover:shadow-md"
+                className="group rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-primary hover:bg-accent/10"
               >
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-3xl">{track.icon}</span>

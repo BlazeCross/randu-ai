@@ -39,25 +39,25 @@ const STYLES: Record<
   { container: string; icon: string; text: string; retry: string }
 > = {
   error: {
-    container: "border-red-200 bg-red-50",
-    icon: "text-red-600",
-    text: "text-red-700",
+    container: "border-destructive/30 bg-destructive/10",
+    icon: "text-destructive",
+    text: "text-destructive",
     retry:
-      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-200",
+      "bg-destructive text-destructive-foreground hover:bg-[color-mix(in_srgb,var(--destructive)_90%,#000)] focus:ring-[var(--ring)]",
   },
   warning: {
-    container: "border-amber-200 bg-amber-50",
-    icon: "text-amber-600",
-    text: "text-amber-700",
+    container: "border-accent bg-accent",
+    icon: "text-accent-foreground",
+    text: "text-accent-foreground",
     retry:
-      "bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-200",
+      "bg-foreground text-background hover:bg-[color-mix(in_srgb,var(--foreground)_90%,#000)] focus:ring-[var(--ring)]",
   },
   info: {
-    container: "border-primary-200 bg-primary-50",
+    container: "border-primary/30 bg-primary/10",
     icon: "text-primary",
-    text: "text-primary-700",
+    text: "text-primary",
     retry:
-      "bg-primary text-white hover:bg-primary-hover focus:ring-primary-200",
+      "bg-primary text-primary-foreground hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)] focus:ring-[var(--ring)]",
   },
 };
 

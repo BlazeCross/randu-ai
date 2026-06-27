@@ -12,13 +12,13 @@ const quickLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-neutral-900">
+    <footer className="border-t border-border bg-foreground">
       <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* 公司信息 */}
           <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold text-white">四川燃渡传媒</h3>
-            <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
+            <h3 className="text-lg font-semibold text-background">四川燃渡传媒</h3>
+            <p className="mt-4 max-w-sm text-sm leading-6 text-background/60">
               燃渡AI工作流服务平台，致力于让AI技术触手可及，
               为个人和企业提供高效、便捷的AI工作流解决方案。
             </p>
@@ -26,7 +26,7 @@ export default function Footer() {
               {socialLinks.map((social) => (
                 <span
                   key={social.label}
-                  className="inline-flex items-center rounded-[var(--radius-sm)] border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs text-muted-foreground"
+                  className="inline-flex items-center rounded-[var(--radius-sm)] border border-border bg-muted px-3 py-1.5 text-xs text-background/70"
                 >
                   {social.label}：{social.value}
                 </span>
@@ -36,8 +36,8 @@ export default function Footer() {
 
           {/* 联系方式 */}
           <div>
-            <h4 className="text-sm font-semibold text-white">联系方式</h4>
-            <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            <h4 className="text-sm font-semibold text-background">联系方式</h4>
+            <ul className="mt-4 space-y-3 text-sm text-background/60">
               <li>邮箱：contact@randuai.com</li>
               <li>电话：400-888-8888</li>
               <li>地址：四川省成都市</li>
@@ -46,13 +46,13 @@ export default function Footer() {
 
           {/* 快速链接 */}
           <div>
-            <h4 className="text-sm font-semibold text-white">快速链接</h4>
+            <h4 className="text-sm font-semibold text-background">快速链接</h4>
             <ul className="mt-4 space-y-3 text-sm">
               {quickLinks.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground transition-colors hover:text-primary-400"
+                    className="text-background/60 transition-colors hover:text-primary-400"
                   >
                     {link.label}
                   </a>
@@ -63,11 +63,11 @@ export default function Footer() {
         </div>
 
         {/* 底部版权 */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-neutral-800 pt-8 sm:flex-row sm:justify-between">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-12 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:justify-between">
+          <p className="text-sm text-background/60">
             © 2026 四川燃渡传媒. 保留所有权利.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-background/60">
             蜀ICP备XXXXXXXX号-1 · 蜀公网安备XXXXXXXXXXXXX号
           </p>
         </div>

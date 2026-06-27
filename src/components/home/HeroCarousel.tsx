@@ -179,7 +179,7 @@ export default function HeroCarousel() {
                     {slide.description}
                   </p>
                   {/* CTA 按钮 */}
-                  <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/95 px-5 py-2.5 text-sm font-semibold text-foreground shadow-lg transition-transform hover:scale-105 sm:text-base">
+                  <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/95 px-5 py-2.5 text-sm font-medium text-foreground shadow-lg transition-transform hover:scale-105 sm:text-base">
                     {slide.cta}
                     <svg
                       className="h-4 w-4"
@@ -205,7 +205,7 @@ export default function HeroCarousel() {
               e.preventDefault();
               prev();
             }}
-            className="absolute left-3 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/40"
+            className="absolute left-3 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/30"
             aria-label="上一张"
           >
             <svg
@@ -228,7 +228,7 @@ export default function HeroCarousel() {
               e.preventDefault();
               next();
             }}
-            className="absolute right-3 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/40"
+            className="absolute right-3 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/30"
             aria-label="下一张"
           >
             <svg

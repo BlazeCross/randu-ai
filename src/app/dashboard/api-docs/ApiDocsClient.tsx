@@ -58,11 +58,11 @@ interface OpenApiSpec {
 }
 
 const HTTP_METHOD_COLORS: Record<string, string> = {
-  get: "bg-blue-50 text-blue-700 border-blue-200",
-  post: "bg-green-50 text-green-700 border-green-200",
-  put: "bg-amber-50 text-amber-700 border-amber-200",
-  delete: "bg-red-50 text-red-700 border-red-200",
-  patch: "bg-purple-50 text-purple-700 border-purple-200",
+  get: "bg-accent text-accent-foreground border-border",
+  post: "bg-success/15 text-success border-success/30",
+  put: "bg-accent text-accent-foreground border-border",
+  delete: "bg-destructive/15 text-destructive border-destructive/30",
+  patch: "bg-accent text-accent-foreground border-border",
 };
 
 /**
@@ -111,7 +111,7 @@ function SchemaTable({ schema, depth = 0 }: { schema: OpenApiSchema; depth?: num
               <td className="py-1.5 pr-2 font-mono text-foreground">
                 {key}
                 {required.has(key) && (
-                  <span className="ml-1 text-red-500" title="必填">
+                  <span className="ml-1 text-destructive" title="必填">
                     *
                   </span>
                 )}
@@ -215,14 +215,14 @@ function OperationCard({
           {/* 完整 URL */}
           <div>
             <p className="mb-1 text-xs font-medium text-muted-foreground">完整地址</p>
-            <code className="block break-all rounded-[var(--radius-sm)] bg-neutral-900 px-3 py-2 font-mono text-xs text-neutral-100">
+            <code className="block break-all rounded-[var(--radius-sm)] bg-foreground px-3 py-2 font-mono text-xs text-background">
               {method.toUpperCase()} {fullUrl}
             </code>
           </div>
 
           {/* 鉴权 */}
           {operation.security && (
-            <div className="rounded-[var(--radius-sm)] bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <div className="rounded-[var(--radius-sm)] bg-accent px-3 py-2 text-xs text-accent-foreground">
               鉴权：X-API-Key 请求头（在
               <Link href="/dashboard/keys" className="underline">
                 {" "}
@@ -259,7 +259,7 @@ function OperationCard({
               <p className="mb-2 text-sm font-medium text-foreground">
                 请求体
                 {operation.requestBody?.required && (
-                  <span className="ml-1 text-xs text-red-500">必填</span>
+                      <span className="ml-1 text-xs text-destructive">必填</span>
                 )}
               </p>
               <SchemaTable schema={requestBodySchema} />
@@ -430,13 +430,13 @@ export default function ApiDocsClient() {
         </div>
 
         {/* 鉴权说明 */}
-        <div className="mb-8 rounded-[var(--radius)] border border-primary-100 bg-primary-50/50 p-5">
-          <h2 className="mb-2 text-sm font-semibold text-primary-900">鉴权方式</h2>
-          <p className="text-xs text-primary-800">
+        <div className="mb-8 rounded-[var(--radius)] border border-primary/30 bg-primary/5 p-5">
+          <h2 className="mb-2 text-sm font-semibold text-foreground">鉴权方式</h2>
+          <p className="text-xs text-muted-foreground">
             所有接口使用 HTTP Header <code className="rounded bg-card px-1.5 py-0.5 font-mono">X-API-Key</code> 鉴权。
             在个人中心创建 API Key 后获得明文 Key，每次请求需在 Header 中携带：
           </p>
-          <pre className="mt-3 overflow-x-auto rounded-[var(--radius-sm)] bg-neutral-900 p-3 text-xs text-neutral-100">
+          <pre className="mt-3 overflow-x-auto rounded-[var(--radius-sm)] bg-foreground p-3 text-xs text-background">
             <code>{`X-API-Key: sk_your_api_key_here
 Content-Type: application/json`}</code>
           </pre>
@@ -451,8 +451,8 @@ Content-Type: application/json`}</code>
             </svg>
           </div>
         ) : error ? (
-          <div className="rounded-[var(--radius)] border border-red-200 bg-red-50 p-6 text-center">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-6 text-center">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
         ) : !spec ? null : (
           <>

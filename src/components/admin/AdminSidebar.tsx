@@ -272,7 +272,7 @@ export default function AdminSidebar({
       {/* 移动端遮罩 */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-neutral-900/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-30 bg-foreground/40 backdrop-blur-sm md:hidden"
           onClick={onClose}
           aria-hidden="true"
         />

@@ -179,13 +179,13 @@ function RegisterContent() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-gradient-to-b from-primary-50 via-white to-white px-4 py-12">
+    <main className="flex flex-1 items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         {/* 品牌 Logo */}
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-primary-600 to-success-500 bg-clip-text text-transparent">
+              <span className="text-foreground font-bold">
                 燃渡AI
               </span>
             </h1>
@@ -196,7 +196,7 @@ function RegisterContent() {
         </div>
 
         {/* 试用期说明 */}
-        <div className="mb-4 flex items-center gap-3 rounded-[var(--radius-sm)] border border-success-200 bg-success-50 px-4 py-3">
+        <div className="mb-4 flex items-center gap-3 rounded-[var(--radius-sm)] border border-success/30 bg-success/10 px-4 py-3">
           <svg
             className="h-5 w-5 flex-shrink-0 text-success-500"
             fill="none"
@@ -210,13 +210,13 @@ function RegisterContent() {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="text-sm text-success-700">
+          <p className="text-sm text-success">
             注册即享 7 天免费试用，全功能体验
           </p>
         </div>
 
         {/* 注册卡片 */}
-        <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-xl shadow-primary-600/5 sm:p-8">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 邮箱输入框（可选） */}
             <div>
@@ -360,9 +360,9 @@ function RegisterContent() {
                 autoComplete="off"
                 className={`w-full rounded-[var(--radius-sm)] border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:outline-none focus:ring-2 ${
                   inviteStatus.state === "valid"
-                    ? "border-success-400 focus:border-success focus:ring-success/20"
+                    ? "border-success focus:ring-[var(--ring)]"
                     : inviteStatus.state === "invalid"
-                      ? "border-red-300 focus:border-red-500 focus:ring-red/20"
+                      ? "border-destructive focus:ring-[var(--ring)]"
                       : "border-border focus:border-primary focus:ring-primary/20"
                 }`}
               />
@@ -392,7 +392,7 @@ function RegisterContent() {
                 </p>
               )}
               {inviteStatus.state === "valid" && (
-                <p className="mt-1.5 flex items-center gap-1 text-xs text-success-600">
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-success">
                   <svg
                     className="h-3 w-3"
                     fill="none"
@@ -421,7 +421,7 @@ function RegisterContent() {
                 </p>
               )}
               {inviteStatus.state === "invalid" && (
-                <p className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-destructive">
                   <svg
                     className="h-3 w-3"
                     fill="none"
@@ -447,7 +447,7 @@ function RegisterContent() {
 
             {/* 错误提示 */}
             {error && (
-              <div className="rounded-[var(--radius-sm)] bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-[var(--radius-sm)] bg-destructive/10 px-4 py-3 text-sm text-destructive">
                 {error}
               </div>
             )}
@@ -456,7 +456,7 @@ function RegisterContent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-3 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+              className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-base font-semibold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>

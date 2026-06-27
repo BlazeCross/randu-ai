@@ -55,7 +55,7 @@ export default function PricingSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* 标题区 */}
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-wider text-primary-600">
+          <span className="text-sm font-semibold uppercase tracking-wider text-primary">
             定价方案
           </span>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -73,8 +73,8 @@ export default function PricingSection() {
               key={plan.name}
               className={`relative rounded-[var(--radius)] border bg-card p-6 transition-all sm:p-8 ${
                 plan.highlighted
-                  ? "border-primary-600 shadow-2xl shadow-primary-600/10 lg:-translate-y-4"
-                  : "border-border hover:border-border hover:shadow-md"
+                  ? "border-primary hover:border-primary/30"
+                  : "border-border hover:border-primary/30"
               }`}
             >
               {/* 推荐标签 */}
@@ -103,10 +103,10 @@ export default function PricingSection() {
               {/* CTA 按钮 */}
               <Link
                 href={plan.href}
-                className={`mt-8 block rounded-[var(--radius-sm)] px-4 py-3 text-center text-sm font-semibold transition-colors ${
+                className={`mt-8 block rounded-full px-4 py-3 text-center text-sm font-semibold transition-colors ${
                   plan.highlighted
                     ? "bg-primary text-white hover:bg-primary-hover"
-                    : "bg-muted text-foreground hover:bg-muted"
+                    : "border border-border bg-background text-foreground hover:bg-muted"
                 }`}
               >
                 {plan.cta}

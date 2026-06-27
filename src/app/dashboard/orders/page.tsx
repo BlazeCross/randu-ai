@@ -54,16 +54,16 @@ interface CreatePaymentResponse {
 
 // 状态标签配置
 const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: "待支付", bg: "bg-amber-100", text: "text-amber-700" },
-  paid: { label: "已支付", bg: "bg-success-100", text: "text-success-700" },
-  failed: { label: "失败", bg: "bg-red-100", text: "text-red-600" },
+  pending: { label: "待支付", bg: "bg-accent", text: "text-accent-foreground" },
+  paid: { label: "已支付", bg: "bg-success/15", text: "text-success" },
+  failed: { label: "失败", bg: "bg-destructive/15", text: "text-destructive" },
   refunded: { label: "已退款", bg: "bg-muted", text: "text-muted-foreground" },
 };
 
 // 类型标签
 const typeConfig: Record<string, { label: string; bg: string; text: string }> = {
-  subscription: { label: "套餐订阅", bg: "bg-primary-100", text: "text-primary-700" },
-  credits: { label: "积分充值", bg: "bg-purple-100", text: "text-purple-700" },
+  subscription: { label: "套餐订阅", bg: "bg-accent", text: "text-accent-foreground" },
+  credits: { label: "积分充值", bg: "bg-accent", text: "text-accent-foreground" },
 };
 
 function formatDate(dateStr: string): string {
@@ -203,7 +203,7 @@ export default function OrdersPage() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">套餐订阅</h2>
             {!paymentEnabled && (
-              <span className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-700">
+              <span className="rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground">
                 支付功能暂未开放
               </span>
             )}
@@ -216,7 +216,7 @@ export default function OrdersPage() {
                 <div
                   key={plan.id}
                   className={`flex flex-col rounded-[var(--radius)] border bg-card p-5 ${
-                    isCurrent ? "border-success-300 bg-success-50/30" : "border-border"
+                    isCurrent ? "border-primary bg-primary/5" : "border-border"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -224,7 +224,7 @@ export default function OrdersPage() {
                       {plan.name}
                     </h3>
                     {isCurrent && (
-                      <span className="rounded-full bg-success-100 px-2 py-0.5 text-xs font-medium text-success-700">
+                      <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
                         当前
                       </span>
                     )}
@@ -235,7 +235,7 @@ export default function OrdersPage() {
                     </span>
                     <span className="ml-1 text-sm text-muted-foreground">/月</span>
                   </div>
-                  <p className="mt-1 text-xs text-primary-700">
+                  <p className="mt-1 text-xs text-primary">
                     每日 {plan.dailyLimit} 次调用
                   </p>
                   <ul className="mt-4 flex-1 space-y-2">
@@ -260,7 +260,7 @@ export default function OrdersPage() {
                     onClick={() =>
                       handleCreatePayment("subscription", { planName: plan.name }, key)
                     }
-                    className={`mt-4 w-full rounded-[var(--radius-sm)] px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    className={`mt-4 w-full rounded-full px-4 py-2.5 text-sm font-semibold transition-colors ${
                       isCurrent
                         ? "cursor-not-allowed bg-muted text-muted-foreground"
                         : paymentEnabled
@@ -285,7 +285,7 @@ export default function OrdersPage() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">积分充值</h2>
             <span className="text-sm text-muted-foreground">
-              当前积分：<strong className="text-primary-700">{user.credits}</strong>
+              当前积分：<strong className="text-primary">{user.credits}</strong>
             </span>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -301,14 +301,14 @@ export default function OrdersPage() {
                       {pkg.credits}
                     </span>
                     {pkg.bonus && (
-                      <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-[10px] font-medium text-red-600">
+                      <span className="rounded-full bg-destructive/15 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
                         {pkg.bonus}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">积分</p>
                   <div className="mt-3 flex items-baseline">
-                    <span className="text-xl font-bold text-primary-700">
+                    <span className="text-xl font-bold text-primary">
                       ¥{pkg.price}
                     </span>
                   </div>
@@ -318,7 +318,7 @@ export default function OrdersPage() {
                     onClick={() =>
                       handleCreatePayment("credits", { packageId: pkg.id }, key)
                     }
-                    className={`mt-3 w-full rounded-[var(--radius-sm)] px-3 py-2 text-xs font-semibold transition-colors ${
+                    className={`mt-3 w-full rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
                       paymentEnabled
                         ? "bg-primary text-white hover:bg-primary-hover disabled:opacity-50"
                         : "cursor-not-allowed bg-muted text-muted-foreground"
@@ -339,14 +339,14 @@ export default function OrdersPage() {
             <button
               onClick={() => fetchOrders()}
               disabled={ordersLoading}
-              className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               刷新
             </button>
           </div>
 
           {error && (
-            <div className="border-b border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6">
+            <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive sm:px-6">
               {error}
             </div>
           )}

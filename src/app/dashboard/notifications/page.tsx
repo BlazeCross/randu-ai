@@ -32,23 +32,23 @@ const typeIconConfig: Record<
 > = {
   task_complete: {
     icon: "M5 13l4 4L19 7",
-    bg: "bg-success-100",
-    text: "text-success-600",
+    bg: "bg-success/15",
+    text: "text-success",
   },
   task_failed: {
     icon: "M6 18L18 6M6 6l12 12",
-    bg: "bg-red-100",
-    text: "text-red-600",
+    bg: "bg-destructive/15",
+    text: "text-destructive",
   },
   system: {
     icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-    bg: "bg-primary-100",
-    text: "text-primary-600",
+    bg: "bg-accent",
+    text: "text-accent-foreground",
   },
   announcement: {
     icon: "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6a3.99 3.99 0 011.5-2.741M5.436 13.683L3 14m2.436-.317l4.5 1.641",
-    bg: "bg-amber-100",
-    text: "text-amber-600",
+    bg: "bg-accent",
+    text: "text-accent-foreground",
   },
 };
 
@@ -202,7 +202,7 @@ export default function NotificationsPage() {
           <p className="mb-6 text-sm text-muted-foreground">登录后查看通知</p>
           <Link
             href="/login"
-            className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-hover"
           >
             前往登录
           </Link>
@@ -236,7 +236,7 @@ export default function NotificationsPage() {
               <button
                 onClick={handleMarkAllRead}
                 disabled={markingAll}
-                className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
               >
                 {markingAll ? "处理中..." : "全部已读"}
               </button>
@@ -246,11 +246,11 @@ export default function NotificationsPage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-red-200 bg-red-50 p-4">
-            <p className="flex-1 text-sm text-red-700">{error}</p>
+          <div className="mb-6 flex items-start gap-3 rounded-[var(--radius)] border border-destructive/30 bg-destructive/10 p-4">
+            <p className="flex-1 text-sm text-destructive">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="text-red-400 hover:text-red-600"
+              className="text-destructive/60 hover:text-destructive"
             >
               ✕
             </button>
@@ -290,7 +290,7 @@ export default function NotificationsPage() {
                   <div
                     key={item.id}
                     className={`px-4 py-4 transition-colors sm:px-6 ${
-                      item.isRead ? "bg-card" : "bg-primary-50/30"
+                      item.isRead ? "bg-card" : "bg-primary/5"
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -326,7 +326,7 @@ export default function NotificationsPage() {
                             {item.title}
                           </span>
                           {!item.isRead && (
-                            <span className="h-2 w-2 flex-shrink-0 rounded-full bg-primary-500" />
+                            <span className="h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
                           )}
                         </div>
                         {item.content && (
@@ -391,7 +391,7 @@ export default function NotificationsPage() {
             <button
               onClick={() => fetchNotifications(page - 1)}
               disabled={page <= 1 || listLoading}
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+              className="rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
@@ -401,7 +401,7 @@ export default function NotificationsPage() {
             <button
               onClick={() => fetchNotifications(page + 1)}
               disabled={page >= data.totalPages || listLoading}
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+              className="rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>

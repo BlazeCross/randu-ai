@@ -39,7 +39,7 @@ export default function WorkflowCategories() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* 标题区 */}
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-wider text-primary-600">
+          <span className="text-sm font-semibold uppercase tracking-wider text-primary">
             工作流分类
           </span>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -56,10 +56,10 @@ export default function WorkflowCategories() {
             <Link
               key={category.name}
               href="/workspace"
-              className="group relative rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/5 sm:p-8"
+              className="group relative rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] sm:p-8"
             >
               {/* 图标 */}
-              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-sm)] bg-primary-50 text-3xl transition-colors group-hover:bg-primary-100">
+              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-sm)] bg-accent text-3xl transition-colors group-hover:bg-accent">
                 {category.icon}
               </div>
 
@@ -74,7 +74,7 @@ export default function WorkflowCategories() {
               </p>
 
               {/* 查看更多 */}
-              <div className="mt-5 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 transition-all group-hover:opacity-100">
+              <div className="mt-5 inline-flex items-center text-sm font-medium text-primary opacity-0 transition-all group-hover:opacity-100">
                 了解更多
                 <svg
                   className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1"

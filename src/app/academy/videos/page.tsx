@@ -83,7 +83,7 @@ export default function VideosPage() {
           {VIDEO_PREVIEWS.map((video) => (
             <article
               key={video.title}
-              className="group flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
+              className="group flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card transition-all hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))]"
             >
               {/* 缩略图占位（16:9）+ 播放图标 */}
               <div className="relative flex aspect-video items-center justify-center bg-muted">
