@@ -218,6 +218,17 @@ export default function Navbar() {
                   个人中心
                 </Link>
                 <Link
+                  href="/dashboard/invite"
+                  onClick={() => setMobileOpen(false)}
+                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive("/dashboard/invite")
+                      ? "bg-success-50 text-success-700"
+                      : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  }`}
+                >
+                  邀请奖励
+                </Link>
+                <Link
                   href="/dashboard/notifications"
                   onClick={() => setMobileOpen(false)}
                   className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${

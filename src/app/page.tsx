@@ -5,6 +5,7 @@ import AdBanner from "@/components/home/AdBanner";
 import PricingSection from "@/components/home/PricingSection";
 import Footer from "@/components/home/Footer";
 import AnnouncementBanner from "@/components/home/AnnouncementBanner";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randu.ai";
@@ -57,6 +58,7 @@ export default function Home() {
   return (
     <>
       <StructuredData />
+      <PageViewTracker page="home" />
       <AnnouncementBanner />
       <HeroSection />
       <WorkflowCategories />

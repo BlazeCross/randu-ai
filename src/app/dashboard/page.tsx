@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrackPageView } from "@/hooks/useTrack";
 import UpgradePrompt from "@/components/upgrade/UpgradePrompt";
 import SubscriptionCard, {
   type TrialStatus,
@@ -87,6 +88,7 @@ function formatDate(dateStr: string): string {
 export default function DashboardPage() {
   const router = useRouter();
   const { user, token, loading, logout } = useAuth();
+  useTrackPageView("dashboard");
 
   const [usageData, setUsageData] = useState<UsageData | null>(null);
   const [usageLoading, setUsageLoading] = useState(false);
@@ -221,6 +223,12 @@ export default function DashboardPage() {
               className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
             >
               订单管理
+            </Link>
+            <Link
+              href="/dashboard/invite"
+              className="rounded-lg border border-success-300 bg-success-50 px-4 py-2 text-sm font-medium text-success-700 transition-colors hover:bg-success-100"
+            >
+              邀请奖励
             </Link>
             <Link
               href="/dashboard/keys"

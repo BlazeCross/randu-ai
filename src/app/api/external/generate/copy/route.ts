@@ -94,6 +94,7 @@ export const POST = requireApiKey(
 
     let content: string;
     let tokensUsed: number;
+    let apiCost: number;
     try {
       const result = await chatCompletion({
         messages: [
@@ -105,6 +106,7 @@ export const POST = requireApiKey(
       });
       content = result.content;
       tokensUsed = result.tokensUsed;
+      apiCost = result.cost;
     } catch (error) {
       // 调用失败：退还预扣积分 + 记录失败日志
       await refundUserCredits(userId, COPY_CREDITS_COST).catch(() => {});
@@ -143,6 +145,7 @@ export const POST = requireApiKey(
       status: "success",
       responseTime: Date.now() - startTime,
       clientIp: getClientIp(request),
+      apiCost,
     });
 
     return NextResponse.json({

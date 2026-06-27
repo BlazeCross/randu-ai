@@ -113,6 +113,7 @@ export const POST = requireApiKey(
 
     // 3. 调用 Seedream 生图
     let urls: string[];
+    let apiCost: number;
     try {
       const result = await generateImage({
         prompt,
@@ -120,6 +121,7 @@ export const POST = requireApiKey(
         n,
       });
       urls = result.urls;
+      apiCost = result.cost;
     } catch (error) {
       // 调用失败：退还预扣积分 + 记录失败日志
       await refundUserCredits(userId, creditsCost).catch(() => {});
@@ -179,6 +181,7 @@ export const POST = requireApiKey(
       status: "success",
       responseTime: Date.now() - startTime,
       clientIp: getClientIp(request),
+      apiCost,
     });
 
     return NextResponse.json({

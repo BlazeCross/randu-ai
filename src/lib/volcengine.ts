@@ -77,6 +77,8 @@ export interface ChatResult {
   tokensUsed: number;
   /** 实际使用的模型 ID */
   model: string;
+  /** 估算成本（元）：tokens / 1000 * 0.004（豆包定价 4 元/百万 tokens） */
+  cost: number;
 }
 
 /**
@@ -132,10 +134,15 @@ export async function chatCompletion(
     usage?: { total_tokens?: number };
   };
 
+  const tokensUsed = data.usage?.total_tokens ?? 0;
+  // 估算成本：tokens / 1000 * 0.004（豆包定价 4 元/百万 tokens）
+  const cost = (tokensUsed / 1000) * 0.004;
+
   return {
     content: data.choices?.[0]?.message?.content ?? "",
-    tokensUsed: data.usage?.total_tokens ?? 0,
+    tokensUsed,
     model,
+    cost,
   };
 }
 
@@ -158,6 +165,8 @@ export interface ImageResult {
   urls: string[];
   /** 实际使用的模型 ID */
   model: string;
+  /** 估算成本（元）：0.1 元/张 */
+  cost: number;
 }
 
 /**
@@ -215,7 +224,10 @@ export async function generateImage(
     .map((item) => item.url)
     .filter((url): url is string => typeof url === "string" && url.length > 0);
 
-  return { urls, model };
+  // 估算成本：0.1 元/张
+  const cost = urls.length * 0.1;
+
+  return { urls, model, cost };
 }
 
 // ============ Seedance 视频生成 ============

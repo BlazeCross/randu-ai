@@ -20,9 +20,21 @@ model User {
   isSubscribed     Boolean     @default(false) @map("is_subscribed")
   subscriptionPlan String?     @map("subscription_plan")
   credits          Int         @default(0)
+  // 积分过期（17.3）
+  creditsExpiresAt DateTime?   @map("credits_expires_at")
+  creditsExpired   Boolean     @default(false) @map("credits_expired")
   totalUsed        Int         @default(0) @map("total_used")
+  // 邀请裂变（13.4）
+  inviteCode       String?     @unique @map("invite_code") // 用户专属邀请码
+  inviterId        String?     @map("inviter_id") // 邀请人 ID
+  inviteCount      Int         @default(0) @map("invite_count") // 成功邀请人数
+  inviteReward     Int         @default(0) @map("invite_reward") // 邀请奖励总积分
   createdAt        DateTime    @default(now()) @map("created_at")
   updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  // 邀请关系：inviter 是邀请人，invitees 是被该用户邀请的人
+  inviter               User?       @relation("UserInvite", fields: [inviterId], references: [id], onDelete: SetNull)
+  invitees              User[]      @relation("UserInvite")
 
   usageLogs            UsageLog[]
   apiKeys              ApiKey[]
@@ -31,7 +43,9 @@ model User {
   notifications        Notification[]
   actionLogsAsOperator ActionLog[] @relation("ActionLogOperator")
   actionLogsAsTarget   ActionLog[] @relation("ActionLogTarget")
+  eventLogs            EventLog[]
 
+  @@index([inviterId])
   @@map("users")
 }
 
@@ -83,6 +97,8 @@ model CallLog {
   errorMessage String?   @map("error_message")
   responseTime Int?      @map("response_time")
   clientIp     String?   @map("client_ip")
+  // 真实 API 成本（元），用于成本核算（Phase 13.3）
+  apiCost      Decimal   @db.Decimal(10, 4) @default(0) @map("api_cost")
   createdAt    DateTime  @default(now()) @map("created_at")
 
   apiKey ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
@@ -106,6 +122,11 @@ model Order {
   paymentId     String?   @map("payment_id")
   paidAt        DateTime? @map("paid_at")
   createdAt     DateTime  @default(now()) @map("created_at")
+  // 退费相关字段（Phase 13.2）
+  refundStatus  String    @default("none") @map("refund_status") // none | requested | refunded | rejected
+  refundReason  String?   @map("refund_reason")
+  refundedAt    DateTime? @map("refunded_at")
+  refundAmount Decimal?   @db.Decimal(10, 2) @map("refund_amount")
 
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan Plan? @relation(fields: [planId], references: [id], onDelete: SetNull)
@@ -212,4 +233,21 @@ model ActionLog {
   @@index([operatorId, createdAt])
   @@index([targetUserId])
   @@map("action_logs")
+}
+
+/// 用户行为埋点日志（18.1）
+model EventLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  event      String // page_view | button_click | workflow_run | chat_message | register | login | purchase
+  properties Json?
+  clientIp   String? @map("client_ip")
+  userAgent  String? @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([event, createdAt])
+  @@map("event_logs")
 }

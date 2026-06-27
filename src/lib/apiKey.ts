@@ -296,6 +296,8 @@ export async function confirmKeyUsage(
  * - 同步调用（如 /api/external/generate/copy）通常不填
  * - 异步调用（如 /api/external/generate/video/status）可用于存储外部任务 ID
  *   便于幂等检查（避免重复扣点）
+ *
+ * apiCost 字段可选：真实 API 成本（元），用于成本核算（Phase 13.3）
  */
 export async function logApiCall(data: {
   apiKeyId: string;
@@ -309,8 +311,17 @@ export async function logApiCall(data: {
   clientIp?: string;
   /** 可选：关联的外部任务 ID 或工作流 ID（用于异步任务幂等检查） */
   workflowId?: string;
+  /** 可选：真实 API 成本（元），用于成本核算 */
+  apiCost?: number;
 }): Promise<void> {
-  await prisma.callLog.create({ data });
+  // 将 apiCost 从参数中取出，其余字段直接传入（Prisma 会忽略 undefined）
+  const { apiCost, ...rest } = data;
+  await prisma.callLog.create({
+    data: {
+      ...rest,
+      ...(apiCost !== undefined ? { apiCost } : {}),
+    },
+  });
 }
 
 /**

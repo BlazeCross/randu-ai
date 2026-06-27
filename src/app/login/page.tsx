@@ -4,10 +4,12 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrack } from "@/hooks/useTrack";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const { track } = useTrack();
 
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
@@ -46,6 +48,7 @@ export default function LoginPage() {
 
       // 保存 token 并获取用户信息，然后跳转
       await login(data.token);
+      track("login");
       router.push("/dashboard");
     } catch {
       setError("网络错误，请稍后重试");

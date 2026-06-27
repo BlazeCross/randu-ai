@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
+import { isValidInviteCodeFormat } from "@/lib/invite";
 import {
   getClientIp,
   checkIpRateLimit,
@@ -13,6 +14,7 @@ interface RegisterBody {
   email?: string;
   phone?: string;
   password?: string;
+  inviteCode?: string;
 }
 
 // 试用期时长：7 天
@@ -20,6 +22,10 @@ const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
 // 注册赠送积分：500 点（约 5 元，技术方案 13.1 试用期转化漏斗）
 const REGISTER_BONUS_CREDITS = 500;
+
+// 邀请奖励积分：邀请人 +50，被邀请人 +50（额外奖励，不影响注册赠送 500 积分）
+const INVITER_REWARD_CREDITS = 50;
+const INVITEE_REWARD_CREDITS = 50;
 
 // 注册接口防批量限流：每分钟 3 次（IP 维度）
 const REGISTER_RATE_LIMIT_PER_MIN = 3;
@@ -70,6 +76,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // 校验邀请码格式（如果提供了）
+    const rawInviteCode = body.inviteCode?.trim().toUpperCase() || "";
+    const inviteCode = rawInviteCode || undefined;
+    if (inviteCode && !isValidInviteCodeFormat(inviteCode)) {
+      return NextResponse.json(
+        { message: "邀请码格式不正确" },
+        { status: 400 },
+      );
+    }
+
     // 唯一性校验：检查 email/phone 是否已注册
     if (normalizedEmail) {
       const existingEmail = await prisma.user.findUnique({
@@ -96,36 +112,75 @@ export async function POST(request: Request) {
       }
     }
 
+    // 校验邀请人：邀请码不存在 → 忽略（不阻断注册）
+    let inviterId: string | undefined = undefined;
+    if (inviteCode) {
+      const inviter = await prisma.user.findUnique({
+        where: { inviteCode },
+        select: { id: true },
+      });
+      if (inviter) {
+        inviterId = inviter.id;
+      }
+      // 邀请码不存在时静默忽略
+    }
+
     // 使用 bcryptjs 哈希密码
     const passwordHash = await bcrypt.hash(password, 10);
 
     // 试用到期时间：7 天后
     const trialExpiresAt = new Date(Date.now() + TRIAL_DURATION_MS);
 
-    // 创建用户记录（赠送 500 点注册积分）
-    const user = await prisma.user.create({
-      data: {
-        email: normalizedEmail ?? null,
-        phone: normalizedPhone ?? null,
-        passwordHash,
-        trialExpiresAt,
-        credits: REGISTER_BONUS_CREDITS,
-      },
+    // 注册成功后：邀请人 +50 积分、被邀请人 +50 积分（额外奖励）
+    // 邀请人 inviteCount+1、inviteReward+50
+    // 全部在事务中完成，避免并发作弊
+    const result = await prisma.$transaction(async (tx) => {
+      // 计算被邀请人初始积分：注册赠送 500 + 邀请奖励 50（如有邀请人）
+      const initialCredits =
+        REGISTER_BONUS_CREDITS +
+        (inviterId ? INVITEE_REWARD_CREDITS : 0);
+
+      // 创建用户记录
+      const newUser = await tx.user.create({
+        data: {
+          email: normalizedEmail ?? null,
+          phone: normalizedPhone ?? null,
+          passwordHash,
+          trialExpiresAt,
+          credits: initialCredits,
+          inviterId: inviterId ?? null,
+        },
+      });
+
+      // 若有邀请人：更新邀请人计数与积分
+      // 自邀校验：inviterId !== newUser.id（逻辑上必然成立，因为邀请人先于被邀请人注册）
+      if (inviterId && inviterId !== newUser.id) {
+        await tx.user.update({
+          where: { id: inviterId },
+          data: {
+            inviteCount: { increment: 1 },
+            inviteReward: { increment: INVITER_REWARD_CREDITS },
+            credits: { increment: INVITER_REWARD_CREDITS },
+          },
+        });
+      }
+
+      return newUser;
     });
 
     // 签发 JWT
-    const token = signToken(user.id);
+    const token = signToken(result.id);
 
     return NextResponse.json(
       {
         token,
         user: {
-          id: user.id,
-          email: user.email,
-          phone: user.phone,
-          trialExpiresAt: user.trialExpiresAt,
-          isSubscribed: user.isSubscribed,
-          credits: user.credits,
+          id: result.id,
+          email: result.email,
+          phone: result.phone,
+          trialExpiresAt: result.trialExpiresAt,
+          isSubscribed: result.isSubscribed,
+          credits: result.credits,
         },
       },
       { status: 201 },

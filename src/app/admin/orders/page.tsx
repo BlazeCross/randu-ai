@@ -16,6 +16,8 @@ interface OrderItem {
   paymentId: string | null;
   paidAt: string | null;
   createdAt: string;
+  refundStatus: string;
+  refundedAt: string | null;
   plan: { id: string; name: string } | null;
   user: {
     id: string;
@@ -119,6 +121,40 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     setPage(1);
   }, [statusFilter, typeFilter, orderNoSearch]);
+
+  // 退款处理：弹出输入框收集退款原因，调用退款 API
+  const handleRefund = useCallback(
+    async (order: OrderItem) => {
+      const reason = window.prompt(
+        `确认退款订单 ${order.orderNo}？\n退款金额：¥${order.amount.toFixed(2)}\n退还积分：${Math.round(order.amount * 100)}\n请输入退款原因（可选）：`,
+      );
+      // 用户点击取消（返回 null）则中止
+      if (reason === null) return;
+
+      try {
+        const res = await fetch(
+          `/api/admin/orders/${order.id}/refund`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ reason: reason.trim() || undefined }),
+          },
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.message || `退款失败 (${res.status})`);
+        }
+        // 成功后刷新列表
+        await fetchOrders();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "退款失败");
+      }
+    },
+    [token, fetchOrders],
+  );
 
   return (
     <div className="space-y-5">
@@ -261,6 +297,9 @@ export default function AdminOrdersPage() {
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
                     时间
                   </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                    操作
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 bg-white">
@@ -313,6 +352,12 @@ export default function AdminOrdersPage() {
                         >
                           {status.label}
                         </span>
+                        {/* 退款状态徽章：已退款显示红色徽章 */}
+                        {order.refundStatus === "refunded" && (
+                          <span className="ml-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                            已退款
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-xs text-neutral-500">
                         <div>{formatDate(order.createdAt)}</div>
@@ -321,6 +366,23 @@ export default function AdminOrdersPage() {
                             支付于 {formatDate(order.paidAt)}
                           </div>
                         )}
+                        {order.refundedAt && (
+                          <div className="text-red-600">
+                            退款于 {formatDate(order.refundedAt)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {/* 退款按钮：仅已支付且未退款时显示 */}
+                        {order.status === "paid" &&
+                          order.refundStatus !== "refunded" && (
+                            <button
+                              onClick={() => handleRefund(order)}
+                              className="rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                            >
+                              退款
+                            </button>
+                          )}
                       </td>
                     </tr>
                   );

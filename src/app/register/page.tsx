@@ -1,13 +1,23 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, useRef, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrack } from "@/hooks/useTrack";
+
+// 邀请码校验状态
+type InviteStatus =
+  | { state: "idle" }
+  | { state: "checking" }
+  | { state: "valid"; inviterNickname: string | null }
+  | { state: "invalid" };
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
+  const { track } = useTrack();
 
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -16,6 +26,93 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // 邀请码相关状态
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteStatus, setInviteStatus] = useState<InviteStatus>({
+    state: "idle",
+  });
+  // 防抖定时器引用
+  const verifyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 初始化：从 URL 参数 ?ref=xxx 读取邀请码
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) {
+      // 统一格式：大写 + 去除空白
+      const normalized = ref.trim().toUpperCase();
+      // 通过微任务延迟 setState，避免 effect 内同步 setState 触发级联渲染
+      Promise.resolve().then(() => setInviteCode(normalized));
+      // 由 useEffect[inviteCode] 自动触发校验
+    }
+  }, [searchParams]);
+
+  /**
+   * 调用验证 API 校验邀请码
+   */
+  const verifyInviteCode = useCallback(async (code: string) => {
+    if (!code) {
+      setInviteStatus({ state: "idle" });
+      return;
+    }
+    setInviteStatus({ state: "checking" });
+    try {
+      const res = await fetch("/api/invite/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inviteCode: code }),
+      });
+      if (!res.ok) {
+        setInviteStatus({ state: "invalid" });
+        return;
+      }
+      const data = (await res.json()) as {
+        valid: boolean;
+        inviterNickname?: string | null;
+      };
+      if (data.valid) {
+        setInviteStatus({
+          state: "valid",
+          inviterNickname: data.inviterNickname ?? null,
+        });
+      } else {
+        setInviteStatus({ state: "invalid" });
+      }
+    } catch {
+      // 网络错误时不阻断，设为 idle
+      setInviteStatus({ state: "idle" });
+    }
+  }, []);
+
+  // 邀请码输入变化时，防抖触发校验
+  useEffect(() => {
+    if (verifyTimerRef.current) {
+      clearTimeout(verifyTimerRef.current);
+    }
+    // 空值立即重置（通过微任务延迟，避免 effect 内同步 setState 触发级联渲染）
+    if (!inviteCode) {
+      Promise.resolve().then(() => setInviteStatus({ state: "idle" }));
+      return;
+    }
+    verifyTimerRef.current = setTimeout(() => {
+      void verifyInviteCode(inviteCode);
+    }, 500);
+
+    return () => {
+      if (verifyTimerRef.current) {
+        clearTimeout(verifyTimerRef.current);
+      }
+    };
+  }, [inviteCode, verifyInviteCode]);
+
+  // 组件卸载时清理定时器
+  useEffect(() => {
+    return () => {
+      if (verifyTimerRef.current) {
+        clearTimeout(verifyTimerRef.current);
+      }
+    };
+  }, []);
 
   // 提交注册表单
   async function handleSubmit(e: FormEvent) {
@@ -45,6 +142,13 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
+      // 仅当邀请码校验有效时才传给后端
+      const trimmedInvite = inviteCode.trim().toUpperCase();
+      const payloadInviteCode =
+        trimmedInvite && inviteStatus.state === "valid"
+          ? trimmedInvite
+          : undefined;
+
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,6 +156,7 @@ export default function RegisterPage() {
           email: trimmedEmail || undefined,
           phone: trimmedPhone || undefined,
           password,
+          inviteCode: payloadInviteCode,
         }),
       });
       const data = await res.json();
@@ -63,6 +168,7 @@ export default function RegisterPage() {
 
       // 保存 token 并获取用户信息，然后跳转到新用户引导页
       await login(data.token);
+      track("register");
       router.push("/welcome");
     } catch {
       setError("网络错误，请稍后重试");
@@ -231,6 +337,111 @@ export default function RegisterPage() {
                 autoComplete="new-password"
                 className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
+            </div>
+
+            {/* 邀请码输入框（可选） */}
+            <div>
+              <label
+                htmlFor="inviteCode"
+                className="mb-1.5 block text-sm font-medium text-neutral-700"
+              >
+                邀请码 <span className="text-neutral-400">（可选）</span>
+              </label>
+              <input
+                id="inviteCode"
+                type="text"
+                value={inviteCode}
+                onChange={(e) =>
+                  setInviteCode(e.target.value.trim().toUpperCase())
+                }
+                placeholder="请输入邀请码"
+                maxLength={8}
+                autoComplete="off"
+                className={`w-full rounded-xl border bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:outline-none focus:ring-2 ${
+                  inviteStatus.state === "valid"
+                    ? "border-success-400 focus:border-success focus:ring-success/20"
+                    : inviteStatus.state === "invalid"
+                      ? "border-red-300 focus:border-red-500 focus:ring-red/20"
+                      : "border-neutral-300 focus:border-primary focus:ring-primary/20"
+                }`}
+              />
+              {/* 邀请码状态提示 */}
+              {inviteStatus.state === "checking" && (
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-neutral-500">
+                  <svg
+                    className="h-3 w-3 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  正在校验邀请码...
+                </p>
+              )}
+              {inviteStatus.state === "valid" && (
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-success-600">
+                  <svg
+                    className="h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  邀请码有效
+                  {inviteStatus.inviterNickname && (
+                    <span className="text-neutral-500">
+                      ，邀请人：
+                      <strong className="text-neutral-700">
+                        {inviteStatus.inviterNickname}
+                      </strong>
+                    </span>
+                  )}
+                  <span className="text-success-500">
+                    · 注册可获额外 50 积分
+                  </span>
+                </p>
+              )}
+              {inviteStatus.state === "invalid" && (
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
+                  <svg
+                    className="h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  邀请码无效，请检查后重新输入
+                </p>
+              )}
+              {inviteStatus.state === "idle" && (
+                <p className="mt-1 text-xs text-neutral-400">
+                  有邀请码？填写后注册可获额外 50 积分奖励
+                </p>
+              )}
             </div>
 
             {/* 错误提示 */}

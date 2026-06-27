@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
+import { checkAndExpireCredits, notifyLowBalance } from "@/lib/creditsExpiry";
 
 // 昵称长度限制
 const NICKNAME_MAX_LENGTH = 20;
@@ -33,6 +34,11 @@ export const GET = requireAuth(async (_request, { userId }) => {
       );
     }
 
+    // 检查积分是否过期，过期则清零并返回最新余额（17.3）
+    const { expired, credits: currentCredits } = await checkAndExpireCredits(userId);
+    // 余额低于阈值时发送提醒（静默失败，不阻断主流程）
+    await notifyLowBalance(userId, currentCredits);
+
     // 计算试用状态
     const now = Date.now();
     const trialExpiresAt = user.trialExpiresAt.getTime();
@@ -49,7 +55,7 @@ export const GET = requireAuth(async (_request, { userId }) => {
       nickname: user.nickname,
       avatar: user.avatar,
       role: user.role,
-      credits: user.credits,
+      credits: expired ? currentCredits : user.credits,
       totalUsed: user.totalUsed,
       trialExpiresAt: user.trialExpiresAt,
       isSubscribed: user.isSubscribed,

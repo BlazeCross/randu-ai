@@ -65,6 +65,8 @@ export const GET = requireAdmin(async (request) => {
         paymentId: true,
         paidAt: true,
         createdAt: true,
+        refundStatus: true,
+        refundedAt: true,
         plan: {
           select: { id: true, name: true },
         },

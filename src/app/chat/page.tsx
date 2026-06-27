@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrackPageView } from "@/hooks/useTrack";
 
 // 消息类型
 interface ChatMessage {
@@ -81,12 +82,16 @@ function saveHistory(messages: ChatMessage[]) {
  * - 历史记录持久化到 localStorage（不跨设备）
  * - 清空对话
  * - 积分余额显示
+ * - 语音输入（Web Speech API）
+ * - 图片上传（/api/upload）
+ * - 消息操作（复制 / 重新生成）
  *
  * 后端：POST /api/chat，返回 { role, content, type, imageUrl?, creditsCost }
  */
 export default function ChatPage() {
   const router = useRouter();
   const { user, token, loading: authLoading } = useAuth();
+  useTrackPageView("chat");
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -94,6 +99,22 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   // 当前积分余额（从 API 响应中更新）
   const [creditsBalance, setCreditsBalance] = useState<number | null>(null);
+
+  // 语音输入相关状态
+  const [isRecording, setIsRecording] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  // 录音开始时的输入框内容（作为追加基础）
+  const baseInputRef = useRef("");
+  // 累计的最终识别结果
+  const finalTranscriptRef = useRef("");
+
+  // 文件上传相关状态
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 消息操作相关状态：记录当前已复制消息 ID
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // 消息列表底部滚动容器
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -117,88 +138,276 @@ export default function ChatPage() {
   }, [user]);
 
   /**
-   * 发送消息
+   * 初始化语音识别（Web Speech API）
+   * - 兼容 window.SpeechRecognition / window.webkitSpeechRecognition
+   * - 不支持的浏览器隐藏语音按钮
    */
-  const handleSend = useCallback(async () => {
-    const text = input.trim();
-    if (!text || sending || !token) return;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognitionAPI =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      setSpeechSupported(false);
+      return;
+    }
+    setSpeechSupported(true);
 
-    // 创建用户消息
-    const userMessage: ChatMessage = {
-      id: genId(),
-      role: "user",
-      content: text,
-      type: "text",
-      createdAt: Date.now(),
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "zh-CN";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscriptRef.current += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      setInput(baseInputRef.current + finalTranscriptRef.current + interim);
     };
 
-    // 构建发送给后端的历史消息（仅 role + content）
-    const historyForApi = messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setSending(true);
-    setError(null);
+    recognition.onerror = (event: any) => {
+      console.error("语音识别错误:", event?.error);
+      setIsRecording(false);
+    };
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          messages: historyForApi,
-          userInput: text,
-        }),
-      });
+    recognitionRef.current = recognition;
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 403) {
-          // 积分不足
-          setError(
-            typeof data?.message === "string"
-              ? data.message
-              : "积分余额不足，请充值",
-          );
-          return;
-        }
-        setError(
-          typeof data?.message === "string" ? data.message : "对话失败",
-        );
-        return;
+    return () => {
+      try {
+        recognition.abort();
+      } catch {
+        // 静默
       }
+      recognitionRef.current = null;
+    };
+  }, []);
 
-      // 创建 AI 回复消息
-      const assistantMessage: ChatMessage = {
+  /**
+   * 核心发送函数（可复用）
+   * - baseMessages 可选，用于"重新生成"场景显式指定历史消息
+   * - 默认使用当前 messages 闭包作为历史
+   */
+  const sendMessage = useCallback(
+    async (text: string, baseMessages?: ChatMessage[]) => {
+      const trimmed = text.trim();
+      if (!trimmed || !token) return;
+
+      const historySource = baseMessages ?? messages;
+
+      // 创建用户消息
+      const userMessage: ChatMessage = {
         id: genId(),
-        role: "assistant",
-        content: data.content || "",
-        type: data.type === "image" ? "image" : "text",
-        imageUrl: data.imageUrl,
+        role: "user",
+        content: trimmed,
+        type: "text",
         createdAt: Date.now(),
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      // 构建发送给后端的历史消息（仅 role + content）
+      const historyForApi = historySource.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
-      // 更新积分余额
-      if (typeof data.creditsCost === "number" && creditsBalance !== null) {
-        setCreditsBalance((prev) =>
-          prev !== null ? Math.max(prev - data.creditsCost, 0) : prev,
-        );
+      setMessages((prev) => [...prev, userMessage]);
+      setSending(true);
+      setError(null);
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            messages: historyForApi,
+            userInput: trimmed,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (res.status === 403) {
+            // 积分不足
+            setError(
+              typeof data?.message === "string"
+                ? data.message
+                : "积分余额不足，请充值",
+            );
+            return;
+          }
+          setError(
+            typeof data?.message === "string" ? data.message : "对话失败",
+          );
+          return;
+        }
+
+        // 创建 AI 回复消息
+        const assistantMessage: ChatMessage = {
+          id: genId(),
+          role: "assistant",
+          content: data.content || "",
+          type: data.type === "image" ? "image" : "text",
+          imageUrl: data.imageUrl,
+          createdAt: Date.now(),
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+
+        // 更新积分余额
+        if (typeof data.creditsCost === "number" && creditsBalance !== null) {
+          setCreditsBalance((prev) =>
+            prev !== null ? Math.max(prev - data.creditsCost, 0) : prev,
+          );
+        }
+      } catch (err) {
+        console.error("对话失败:", err);
+        setError("网络错误，对话失败");
+      } finally {
+        setSending(false);
       }
-    } catch (err) {
-      console.error("对话失败:", err);
-      setError("网络错误，对话失败");
-    } finally {
-      setSending(false);
+    },
+    [messages, token, creditsBalance],
+  );
+
+  /**
+   * 发送消息（输入框触发）
+   */
+  const handleSend = useCallback(() => {
+    const text = input.trim();
+    if (!text || sending) return;
+    setInput("");
+    sendMessage(text);
+  }, [input, sending, sendMessage]);
+
+  /**
+   * 切换语音录制：开始 / 停止
+   */
+  const toggleRecording = useCallback(() => {
+    if (!recognitionRef.current) return;
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      // 以当前输入框内容作为追加基础
+      baseInputRef.current = input;
+      finalTranscriptRef.current = "";
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      } catch (err) {
+        console.error("启动语音识别失败:", err);
+        setIsRecording(false);
+      }
     }
-  }, [input, sending, token, messages, creditsBalance]);
+  }, [isRecording, input]);
+
+  /**
+   * 文件选择 → 上传到 /api/upload
+   * - 使用 FormData，file 字段
+   * - 携带 Authorization: Bearer token
+   * - 成功后在输入框追加 "请分析这张图片：${url}"
+   */
+  const handleFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      // 重置 input value 以便重复选择同一文件
+      e.target.value = "";
+      if (!file || !token) return;
+
+      setUploading(true);
+      setError(null);
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(
+            typeof data?.message === "string" ? data.message : "图片上传失败",
+          );
+          return;
+        }
+
+        // 上传成功后在输入框追加图片分析请求
+        setInput((prev) => {
+          const base = prev ? (prev.endsWith(" ") ? prev : prev + " ") : "";
+          return `${base}请分析这张图片：${data.url}`;
+        });
+      } catch (err) {
+        console.error("上传失败:", err);
+        setError("图片上传失败，请稍后重试");
+      } finally {
+        setUploading(false);
+      }
+    },
+    [token],
+  );
+
+  /**
+   * 复制消息内容到剪贴板
+   */
+  const handleCopy = useCallback(async (msg: ChatMessage) => {
+    try {
+      await navigator.clipboard.writeText(msg.content);
+      setCopiedId(msg.id);
+      setTimeout(
+        () => setCopiedId((prev) => (prev === msg.id ? null : prev)),
+        2000,
+      );
+    } catch (err) {
+      console.error("复制失败:", err);
+    }
+  }, []);
+
+  /**
+   * 重新生成 AI 回复
+   * - 找到 AI 消息的前一条用户消息
+   * - 删除当前 AI 消息和前一条用户消息（sendMessage 会重新创建用户消息）
+   * - 调用 sendMessage 重新发送
+   */
+  const handleRegenerate = useCallback(
+    (aiMessageId: string) => {
+      if (sending) return;
+      const aiIndex = messages.findIndex((m) => m.id === aiMessageId);
+      if (aiIndex < 0) return;
+      // 找到前一条用户消息
+      let userIdx = aiIndex - 1;
+      while (userIdx >= 0 && messages[userIdx].role !== "user") userIdx--;
+      if (userIdx < 0) return;
+
+      const userText = messages[userIdx].content;
+      // 构造去除 AI 消息 + 前一条用户消息后的新历史
+      const newMessages = messages.filter(
+        (_, i) => i !== aiIndex && i !== userIdx,
+      );
+      setMessages(newMessages);
+      sendMessage(userText, newMessages);
+    },
+    [messages, sending, sendMessage],
+  );
 
   /**
    * 清空对话
@@ -414,7 +623,7 @@ export default function ChatPage() {
                   </div>
                   {/* 消息内容 */}
                   <div
-                    className={`flex max-w-[80%] flex-col ${
+                    className={`group flex max-w-[80%] flex-col ${
                       msg.role === "user" ? "items-end" : "items-start"
                     }`}
                   >
@@ -471,9 +680,75 @@ export default function ChatPage() {
                         </p>
                       )}
                     </div>
-                    <span className="mt-1 text-[10px] text-neutral-400">
-                      {formatTime(msg.createdAt)}
-                    </span>
+                    {/* 时间 + 操作按钮（仅 AI 消息显示操作按钮） */}
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-[10px] text-neutral-400">
+                        {formatTime(msg.createdAt)}
+                      </span>
+                      {msg.role === "assistant" && (
+                        <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                          {/* 复制按钮 */}
+                          <button
+                            onClick={() => handleCopy(msg)}
+                            className="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+                            aria-label="复制"
+                            title="复制"
+                          >
+                            {copiedId === msg.id ? (
+                              <svg
+                                className="h-3.5 w-3.5 text-green-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="h-3.5 w-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                          {/* 重新生成按钮 */}
+                          <button
+                            onClick={() => handleRegenerate(msg.id)}
+                            disabled={sending}
+                            className="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-40"
+                            aria-label="重新生成"
+                            title="重新生成"
+                          >
+                            <svg
+                              className="h-3.5 w-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -543,6 +818,102 @@ export default function ChatPage() {
       <div className="border-t border-neutral-200 bg-white">
         <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
           <div className="flex items-end gap-2">
+            {/* 隐藏的文件上传 input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            {/* 语音输入按钮（不支持时隐藏） */}
+            {speechSupported && (
+              <button
+                onClick={toggleRecording}
+                disabled={sending}
+                className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-all disabled:opacity-50 ${
+                  isRecording
+                    ? "bg-red-500 text-white animate-pulse"
+                    : "border border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50"
+                }`}
+                aria-label={isRecording ? "停止录音" : "开始语音输入"}
+                title={isRecording ? "停止录音" : "语音输入"}
+              >
+                {isRecording ? (
+                  // 停止 / 录音中方块图标
+                  <svg
+                    className="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                ) : (
+                  // 麦克风图标
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                    />
+                  </svg>
+                )}
+              </button>
+            )}
+
+            {/* 文件上传按钮 */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading || sending}
+              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-neutral-300 bg-white text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+              aria-label="上传图片"
+              title="上传图片"
+            >
+              {uploading ? (
+                <svg
+                  className="h-5 w-5 animate-spin"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+              ) : (
+                // 回形针图标
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                  />
+                </svg>
+              )}
+            </button>
+
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}

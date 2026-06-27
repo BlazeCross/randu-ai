@@ -16,9 +16,11 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/workflows": "工作流管理",
   "/admin/users": "用户管理",
   "/admin/orders": "订单管理",
+  "/admin/cost": "成本核算",
   "/admin/keys": "Key 总览",
   "/admin/action-logs": "操作日志",
   "/admin/notifications": "公告管理",
+  "/admin/retention": "留存分析",
 };
 
 /**
