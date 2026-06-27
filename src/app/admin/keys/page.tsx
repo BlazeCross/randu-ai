@@ -42,7 +42,7 @@ const STATUS_BADGES: Record<
   { label: string; bg: string; text: string }
 > = {
   active: { label: "正常", bg: "bg-success-50", text: "text-success-700" },
-  inactive: { label: "已停用", bg: "bg-neutral-100", text: "text-neutral-700" },
+  inactive: { label: "已停用", bg: "bg-muted", text: "text-foreground" },
   revoked: { label: "已吊销", bg: "bg-red-50", text: "text-red-700" },
 };
 
@@ -156,12 +156,12 @@ export default function AdminKeysPage() {
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">Key 总览</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">Key 总览</span>
       </nav>
 
       {/* 顶部工具栏：搜索 + 筛选 + 刷新 */}
@@ -175,12 +175,12 @@ export default function AdminKeysPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索 Key 名称 / 前缀 / 用户..."
-            className="w-full max-w-xs rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="">全部状态</option>
             <option value="active">正常</option>
@@ -189,7 +189,7 @@ export default function AdminKeysPage() {
           </select>
           <button
             type="submit"
-            className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+            className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
           >
             搜索
           </button>
@@ -197,7 +197,7 @@ export default function AdminKeysPage() {
         <button
           onClick={() => fetchKeys(page)}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
         >
           <svg
             className="h-4 w-4"
@@ -218,13 +218,13 @@ export default function AdminKeysPage() {
 
       {/* 错误提示 */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg
@@ -249,12 +249,12 @@ export default function AdminKeysPage() {
           </div>
         ) : keys.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-neutral-500">暂无 API Key</p>
+            <p className="text-sm text-muted-foreground">暂无 API Key</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-neutral-200 text-xs uppercase text-neutral-500">
+              <thead className="border-b border-border text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">Key 前缀</th>
                   <th className="px-4 py-3 font-medium">名称</th>
@@ -268,24 +268,24 @@ export default function AdminKeysPage() {
                   <th className="px-4 py-3 font-medium">创建时间</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-border">
                 {keys.map((k) => {
                   const statusBadge =
                     STATUS_BADGES[k.status] || {
                       label: k.status,
-                      bg: "bg-neutral-100",
-                      text: "text-neutral-700",
+                      bg: "bg-muted",
+                      text: "text-foreground",
                     };
                   const isExpired =
                     k.expiresAt !== null && new Date(k.expiresAt) <= new Date();
                   return (
-                    <tr key={k.id} className="hover:bg-neutral-50">
+                    <tr key={k.id} className="hover:bg-muted">
                       <td className="px-4 py-3">
-                        <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-700">
+                        <code className="rounded bg-muted px-1.5 py-0.5 text-xs text-foreground">
                           {k.keyPrefix}…
                         </code>
                       </td>
-                      <td className="px-4 py-3 font-medium text-neutral-900">
+                      <td className="px-4 py-3 font-medium text-foreground">
                         {k.name}
                       </td>
                       <td className="px-4 py-3">
@@ -303,13 +303,13 @@ export default function AdminKeysPage() {
                           {k.user.nickname || k.user.email || k.user.phone || "未知用户"}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {k.creditsUsed}
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {k.totalCalls}
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         <div>
                           {k.qpsLimit > 0 ? `${k.qpsLimit} QPS` : "不限QPS"}
                         </div>
@@ -319,7 +319,7 @@ export default function AdminKeysPage() {
                             : "不限日调"}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {formatDate(k.lastUsedAt)}
                       </td>
                       <td className="px-4 py-3 text-xs">
@@ -328,17 +328,17 @@ export default function AdminKeysPage() {
                             className={
                               isExpired
                                 ? "font-medium text-red-600"
-                                : "text-neutral-500"
+                                : "text-muted-foreground"
                             }
                           >
                             {formatDate(k.expiresAt)}
                             {isExpired && " (已过期)"}
                           </span>
                         ) : (
-                          <span className="text-neutral-400">永不过期</span>
+                          <span className="text-muted-foreground">永不过期</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {formatDate(k.createdAt)}
                       </td>
                     </tr>
@@ -353,21 +353,21 @@ export default function AdminKeysPage() {
       {/* 分页 */}
       {total > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             共 {total} 条，第 {page}/{totalPages} 页
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => fetchKeys(page - 1)}
               disabled={page <= 1 || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
             <button
               onClick={() => fetchKeys(page + 1)}
               disabled={page >= totalPages || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>

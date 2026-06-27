@@ -106,49 +106,49 @@ export default function AdminCostPage() {
       label: "利润率",
       value: data ? `${(data.profitMargin * 100).toFixed(2)}%` : "—",
       desc: "利润 / 收入",
-      color: "text-neutral-900",
+      color: "text-foreground",
     },
   ];
 
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">成本核算</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">成本核算</span>
       </nav>
 
       {/* 日期范围选择器 */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-4">
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
               起始日期
             </label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
               截止日期
             </label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
           <button
             onClick={fetchCost}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
+            className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
           >
             查询
           </button>
@@ -157,7 +157,7 @@ export default function AdminCostPage() {
 
       {/* 错误提示 */}
       {error && (
-        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -167,26 +167,26 @@ export default function AdminCostPage() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm"
+            className="rounded-[var(--radius-sm)] border border-border bg-card p-4"
           >
-            <p className="text-xs font-medium text-neutral-500">
+            <p className="text-xs font-medium text-muted-foreground">
               {card.label}
             </p>
             <p className={`mt-1 text-2xl font-bold ${card.color}`}>
               {loading ? "—" : card.value}
             </p>
-            <p className="mt-0.5 text-[11px] text-neutral-400">{card.desc}</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">{card.desc}</p>
           </div>
         ))}
       </div>
 
       {/* 按接口分组的成本明细 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <div className="border-b border-neutral-200 px-4 py-3 sm:px-6">
-          <h2 className="text-sm font-semibold text-neutral-900">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+        <div className="border-b border-border px-4 py-3 sm:px-6">
+          <h2 className="text-sm font-semibold text-foreground">
             接口成本明细
           </h2>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {data
               ? `${data.startDate} ~ ${data.endDate}`
               : "按接口分组的成本统计"}
@@ -217,45 +217,45 @@ export default function AdminCostPage() {
           </div>
         ) : !data || data.breakdown.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-neutral-500">所选区间暂无调用记录</p>
+            <p className="text-sm text-muted-foreground">所选区间暂无调用记录</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-neutral-200">
-              <thead className="bg-neutral-50">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-background">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 sm:px-6">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground sm:px-6">
                     接口
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     调用次数
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     成本（元）
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     占比
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 bg-white">
+              <tbody className="divide-y divide-border bg-card">
                 {data.breakdown.map((item) => {
                   const ratio =
                     data.totalCost > 0
                       ? (item.cost / data.totalCost) * 100
                       : 0;
                   return (
-                    <tr key={item.endpoint} className="hover:bg-neutral-50">
-                      <td className="px-4 py-3 text-sm font-mono text-neutral-700 sm:px-6">
+                    <tr key={item.endpoint} className="hover:bg-muted">
+                      <td className="px-4 py-3 text-sm font-mono text-foreground sm:px-6">
                         {item.endpoint}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-neutral-600">
+                      <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                         {item.count}
                       </td>
                       <td className="px-4 py-3 text-right text-sm font-semibold text-red-600">
                         ¥{item.cost.toFixed(4)}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-neutral-500">
+                      <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                         {ratio.toFixed(1)}%
                       </td>
                     </tr>
@@ -263,12 +263,12 @@ export default function AdminCostPage() {
                 })}
               </tbody>
               {data.breakdown.length > 0 && (
-                <tfoot className="bg-neutral-50">
+                <tfoot className="bg-background">
                   <tr>
-                    <td className="px-4 py-3 text-sm font-medium text-neutral-900 sm:px-6">
+                    <td className="px-4 py-3 text-sm font-medium text-foreground sm:px-6">
                       合计
                     </td>
-                    <td className="px-4 py-3 text-right text-sm font-medium text-neutral-900">
+                    <td className="px-4 py-3 text-right text-sm font-medium text-foreground">
                       {data.breakdown.reduce(
                         (sum, item) => sum + item.count,
                         0,
@@ -277,7 +277,7 @@ export default function AdminCostPage() {
                     <td className="px-4 py-3 text-right text-sm font-bold text-red-600">
                       ¥{data.totalCost.toFixed(4)}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-neutral-500">
+                    <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                       100%
                     </td>
                   </tr>
@@ -290,34 +290,34 @@ export default function AdminCostPage() {
 
       {/* 每日成本趋势 */}
       {data && data.dailyTrend.length > 0 && (
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-          <div className="border-b border-neutral-200 px-4 py-3 sm:px-6">
-            <h2 className="text-sm font-semibold text-neutral-900">
+        <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+          <div className="border-b border-border px-4 py-3 sm:px-6">
+            <h2 className="text-sm font-semibold text-foreground">
               每日成本趋势
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-neutral-200">
-              <thead className="bg-neutral-50">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-background">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 sm:px-6">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground sm:px-6">
                     日期
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     调用次数
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     成本（元）
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 bg-white">
+              <tbody className="divide-y divide-border bg-card">
                 {data.dailyTrend.map((item) => (
-                  <tr key={item.date} className="hover:bg-neutral-50">
-                    <td className="px-4 py-3 text-sm text-neutral-700 sm:px-6">
+                  <tr key={item.date} className="hover:bg-muted">
+                    <td className="px-4 py-3 text-sm text-foreground sm:px-6">
                       {item.date}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-neutral-600">
+                    <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                       {item.count}
                     </td>
                     <td className="px-4 py-3 text-right text-sm font-semibold text-red-600">

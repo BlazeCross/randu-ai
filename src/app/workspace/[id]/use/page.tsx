@@ -390,14 +390,14 @@ export default function WorkflowUsePage() {
     : "下载结果";
 
   return (
-    <main className="flex-1 bg-neutral-50">
+    <main className="flex-1 bg-background">
       {/* 面包屑 */}
-      <div className="border-b border-neutral-200 bg-white">
+      <div className="border-b border-border bg-card">
         <nav
           aria-label="面包屑"
           className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8"
         >
-          <ol className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <li>
               <Link href="/" className="hover:text-primary">
                 首页
@@ -423,7 +423,7 @@ export default function WorkflowUsePage() {
               )}
             </li>
             <li aria-hidden>/</li>
-            <li className="font-medium text-neutral-900" aria-current="page">
+            <li className="font-medium text-foreground" aria-current="page">
               使用
             </li>
           </ol>
@@ -434,11 +434,11 @@ export default function WorkflowUsePage() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         {/* 页面标题 */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {workflow ? workflow.name : "工作流使用"}
           </h1>
           {workflow?.description && (
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               {workflow.description}
             </p>
           )}
@@ -450,22 +450,22 @@ export default function WorkflowUsePage() {
             <Spinner className="h-10 w-10 text-primary" />
           </div>
         ) : /* 工作流不存在 */ !workflow ? (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
-            <p className="text-sm text-neutral-600">
+          <div className="rounded-[var(--radius)] border border-border bg-card p-12 text-center">
+            <p className="text-sm text-muted-foreground">
               工作流不存在或已下架
             </p>
             <Link
               href="/workspace"
-              className="mt-4 inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+              className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
             >
               返回工作台
             </Link>
           </div>
         ) : /* 未登录提示 */ !user || !token ? (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
+          <div className="rounded-[var(--radius)] border border-border bg-card p-12 text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <svg
-                className="h-8 w-8 text-neutral-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -478,16 +478,16 @@ export default function WorkflowUsePage() {
                 />
               </svg>
             </div>
-            <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+            <h2 className="mb-2 text-xl font-semibold text-foreground">
               请先登录
             </h2>
-            <p className="mb-6 text-sm text-neutral-500">
+            <p className="mb-6 text-sm text-muted-foreground">
               登录后即可使用 AI 工作流
             </p>
             <button
               type="button"
               onClick={() => router.push("/login")}
-              className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover"
+              className="rounded-[var(--radius-sm)] bg-primary px-6 py-3 text-sm font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover"
             >
               前往登录
             </button>
@@ -499,7 +499,7 @@ export default function WorkflowUsePage() {
               <>
                 {/* 试用已过期 */}
                 {trialExpired ? (
-                  <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 sm:flex-row sm:items-center">
+                  <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border border-red-200 bg-red-50 p-5 sm:flex-row sm:items-center">
                     <div className="flex items-start gap-3">
                       <svg
                         className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
@@ -526,7 +526,7 @@ export default function WorkflowUsePage() {
                     <button
                       type="button"
                       onClick={() => setUpgradeReason("expired")}
-                      className="inline-flex flex-shrink-0 items-center justify-center rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700"
+                      className="inline-flex flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
                     >
                       升级套餐
                     </button>
@@ -534,7 +534,7 @@ export default function WorkflowUsePage() {
                 ) : (
                   /* 试用中：显示使用次数与进度条 */
                   <div
-                    className={`mb-6 rounded-2xl border p-5 ${
+                    className={`mb-6 rounded-[var(--radius)] border p-5 ${
                       trialLimitReached
                         ? "border-amber-200 bg-amber-50"
                         : "border-primary-200 bg-primary-50/50"
@@ -560,7 +560,7 @@ export default function WorkflowUsePage() {
                         <div>
                           <p
                             className={`text-sm font-semibold ${
-                              trialLimitReached ? "text-amber-900" : "text-neutral-900"
+                              trialLimitReached ? "text-amber-900" : "text-foreground"
                             }`}
                           >
                             {trialLimitReached
@@ -569,7 +569,7 @@ export default function WorkflowUsePage() {
                           </p>
                           <p
                             className={`mt-0.5 text-xs ${
-                              trialLimitReached ? "text-amber-700" : "text-neutral-500"
+                              trialLimitReached ? "text-amber-700" : "text-muted-foreground"
                             }`}
                           >
                             {trialLimitReached
@@ -582,7 +582,7 @@ export default function WorkflowUsePage() {
                         <button
                           type="button"
                           onClick={() => setUpgradeReason("limit_reached")}
-                          className="inline-flex flex-shrink-0 items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
+                          className="inline-flex flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                         >
                           升级套餐
                         </button>
@@ -590,7 +590,7 @@ export default function WorkflowUsePage() {
                     </div>
                     {/* 进度条 */}
                     <div className="mt-3">
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-white/60">
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-card/60">
                         <div
                           className={`h-full rounded-full transition-all ${
                             trialLimitReached
@@ -616,8 +616,8 @@ export default function WorkflowUsePage() {
             <div className="space-y-6">
               {/* 动态表单区：根据 inputSchema 渲染 */}
               {useDynamicForm && workflow.inputSchema && showGenerateButton ? (
-                <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-                  <h2 className="mb-4 text-base font-semibold text-neutral-900">
+                <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+                  <h2 className="mb-4 text-base font-semibold text-foreground">
                     填写参数
                   </h2>
                   <DynamicForm
@@ -631,8 +631,8 @@ export default function WorkflowUsePage() {
               ) : /* 旧模式：单一图片上传 */ !useDynamicForm && showGenerateButton ? (
                 <>
                   {/* 图片上传区 */}
-                  <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-                    <h2 className="mb-4 text-base font-semibold text-neutral-900">
+                  <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+                    <h2 className="mb-4 text-base font-semibold text-foreground">
                       上传图片
                     </h2>
                     <ImageUploader
@@ -649,7 +649,7 @@ export default function WorkflowUsePage() {
                     type="button"
                     onClick={handleLegacyGenerate}
                     disabled={!legacyCanGenerate}
-                    className="flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/20 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                    className="flex w-full items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3.5 text-base font-semibold text-white shadow-primary-600/20 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
                   >
                     {submitting ? (
                       <>
@@ -690,30 +690,30 @@ export default function WorkflowUsePage() {
 
               {/* 进度展示区 */}
               {showProgress && (
-                <div className="animate-fade-in rounded-2xl border border-primary-200 bg-primary-50/50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-primary-200 bg-primary-50/50 p-6">
                   {/* 状态指示 + 已等待时间 */}
                   <div className="mb-4 flex items-center justify-between">
                     <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-0.5 text-xs font-medium text-primary-700">
                       {currentStatusLabel}
                     </span>
                     {isPolling && (
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-muted-foreground">
                         已等待 {formatElapsed(elapsedSeconds)}
                       </span>
                     )}
                   </div>
 
                   {/* 进度条 */}
-                  <div className="h-3 w-full overflow-hidden rounded-full bg-neutral-200">
+                  <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
                     <div className="animate-workflow-progress h-full rounded-full bg-primary" />
                   </div>
 
                   {/* 等待文案 */}
                   <div className="mt-4 text-center">
-                    <p className="text-base font-medium text-neutral-900">
+                    <p className="text-base font-medium text-foreground">
                       AI正在努力生成中，请稍候...
                     </p>
-                    <p className="mt-1 text-sm text-neutral-500">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       处理约需几分钟，请耐心等待
                     </p>
                   </div>
@@ -722,7 +722,7 @@ export default function WorkflowUsePage() {
 
               {/* 结果展示区 */}
               {isCompleted && (
-                <div className="animate-fade-in rounded-2xl border border-success-200 bg-success-50/50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-success-200 bg-success-50/50 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
                       className="h-5 w-5 text-success-600"
@@ -737,11 +737,11 @@ export default function WorkflowUsePage() {
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <h3 className="text-base font-semibold text-neutral-900">
+                    <h3 className="text-base font-semibold text-foreground">
                       {resultTitle}
                     </h3>
                     {tokensUsed > 0 && (
-                      <span className="ml-auto text-sm text-neutral-500">
+                      <span className="ml-auto text-sm text-muted-foreground">
                         消耗 {tokensUsed} tokens
                       </span>
                     )}
@@ -755,18 +755,18 @@ export default function WorkflowUsePage() {
                           src={outputUrl}
                           controls
                           autoPlay
-                          className="w-full rounded-xl bg-black"
+                          className="w-full rounded-[var(--radius-sm)] bg-black"
                         />
                       ) : workflow.outputType === "image" ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={outputUrl}
                           alt="生成结果"
-                          className="w-full rounded-xl bg-neutral-100"
+                          className="w-full rounded-[var(--radius-sm)] bg-muted"
                         />
                       ) : (
                         // text 类型：展示在 pre 块中
-                        <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-white p-4 text-sm text-neutral-800">
+                        <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-[var(--radius-sm)] bg-card p-4 text-sm text-foreground">
                           {outputUrl}
                         </pre>
                       )}
@@ -783,7 +783,7 @@ export default function WorkflowUsePage() {
                                 void navigator.clipboard.writeText(outputUrl);
                               }
                             }}
-                            className="inline-flex flex-1 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                           >
                             <svg
                               className="mr-2 h-4 w-4"
@@ -805,7 +805,7 @@ export default function WorkflowUsePage() {
                           <a
                             href={outputUrl}
                             download
-                            className="inline-flex flex-1 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                            className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                           >
                             <svg
                               className="mr-2 h-4 w-4"
@@ -827,7 +827,7 @@ export default function WorkflowUsePage() {
                         <button
                           type="button"
                           onClick={handleReset}
-                          className="inline-flex flex-1 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary hover:text-primary"
+                          className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
                         >
                           重新生成
                         </button>
@@ -840,11 +840,11 @@ export default function WorkflowUsePage() {
                         结果获取失败，请重试
                       </p>
                       {debugInfo && (
-                        <details className="mb-4 rounded-lg border border-neutral-300 bg-neutral-50 p-3">
-                          <summary className="cursor-pointer text-xs font-medium text-neutral-600">
+                        <details className="mb-4 rounded-[var(--radius-sm)] border border-border bg-background p-3">
+                          <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
                             调试信息（请截图发给开发者）
                           </summary>
-                          <pre className="mt-2 max-h-60 overflow-auto text-xs text-neutral-700">
+                          <pre className="mt-2 max-h-60 overflow-auto text-xs text-foreground">
                             {JSON.stringify(debugInfo, null, 2)}
                           </pre>
                         </details>
@@ -852,7 +852,7 @@ export default function WorkflowUsePage() {
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                        className="inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
                       >
                         重试
                       </button>
@@ -863,7 +863,7 @@ export default function WorkflowUsePage() {
 
               {/* 失败提示 */}
               {isFailed && (
-                <div className="animate-fade-in rounded-2xl border border-red-200 bg-red-50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-red-200 bg-red-50 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
                       className="h-5 w-5 text-red-600"
@@ -878,7 +878,7 @@ export default function WorkflowUsePage() {
                         d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <h3 className="text-base font-semibold text-neutral-900">
+                    <h3 className="text-base font-semibold text-foreground">
                       生成失败
                     </h3>
                   </div>
@@ -891,7 +891,7 @@ export default function WorkflowUsePage() {
 
               {/* 超时提示 */}
               {isTimeout && (
-                <div className="animate-fade-in rounded-2xl border border-amber-200 bg-amber-50 p-6">
+                <div className="animate-fade-in rounded-[var(--radius)] border border-amber-200 bg-amber-50 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
                       className="h-5 w-5 text-amber-600"
@@ -906,7 +906,7 @@ export default function WorkflowUsePage() {
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <h3 className="text-base font-semibold text-neutral-900">
+                    <h3 className="text-base font-semibold text-foreground">
                       生成超时
                     </h3>
                   </div>
@@ -922,8 +922,8 @@ export default function WorkflowUsePage() {
             {/* 右侧：使用说明 + 飞书文档 */}
             <div className="space-y-6">
               {/* 使用说明卡片 */}
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-                <h2 className="mb-4 text-base font-semibold text-neutral-900">
+              <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+                <h2 className="mb-4 text-base font-semibold text-foreground">
                   使用说明
                 </h2>
                 <ol className="space-y-4">
@@ -932,7 +932,7 @@ export default function WorkflowUsePage() {
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
                         {step.num}
                       </div>
-                      <span className="text-sm text-neutral-700">
+                      <span className="text-sm text-foreground">
                         {step.text}
                       </span>
                     </li>
@@ -941,11 +941,11 @@ export default function WorkflowUsePage() {
               </div>
 
               {/* 飞书文档跳转 */}
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-                <h3 className="mb-2 text-base font-semibold text-neutral-900">
+              <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+                <h3 className="mb-2 text-base font-semibold text-foreground">
                   详细教程
                 </h3>
-                <p className="mb-4 text-sm text-neutral-500">
+                <p className="mb-4 text-sm text-muted-foreground">
                   查看飞书文档获取更详细的使用指南
                 </p>
                 {workflow.feishuDocUrl ? (
@@ -953,7 +953,7 @@ export default function WorkflowUsePage() {
                     href={workflow.feishuDocUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 transition-colors hover:border-primary hover:text-primary"
+                    className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
                   >
                     查看详细教程
                     <svg
@@ -971,7 +971,7 @@ export default function WorkflowUsePage() {
                     </svg>
                   </a>
                 ) : (
-                  <span className="inline-flex items-center justify-center rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-5 py-3 text-sm font-medium text-neutral-400">
+                  <span className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-dashed border-border bg-background px-5 py-3 text-sm font-medium text-muted-foreground">
                     暂无教程
                   </span>
                 )}

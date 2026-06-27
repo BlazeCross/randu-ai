@@ -150,27 +150,27 @@ export default function AdminNotificationsPage() {
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">公告管理</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">公告管理</span>
       </nav>
 
       {/* 创建公告卡片 */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-base font-semibold text-neutral-900">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+        <h2 className="mb-4 text-base font-semibold text-foreground">
           发布新公告
         </h2>
 
         {formError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {formError}
           </div>
         )}
         {successMsg && (
-          <div className="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-sm text-success-700">
+          <div className="mb-4 rounded-[var(--radius-sm)] border border-success-200 bg-success-50 px-4 py-3 text-sm text-success-700">
             {successMsg}
           </div>
         )}
@@ -178,7 +178,7 @@ export default function AdminNotificationsPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 标题 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               公告标题 <span className="text-red-500">*</span>
             </label>
             <input
@@ -187,16 +187,16 @@ export default function AdminNotificationsPage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="如：系统维护通知"
               maxLength={100}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               {title.length}/100 字
             </p>
           </div>
 
           {/* 内容 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               公告内容
             </label>
             <textarea
@@ -205,16 +205,16 @@ export default function AdminNotificationsPage() {
               placeholder="公告详细内容..."
               rows={4}
               maxLength={1000}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               {content.length}/1000 字
             </p>
           </div>
 
           {/* 链接 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               跳转链接（可选）
             </label>
             <input
@@ -222,7 +222,7 @@ export default function AdminNotificationsPage() {
               value={link}
               onChange={(e) => setLink(e.target.value)}
               placeholder="https://..."
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
@@ -231,11 +231,11 @@ export default function AdminNotificationsPage() {
             <button
               type="submit"
               disabled={submitting || !title.trim()}
-              className="rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
             >
               {submitting ? "发送中..." : "发布公告"}
             </button>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-muted-foreground">
               公告将发送给所有活跃用户，并显示在首页横幅
             </p>
           </div>
@@ -243,15 +243,15 @@ export default function AdminNotificationsPage() {
       </div>
 
       {/* 公告列表 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">
+          <h2 className="text-base font-semibold text-foreground">
             历史公告
           </h2>
           <button
             onClick={() => fetchAnnouncements()}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
           >
             <svg
               className="h-3.5 w-3.5"
@@ -271,7 +271,7 @@ export default function AdminNotificationsPage() {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -300,19 +300,19 @@ export default function AdminNotificationsPage() {
           </div>
         ) : announcements.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-neutral-500">暂无公告</p>
+            <p className="text-sm text-muted-foreground">暂无公告</p>
           </div>
         ) : (
-          <div className="divide-y divide-neutral-100">
+          <div className="divide-y divide-border">
             {announcements.map((a) => (
               <div key={a.id} className="py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-medium text-neutral-900">
+                    <h3 className="text-sm font-medium text-foreground">
                       {a.title}
                     </h3>
                     {a.content && (
-                      <p className="mt-1 text-xs text-neutral-600">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {a.content}
                       </p>
                     )}
@@ -340,9 +340,9 @@ export default function AdminNotificationsPage() {
                       </a>
                     )}
                   </div>
-                  <div className="flex flex-shrink-0 flex-col items-end gap-1 text-xs text-neutral-400">
+                  <div className="flex flex-shrink-0 flex-col items-end gap-1 text-xs text-muted-foreground">
                     <span>{formatDate(a.createdAt)}</span>
-                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-neutral-600">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
                       {a.recipientCount} 人收到
                     </span>
                   </div>

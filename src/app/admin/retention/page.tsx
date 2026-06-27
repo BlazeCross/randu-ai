@@ -87,25 +87,25 @@ export default function AdminRetentionPage() {
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">留存分析</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">留存分析</span>
       </nav>
 
       {/* 日期范围选择器 */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-4">
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
               统计周期（最近 N 天注册用户）
             </label>
             <select
               value={days}
               onChange={(e) => setDays(Number(e.target.value))}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {DAYS_OPTIONS.map((d) => (
                 <option key={d} value={d}>
@@ -116,7 +116,7 @@ export default function AdminRetentionPage() {
           </div>
           <button
             onClick={fetchRetention}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
+            className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
           >
             查询
           </button>
@@ -125,13 +125,13 @@ export default function AdminRetentionPage() {
 
       {/* 错误提示 */}
       {error && (
-        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* 留存说明 */}
-      <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-xs text-neutral-600">
+      <div className="rounded-[var(--radius-sm)] border border-border bg-background px-4 py-3 text-xs text-muted-foreground">
         <p>
           留存定义：用户在某天有调用记录（CallLog）或行为埋点（EventLog）即视为当日留存。
           单元格显示「留存人数 / 注册人数 (留存率%)」，颜色越深表示留存率越高。
@@ -139,12 +139,12 @@ export default function AdminRetentionPage() {
       </div>
 
       {/* Cohort 留存表格 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <div className="border-b border-neutral-200 px-4 py-3 sm:px-6">
-          <h2 className="text-sm font-semibold text-neutral-900">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+        <div className="border-b border-border px-4 py-3 sm:px-6">
+          <h2 className="text-sm font-semibold text-foreground">
             Cohort 留存矩阵
           </h2>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {data
               ? `共 ${data.cohorts.length} 个 cohort · 最近 ${data.days} 天`
               : "按注册日期分组，统计各 cohort 的留存情况"}
@@ -174,24 +174,24 @@ export default function AdminRetentionPage() {
             </svg>
           </div>
         ) : !data || data.cohorts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-sm text-neutral-400">
+          <div className="flex flex-col items-center justify-center py-16 text-sm text-muted-foreground">
             <p>暂无留存数据</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50">
-                  <th className="sticky left-0 z-10 bg-neutral-50 px-3 py-2.5 text-left font-medium text-neutral-600">
+                <tr className="border-b border-border bg-background">
+                  <th className="sticky left-0 z-10 bg-background px-3 py-2.5 text-left font-medium text-muted-foreground">
                     注册日期
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium text-neutral-600">
+                  <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">
                     注册人数
                   </th>
                   {RETENTION_COLUMNS.map((col) => (
                     <th
                       key={col.key}
-                      className="px-3 py-2.5 text-center font-medium text-neutral-600"
+                      className="px-3 py-2.5 text-center font-medium text-muted-foreground"
                     >
                       {col.label}
                     </th>
@@ -202,12 +202,12 @@ export default function AdminRetentionPage() {
                 {data.cohorts.map((cohort) => (
                   <tr
                     key={cohort.date}
-                    className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/50"
+                    className="border-b border-border last:border-0 hover:bg-muted/50"
                   >
-                    <td className="sticky left-0 z-10 bg-white px-3 py-2.5 font-medium text-neutral-900">
+                    <td className="sticky left-0 z-10 bg-card px-3 py-2.5 font-medium text-foreground">
                       {cohort.date}
                     </td>
-                    <td className="px-3 py-2.5 text-right text-neutral-700">
+                    <td className="px-3 py-2.5 text-right text-foreground">
                       {cohort.size}
                     </td>
                     {RETENTION_COLUMNS.map((col) => {
@@ -223,14 +223,14 @@ export default function AdminRetentionPage() {
                           style={{ backgroundColor: rateBgColor(cell.rate) }}
                           title={`留存 ${cell.count} / ${cohort.size} (${percent}%)`}
                         >
-                          <div className="font-medium text-neutral-900">
+                          <div className="font-medium text-foreground">
                             {cell.count}
-                            <span className="text-neutral-400">
+                            <span className="text-muted-foreground">
                               {" "}
                               / {cohort.size}
                             </span>
                           </div>
-                          <div className="text-[11px] text-neutral-500">
+                          <div className="text-[11px] text-muted-foreground">
                             {percent}%
                           </div>
                         </td>

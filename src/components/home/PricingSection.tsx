@@ -51,17 +51,17 @@ const plans = [
 
 export default function PricingSection() {
   return (
-    <section className="bg-neutral-50 py-16 sm:py-24">
+    <section className="bg-background py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* 标题区 */}
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-primary-600">
             定价方案
           </span>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
             选择适合你的套餐
           </h2>
-          <p className="mt-4 text-base text-neutral-600 sm:text-lg">
+          <p className="mt-4 text-base text-muted-foreground sm:text-lg">
             灵活的定价方案，满足不同规模的使用需求
           </p>
         </div>
@@ -71,42 +71,42 @@ export default function PricingSection() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl border bg-white p-6 transition-all sm:p-8 ${
+              className={`relative rounded-[var(--radius)] border bg-card p-6 transition-all sm:p-8 ${
                 plan.highlighted
                   ? "border-primary-600 shadow-2xl shadow-primary-600/10 lg:-translate-y-4"
-                  : "border-neutral-200 shadow-sm hover:border-neutral-300 hover:shadow-md"
+                  : "border-border hover:border-border hover:shadow-md"
               }`}
             >
               {/* 推荐标签 */}
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white shadow-lg">
+                  <span className="inline-flex rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white">
                     最受欢迎
                   </span>
                 </div>
               )}
 
               {/* 套餐名称 */}
-              <h3 className="text-lg font-semibold text-neutral-900">
+              <h3 className="text-lg font-semibold text-foreground">
                 {plan.name}
               </h3>
-              <p className="mt-2 text-sm text-neutral-600">{plan.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
 
               {/* 价格 */}
               <div className="mt-6 flex items-baseline">
-                <span className="text-4xl font-bold tracking-tight text-neutral-900">
+                <span className="text-4xl font-bold tracking-tight text-foreground">
                   ¥{plan.price}
                 </span>
-                <span className="ml-1 text-sm text-neutral-500">/月</span>
+                <span className="ml-1 text-sm text-muted-foreground">/月</span>
               </div>
 
               {/* CTA 按钮 */}
               <Link
                 href={plan.href}
-                className={`mt-8 block rounded-xl px-4 py-3 text-center text-sm font-semibold transition-colors ${
+                className={`mt-8 block rounded-[var(--radius-sm)] px-4 py-3 text-center text-sm font-semibold transition-colors ${
                   plan.highlighted
                     ? "bg-primary text-white hover:bg-primary-hover"
-                    : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+                    : "bg-muted text-foreground hover:bg-muted"
                 }`}
               >
                 {plan.cta}
@@ -117,7 +117,7 @@ export default function PricingSection() {
                 {plan.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-3 text-sm text-neutral-600"
+                    className="flex items-start gap-3 text-sm text-muted-foreground"
                   >
                     <svg
                       className="mt-0.5 h-5 w-5 flex-shrink-0 text-success-500"

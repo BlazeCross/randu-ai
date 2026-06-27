@@ -25,7 +25,7 @@ const SHAPE_DEFAULTS: Record<
   SkeletonShape,
   { height: string; rounded: string }
 > = {
-  rect: { height: "1rem", rounded: "rounded-md" },
+  rect: { height: "1rem", rounded: "rounded-[var(--radius-sm)]" },
   circle: { height: "2.5rem", rounded: "rounded-full" },
   text: { height: "0.875rem", rounded: "rounded" },
 };
@@ -51,7 +51,7 @@ export function Skeleton({
 
   return (
     <div
-      className={`animate-pulse bg-neutral-200 ${finalRounded} ${className}`}
+      className={`animate-pulse bg-muted ${finalRounded} ${className}`}
       style={style}
       aria-hidden="true"
     />
@@ -109,7 +109,7 @@ export function SkeletonListItem() {
  */
 export function SkeletonCard() {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm" aria-hidden="true">
+    <div className="rounded-[var(--radius)] border border-border bg-card p-6" aria-hidden="true">
       <Skeleton shape="text" width="30%" className="mb-4" />
       <div className="space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (

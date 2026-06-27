@@ -50,7 +50,7 @@ export default function NotificationBell() {
     <button
       type="button"
       onClick={() => router.push("/dashboard/notifications")}
-      className="relative rounded-lg p-2 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+      className="relative rounded-[var(--radius-sm)] p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       aria-label="通知"
       title="通知"
     >

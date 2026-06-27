@@ -16,7 +16,7 @@ const slides = [
     description: "每周新增精选工作流，紧跟AI前沿，让你的能力持续进化",
     badge: "持续更新",
     gradient: "from-success-500 to-success-700",
-    badgeBg: "bg-white",
+    badgeBg: "bg-card",
     badgeText: "text-success-700",
   },
   {
@@ -50,7 +50,7 @@ export default function AdBanner() {
   }, [next]);
 
   return (
-    <section className="bg-neutral-50 py-10 sm:py-16">
+    <section className="bg-background py-10 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl shadow-xl shadow-neutral-900/5">
           {/* 轮播容器 */}
@@ -64,9 +64,9 @@ export default function AdBanner() {
               >
                 {/* 装饰元素 */}
                 <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                  <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-                  <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-                  <div className="absolute right-1/4 top-1/2 h-32 w-32 rounded-full bg-white/5 blur-xl" />
+                  <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-card/10 blur-2xl" />
+                  <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-card/10 blur-2xl" />
+                  <div className="absolute right-1/4 top-1/2 h-32 w-32 rounded-full bg-card/5 blur-xl" />
                 </div>
 
                 {/* 内容 */}
@@ -91,7 +91,7 @@ export default function AdBanner() {
           <button
             type="button"
             onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2.5 text-white backdrop-blur transition-colors hover:bg-white/40 sm:left-4"
+            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-card/20 p-2.5 text-white backdrop-blur transition-colors hover:bg-card/40 sm:left-4"
             aria-label="上一个"
           >
             <svg
@@ -113,7 +113,7 @@ export default function AdBanner() {
           <button
             type="button"
             onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2.5 text-white backdrop-blur transition-colors hover:bg-white/40 sm:right-4"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-card/20 p-2.5 text-white backdrop-blur transition-colors hover:bg-card/40 sm:right-4"
             aria-label="下一个"
           >
             <svg
@@ -139,7 +139,7 @@ export default function AdBanner() {
                 type="button"
                 onClick={() => goTo(index)}
                 className={`h-2 rounded-full transition-all ${
-                  index === current ? "w-8 bg-white" : "w-2 bg-white/50"
+                  index === current ? "w-8 bg-card" : "w-2 bg-card/50"
                 }`}
                 aria-label={`切换到第 ${index + 1} 个广告`}
               />

@@ -77,7 +77,7 @@ export default function AdminLayout({
   // 加载中：显示全屏加载态
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-neutral-50">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background">
         <svg
           className="h-10 w-10 animate-spin text-primary"
           fill="none"
@@ -114,7 +114,7 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex bg-neutral-50">
+    <div className="fixed inset-0 z-[60] flex bg-background">
       {/* 侧边栏：桌面端固定，移动端抽屉 */}
       <AdminSidebar
         role={user.role}
@@ -125,13 +125,13 @@ export default function AdminLayout({
       {/* 主内容区：桌面端左侧留出 256px 侧边栏宽度 */}
       <div className="flex flex-1 flex-col md:pl-64">
         {/* 顶栏 */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-neutral-200 bg-white/95 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card/95 px-4 backdrop-blur sm:px-6">
           {/* 左侧：移动端汉堡按钮 + 页面标题 */}
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 md:hidden"
+              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] p-2 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
               aria-label="打开菜单"
             >
               <svg
@@ -148,7 +148,7 @@ export default function AdminLayout({
                 />
               </svg>
             </button>
-            <h1 className="text-base font-semibold text-neutral-900 sm:text-lg">
+            <h1 className="text-base font-semibold text-foreground sm:text-lg">
               {pageTitle}
             </h1>
           </div>
@@ -160,17 +160,17 @@ export default function AdminLayout({
                 {user.nickname?.[0] || user.email?.[0] || user.phone?.[0] || "U"}
               </span>
               <div className="flex flex-col leading-tight">
-                <span className="text-sm font-medium text-neutral-900">
+                <span className="text-sm font-medium text-foreground">
                   {user.nickname || user.email || user.phone || "管理员"}
                 </span>
-                <span className="text-[10px] text-neutral-500">
+                <span className="text-[10px] text-muted-foreground">
                   {user.role === "super_admin" ? "超级管理员" : "管理员"}
                 </span>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
               退出
             </button>

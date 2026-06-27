@@ -35,17 +35,17 @@ const categories = [
 
 export default function WorkflowCategories() {
   return (
-    <section className="bg-white py-16 sm:py-24">
+    <section className="bg-card py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* 标题区 */}
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-primary-600">
             工作流分类
           </span>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
             覆盖全场景的 AI 工作流
           </h2>
-          <p className="mt-4 text-base text-neutral-600 sm:text-lg">
+          <p className="mt-4 text-base text-muted-foreground sm:text-lg">
             从内容创作到数据处理，百款精选工作流满足不同业务需求
           </p>
         </div>
@@ -56,20 +56,20 @@ export default function WorkflowCategories() {
             <Link
               key={category.name}
               href="/workspace"
-              className="group relative rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/5 sm:p-8"
+              className="group relative rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/5 sm:p-8"
             >
               {/* 图标 */}
-              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary-50 text-3xl transition-colors group-hover:bg-primary-100">
+              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-sm)] bg-primary-50 text-3xl transition-colors group-hover:bg-primary-100">
                 {category.icon}
               </div>
 
               {/* 名称 */}
-              <h3 className="mb-2 text-xl font-semibold text-neutral-900">
+              <h3 className="mb-2 text-xl font-semibold text-foreground">
                 {category.name}
               </h3>
 
               {/* 简介 */}
-              <p className="text-sm leading-6 text-neutral-600">
+              <p className="text-sm leading-6 text-muted-foreground">
                 {category.description}
               </p>
 

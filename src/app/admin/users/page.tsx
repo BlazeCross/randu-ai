@@ -32,7 +32,7 @@ interface ListResponse {
 
 // 角色徽章样式
 const ROLE_BADGES: Record<string, { label: string; bg: string; text: string }> = {
-  user: { label: "普通用户", bg: "bg-neutral-100", text: "text-neutral-700" },
+  user: { label: "普通用户", bg: "bg-muted", text: "text-foreground" },
   admin: { label: "管理员", bg: "bg-primary-50", text: "text-primary-700" },
   super_admin: {
     label: "超级管理员",
@@ -230,12 +230,12 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">用户管理</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">用户管理</span>
       </nav>
 
       {/* 顶部工具栏：搜索 + 筛选 + 刷新 */}
@@ -249,12 +249,12 @@ export default function AdminUsersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索昵称 / 邮箱 / 手机号..."
-            className="w-full max-w-xs rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="">全部角色</option>
             <option value="user">普通用户</option>
@@ -264,7 +264,7 @@ export default function AdminUsersPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="">全部状态</option>
             <option value="active">正常</option>
@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
           </select>
           <button
             type="submit"
-            className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+            className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
           >
             搜索
           </button>
@@ -280,7 +280,7 @@ export default function AdminUsersPage() {
         <button
           onClick={() => fetchUsers(page)}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
         >
           <svg
             className="h-4 w-4"
@@ -301,13 +301,13 @@ export default function AdminUsersPage() {
 
       {/* 错误提示 */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg
@@ -332,12 +332,12 @@ export default function AdminUsersPage() {
           </div>
         ) : users.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-neutral-500">暂无用户</p>
+            <p className="text-sm text-muted-foreground">暂无用户</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-neutral-200 text-xs uppercase text-neutral-500">
+              <thead className="border-b border-border text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">用户</th>
                   <th className="px-4 py-3 font-medium">角色</th>
@@ -349,22 +349,22 @@ export default function AdminUsersPage() {
                   <th className="px-4 py-3 text-right font-medium">操作</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-border">
                 {users.map((u) => {
                   const roleBadge =
                     ROLE_BADGES[u.role] || {
                       label: u.role,
-                      bg: "bg-neutral-100",
-                      text: "text-neutral-700",
+                      bg: "bg-muted",
+                      text: "text-foreground",
                     };
                   const statusBadge =
                     STATUS_BADGES[u.status] || {
                       label: u.status,
-                      bg: "bg-neutral-100",
-                      text: "text-neutral-700",
+                      bg: "bg-muted",
+                      text: "text-foreground",
                     };
                   return (
-                    <tr key={u.id} className="hover:bg-neutral-50">
+                    <tr key={u.id} className="hover:bg-muted">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {u.avatar ? (
@@ -379,10 +379,10 @@ export default function AdminUsersPage() {
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-neutral-900">
+                            <p className="truncate font-medium text-foreground">
                               {u.nickname || "未设置昵称"}
                             </p>
-                            <p className="truncate text-xs text-neutral-500">
+                            <p className="truncate text-xs text-muted-foreground">
                               {u.email || u.phone || "—"}
                             </p>
                           </div>
@@ -409,24 +409,24 @@ export default function AdminUsersPage() {
                               已订阅
                             </span>
                             {u.subscriptionPlan && (
-                              <span className="text-xs text-neutral-500">
+                              <span className="text-xs text-muted-foreground">
                                 {u.subscriptionPlan}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-xs text-neutral-400">
+                          <span className="text-xs text-muted-foreground">
                             未订阅
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {u.credits}
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {u.totalUsed}
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {formatDate(u.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -468,21 +468,21 @@ export default function AdminUsersPage() {
       {/* 分页 */}
       {total > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             共 {total} 条，第 {page}/{totalPages} 页
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => fetchUsers(page - 1)}
               disabled={page <= 1 || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
             <button
               onClick={() => fetchUsers(page + 1)}
               disabled={page >= totalPages || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>

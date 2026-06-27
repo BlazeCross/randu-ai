@@ -41,7 +41,7 @@ const STATUS_BADGES: Record<string, { label: string; bg: string; text: string }>
   pending: { label: "待支付", bg: "bg-amber-100", text: "text-amber-700" },
   paid: { label: "已支付", bg: "bg-success-100", text: "text-success-700" },
   failed: { label: "失败", bg: "bg-red-100", text: "text-red-600" },
-  refunded: { label: "已退款", bg: "bg-neutral-100", text: "text-neutral-600" },
+  refunded: { label: "已退款", bg: "bg-muted", text: "text-muted-foreground" },
 };
 
 // 类型徽章样式
@@ -159,12 +159,12 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">订单管理</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">订单管理</span>
       </nav>
 
       {/* 统计卡片 */}
@@ -174,9 +174,9 @@ export default function AdminOrdersPage() {
           return (
             <div
               key={s}
-              className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm"
+              className="rounded-[var(--radius-sm)] border border-border bg-card p-4"
             >
-              <p className="text-xs font-medium text-neutral-500">
+              <p className="text-xs font-medium text-muted-foreground">
                 {config.label}
               </p>
               <p className={`mt-1 text-2xl font-bold ${config.text}`}>
@@ -188,17 +188,17 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* 筛选区 */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {/* 状态筛选 */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
               状态
             </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="">全部状态</option>
               <option value="pending">待支付</option>
@@ -210,13 +210,13 @@ export default function AdminOrdersPage() {
 
           {/* 类型筛选 */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
               类型
             </label>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="">全部类型</option>
               <option value="subscription">套餐订阅</option>
@@ -226,7 +226,7 @@ export default function AdminOrdersPage() {
 
           {/* 订单号搜索 */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
               订单号搜索
             </label>
             <input
@@ -234,14 +234,14 @@ export default function AdminOrdersPage() {
               value={orderNoSearch}
               onChange={(e) => setOrderNoSearch(e.target.value)}
               placeholder="输入订单号"
-              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
       </div>
 
       {/* 订单列表 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
         {error && (
           <div className="border-b border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6">
             {error}
@@ -272,57 +272,57 @@ export default function AdminOrdersPage() {
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-neutral-500">暂无订单</p>
+            <p className="text-sm text-muted-foreground">暂无订单</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-neutral-200">
-              <thead className="bg-neutral-50">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-background">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 sm:px-6">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground sm:px-6">
                     订单
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     用户
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     类型
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     金额
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     状态
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     时间
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     操作
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 bg-white">
+              <tbody className="divide-y divide-border bg-card">
                 {orders.map((order) => {
                   const status = STATUS_BADGES[order.status] || STATUS_BADGES.pending;
                   const type = TYPE_BADGES[order.type] || {
                     label: order.type,
-                    bg: "bg-neutral-100",
-                    text: "text-neutral-600",
+                    bg: "bg-muted",
+                    text: "text-muted-foreground",
                   };
                   return (
-                    <tr key={order.id} className="hover:bg-neutral-50">
+                    <tr key={order.id} className="hover:bg-muted">
                       <td className="px-4 py-3 text-sm sm:px-6">
-                        <div className="font-mono text-xs text-neutral-700">
+                        <div className="font-mono text-xs text-foreground">
                           {order.orderNo}
                         </div>
                         {order.plan && (
-                          <div className="mt-0.5 text-xs text-neutral-400">
+                          <div className="mt-0.5 text-xs text-muted-foreground">
                             {order.plan.name}
                           </div>
                         )}
                         {order.credits > 0 && (
-                          <div className="text-xs text-neutral-400">
+                          <div className="text-xs text-muted-foreground">
                             {order.credits} 积分
                           </div>
                         )}
@@ -332,7 +332,7 @@ export default function AdminOrdersPage() {
                           order.user.email ||
                           order.user.phone ||
                           "未知"}
-                        <div className="text-xs text-neutral-400">
+                        <div className="text-xs text-muted-foreground">
                           {order.user.email || order.user.phone || ""}
                         </div>
                       </td>
@@ -343,7 +343,7 @@ export default function AdminOrdersPage() {
                           {type.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-neutral-900">
+                      <td className="px-4 py-3 text-sm font-semibold text-foreground">
                         ¥{order.amount.toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
@@ -359,7 +359,7 @@ export default function AdminOrdersPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         <div>{formatDate(order.createdAt)}</div>
                         {order.paidAt && (
                           <div className="text-success-600">
@@ -378,7 +378,7 @@ export default function AdminOrdersPage() {
                           order.refundStatus !== "refunded" && (
                             <button
                               onClick={() => handleRefund(order)}
-                              className="rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                              className="rounded-[var(--radius-sm)] border border-red-200 bg-card px-2.5 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
                             >
                               退款
                             </button>
@@ -394,22 +394,22 @@ export default function AdminOrdersPage() {
 
         {/* 分页 */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-neutral-200 px-4 py-3 sm:px-6">
-            <p className="text-xs text-neutral-500">
+          <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-6">
+            <p className="text-xs text-muted-foreground">
               第 {page} / {totalPages} 页
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
               >
                 上一页
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
               >
                 下一页
               </button>

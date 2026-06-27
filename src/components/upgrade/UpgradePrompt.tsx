@@ -92,7 +92,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
       aria-labelledby="upgrade-prompt-title"
     >
       <div
-        className="animate-scale-in relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="animate-scale-in relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[var(--radius)] bg-card shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 关闭按钮 */}
@@ -100,7 +100,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
           type="button"
           onClick={handleClose}
           aria-label="关闭"
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-700"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <svg
             className="h-4 w-4"
@@ -118,7 +118,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
         </button>
 
         {/* 头部：标题与说明 */}
-        <div className="border-b border-neutral-100 px-6 py-8 text-center sm:px-10">
+        <div className="border-b border-border px-6 py-8 text-center sm:px-10">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-100">
             <svg
               className="h-7 w-7 text-primary"
@@ -136,26 +136,26 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
           </div>
           <h2
             id="upgrade-prompt-title"
-            className="text-2xl font-bold text-neutral-900"
+            className="text-2xl font-bold text-foreground"
           >
             {title}
           </h2>
-          <p className="mt-2 text-sm text-neutral-600">{description}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         </div>
 
         {/* 套餐对比 */}
         <div className="px-6 py-8 sm:px-10">
-          <h3 className="mb-6 text-center text-base font-semibold text-neutral-900">
+          <h3 className="mb-6 text-center text-base font-semibold text-foreground">
             选择适合你的套餐
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative flex flex-col rounded-2xl border p-5 transition-all ${
+                className={`relative flex flex-col rounded-[var(--radius)] border p-5 transition-all ${
                   plan.highlighted
-                    ? "border-primary-600 bg-primary-50/40 shadow-lg shadow-primary-600/10"
-                    : "border-neutral-200 bg-white"
+                    ? "border-primary-600 bg-primary-50/40 shadow-primary-600/10"
+                    : "border-border bg-card"
                 }`}
               >
                 {/* 推荐标签 */}
@@ -168,16 +168,16 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
                 )}
 
                 {/* 套餐名称 */}
-                <h4 className="text-base font-semibold text-neutral-900">
+                <h4 className="text-base font-semibold text-foreground">
                   {plan.name}
                 </h4>
 
                 {/* 价格 */}
                 <div className="mt-3 flex items-baseline">
-                  <span className="text-3xl font-bold tracking-tight text-neutral-900">
+                  <span className="text-3xl font-bold tracking-tight text-foreground">
                     ¥{plan.price}
                   </span>
-                  <span className="ml-1 text-sm text-neutral-500">/月</span>
+                  <span className="ml-1 text-sm text-muted-foreground">/月</span>
                 </div>
 
                 {/* 每日次数 */}
@@ -190,7 +190,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
                   {plan.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-2 text-xs text-neutral-600"
+                      className="flex items-start gap-2 text-xs text-muted-foreground"
                     >
                       <svg
                         className="mt-0.5 h-4 w-4 flex-shrink-0 text-success-500"
@@ -214,10 +214,10 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
                 <button
                   type="button"
                   onClick={handleUpgrade}
-                  className={`mt-5 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                  className={`mt-5 w-full rounded-[var(--radius-sm)] px-4 py-2.5 text-sm font-semibold transition-colors ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary-hover"
-                      : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+                      : "bg-muted text-foreground hover:bg-muted"
                   }`}
                 >
                   立即升级
@@ -231,7 +231,7 @@ export default function UpgradePrompt({ reason, onClose }: UpgradePromptProps) {
             <button
               type="button"
               onClick={handleGoDashboard}
-              className="text-sm font-medium text-neutral-500 transition-colors hover:text-primary"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
             >
               前往个人中心查看账号信息 →
             </button>

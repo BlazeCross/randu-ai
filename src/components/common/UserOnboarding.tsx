@@ -81,12 +81,12 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
       aria-modal="true"
       aria-label="新用户引导"
     >
-      <div className="animate-scale-in relative w-full max-w-md overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl">
+      <div className="animate-scale-in relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
         {/* 右上角关闭（跳过） */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 top-3 z-10 rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+          className="absolute right-3 top-3 z-10 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="跳过引导"
         >
           <svg
@@ -118,20 +118,20 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                     ? "w-6 bg-primary"
                     : i < step
                       ? "w-1.5 bg-primary-300"
-                      : "w-1.5 bg-neutral-200"
+                      : "w-1.5 bg-muted"
                 }`}
               />
             ))}
-            <span className="ml-auto text-xs font-medium text-neutral-400">
+            <span className="ml-auto text-xs font-medium text-muted-foreground">
               {step + 1} / {total}
             </span>
           </div>
 
           {/* 标题 */}
-          <h2 className="text-xl font-bold text-neutral-900 sm:text-2xl">
+          <h2 className="text-xl font-bold text-foreground sm:text-2xl">
             {current.title}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-neutral-600">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {current.description}
           </p>
 
@@ -142,7 +142,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                 {current.features.map((f) => (
                   <li
                     key={f.label}
-                    className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3"
+                    className="flex items-start gap-3 rounded-[var(--radius-sm)] border border-border bg-background p-3"
                   >
                     <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
                       <svg
@@ -160,10 +160,10 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                       </svg>
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-neutral-900">
+                      <p className="text-sm font-semibold text-foreground">
                         {f.label}
                       </p>
-                      <p className="text-xs text-neutral-500">{f.desc}</p>
+                      <p className="text-xs text-muted-foreground">{f.desc}</p>
                     </div>
                   </li>
                 ))}
@@ -171,7 +171,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
             )}
 
             {step === 1 && (
-              <div className="flex flex-col items-center rounded-xl border border-primary-200 bg-primary-50 p-6 text-center">
+              <div className="flex flex-col items-center rounded-[var(--radius-sm)] border border-primary-200 bg-primary-50 p-6 text-center">
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-100 text-primary-700">
                   <svg
                     className="h-7 w-7"
@@ -200,7 +200,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                 <Link
                   href="/dashboard"
                   onClick={onClose}
-                  className="group flex flex-col items-start rounded-xl border border-neutral-200 bg-white p-4 transition-colors hover:border-primary-300 hover:bg-primary-50"
+                  className="group flex flex-col items-start rounded-[var(--radius-sm)] border border-border bg-card p-4 transition-colors hover:border-primary-300 hover:bg-primary-50"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-primary-700 transition-colors group-hover:bg-primary-200">
                     <svg
@@ -217,15 +217,15 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                       />
                     </svg>
                   </span>
-                  <p className="mt-2 text-sm font-semibold text-neutral-900">
+                  <p className="mt-2 text-sm font-semibold text-foreground">
                     进入工作台
                   </p>
-                  <p className="text-xs text-neutral-500">查看积分与管理账户</p>
+                  <p className="text-xs text-muted-foreground">查看积分与管理账户</p>
                 </Link>
                 <Link
                   href="/chat"
                   onClick={onClose}
-                  className="group flex flex-col items-start rounded-xl border border-neutral-200 bg-white p-4 transition-colors hover:border-primary-300 hover:bg-primary-50"
+                  className="group flex flex-col items-start rounded-[var(--radius-sm)] border border-border bg-card p-4 transition-colors hover:border-primary-300 hover:bg-primary-50"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-primary-700 transition-colors group-hover:bg-primary-200">
                     <svg
@@ -242,10 +242,10 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
                       />
                     </svg>
                   </span>
-                  <p className="mt-2 text-sm font-semibold text-neutral-900">
+                  <p className="mt-2 text-sm font-semibold text-foreground">
                     智能体对话
                   </p>
-                  <p className="text-xs text-neutral-500">立即开始与 AI 交流</p>
+                  <p className="text-xs text-muted-foreground">立即开始与 AI 交流</p>
                 </Link>
               </div>
             )}
@@ -257,7 +257,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => setStep((s) => s - 1)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 上一步
               </button>
@@ -269,7 +269,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
+                className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
               >
                 开始使用
               </button>
@@ -277,7 +277,7 @@ function OnboardingModal({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => setStep((s) => s + 1)}
-                className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
+                className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
               >
                 下一步
               </button>

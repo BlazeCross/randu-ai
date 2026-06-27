@@ -64,7 +64,7 @@ export default function NewWorkflowPage() {
   return (
     <div className="space-y-6">
       {/* 面包屑 */}
-      <nav aria-label="面包屑" className="text-sm text-neutral-500">
+      <nav aria-label="面包屑" className="text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/admin" className="hover:text-primary">
@@ -78,7 +78,7 @@ export default function NewWorkflowPage() {
             </Link>
           </li>
           <li aria-hidden>/</li>
-          <li className="font-medium text-neutral-900" aria-current="page">
+          <li className="font-medium text-foreground" aria-current="page">
             新建工作流
           </li>
         </ol>
@@ -86,17 +86,17 @@ export default function NewWorkflowPage() {
 
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           新建工作流
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           创建一个新的工作流，配置输入参数后前台将自动生成对应表单
         </p>
       </div>
 
       {/* 错误提示 */}
       {submitError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-700">{submitError}</p>
         </div>
       )}

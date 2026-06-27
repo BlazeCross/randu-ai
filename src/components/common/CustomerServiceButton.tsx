@@ -52,10 +52,10 @@ export default function CustomerServiceButton() {
     >
       {/* 客服面板 */}
       {open && (
-        <div className="animate-scale-in absolute bottom-16 right-0 w-[calc(100vw-2rem)] max-w-xs origin-bottom-right rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl sm:bottom-20 sm:w-80">
+        <div className="animate-scale-in absolute bottom-16 right-0 w-[calc(100vw-2rem)] max-w-xs origin-bottom-right rounded-[var(--radius)] border border-border bg-card p-4 shadow-2xl sm:bottom-20 sm:w-80">
           {/* 头部 */}
-          <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
+          <div className="flex items-center gap-2 border-b border-border pb-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-primary-100 text-primary-700">
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -71,23 +71,23 @@ export default function CustomerServiceButton() {
               </svg>
             </span>
             <div>
-              <p className="text-sm font-semibold text-neutral-900">在线客服</p>
-              <p className="text-xs text-neutral-500">很高兴为您服务</p>
+              <p className="text-sm font-semibold text-foreground">在线客服</p>
+              <p className="text-xs text-muted-foreground">很高兴为您服务</p>
             </div>
           </div>
 
           {/* 微信二维码 */}
           <div className="mt-3 flex flex-col items-center">
-            <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 p-2">
+            <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-background p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={QR_IMAGE_URL}
                 alt="微信客服二维码"
-                className="h-32 w-32 rounded-lg object-cover"
+                className="h-32 w-32 rounded-[var(--radius-sm)] object-cover"
                 loading="lazy"
               />
             </div>
-            <p className="mt-2 text-xs font-medium text-neutral-600">
+            <p className="mt-2 text-xs font-medium text-muted-foreground">
               微信扫码添加客服
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function CustomerServiceButton() {
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <svg
-                className="h-4 w-4 flex-shrink-0 text-neutral-400"
+                className="h-4 w-4 flex-shrink-0 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -108,14 +108,14 @@ export default function CustomerServiceButton() {
                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-              <dt className="text-neutral-500">邮箱</dt>
-              <dd className="ml-auto font-medium text-neutral-800">
+              <dt className="text-muted-foreground">邮箱</dt>
+              <dd className="ml-auto font-medium text-foreground">
                 support@randuai.cn
               </dd>
             </div>
             <div className="flex items-center gap-2">
               <svg
-                className="h-4 w-4 flex-shrink-0 text-neutral-400"
+                className="h-4 w-4 flex-shrink-0 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -127,8 +127,8 @@ export default function CustomerServiceButton() {
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <dt className="text-neutral-500">工作时间</dt>
-              <dd className="ml-auto font-medium text-neutral-800">
+              <dt className="text-muted-foreground">工作时间</dt>
+              <dd className="ml-auto font-medium text-foreground">
                 周一至周五 9:00-18:00
               </dd>
             </div>
@@ -142,7 +142,7 @@ export default function CustomerServiceButton() {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "关闭客服面板" : "打开客服面板"}
         aria-expanded={open}
-        className="tap-feedback flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-colors hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 sm:h-14 sm:w-14"
+        className="tap-feedback flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 sm:h-14 sm:w-14"
       >
         {open ? (
           <svg

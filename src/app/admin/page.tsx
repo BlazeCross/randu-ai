@@ -95,14 +95,14 @@ function StatCard({
   const styles = ACCENT_STYLES[accent];
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br ${styles.bg} p-5 shadow-sm transition-shadow hover:shadow-md`}
+      className={`relative overflow-hidden rounded-[var(--radius)] border border-border bg-gradient-to-br ${styles.bg} p-5 transition-shadow hover:shadow-md`}
     >
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-neutral-600">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-neutral-900">{value}</p>
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
           {subtitle && (
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {highlight ? (
                 <span className="font-semibold text-success-600">
                   {subtitle}
@@ -114,7 +114,7 @@ function StatCard({
           )}
         </div>
         <div
-          className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${styles.iconBg} ${styles.iconText}`}
+          className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] ${styles.iconBg} ${styles.iconText}`}
         >
           {icon}
         </div>
@@ -234,10 +234,10 @@ export default function AdminHomePage() {
             />
           </svg>
         </div>
-        <p className="mb-4 text-sm text-neutral-700">{error}</p>
+        <p className="mb-4 text-sm text-foreground">{error}</p>
         <button
           onClick={handleRefresh}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
+          className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
         >
           重试
         </button>
@@ -258,10 +258,10 @@ export default function AdminHomePage() {
       {/* 顶部：标题 + 刷新按钮 + 更新时间 */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-neutral-900">
+          <h2 className="text-lg font-semibold text-foreground">
             平台数据概览
           </h2>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {data.fetchedAt && `最后更新：${formatTime(data.fetchedAt)}`}
             {error && (
               <span className="ml-2 text-red-600">（刷新失败：{error}）</span>
@@ -271,7 +271,7 @@ export default function AdminHomePage() {
         <button
           onClick={handleRefresh}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
         >
           <svg
             className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
@@ -433,7 +433,7 @@ export default function AdminHomePage() {
 
       {/* 被拉黑用户提示 */}
       {data.users.blocked > 0 && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 p-4">
           <div className="flex items-center gap-3">
             <svg
               className="h-5 w-5 flex-shrink-0 text-amber-600"
@@ -457,10 +457,10 @@ export default function AdminHomePage() {
       )}
 
       {/* 提示信息 */}
-      <div className="rounded-xl border border-neutral-200 bg-white p-4">
+      <div className="rounded-[var(--radius-sm)] border border-border bg-card p-4">
         <div className="flex items-start gap-3">
           <svg
-            className="mt-0.5 h-5 w-5 flex-shrink-0 text-neutral-400"
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -472,9 +472,9 @@ export default function AdminHomePage() {
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <div className="text-sm text-neutral-600">
-            <p className="font-medium text-neutral-900">数据说明</p>
-            <ul className="mt-1 space-y-0.5 text-xs text-neutral-500">
+          <div className="text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">数据说明</p>
+            <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
               <li>· 数据每 60 秒自动刷新一次，也可点击右上角手动刷新</li>
               <li>· "今日"按上海时区（UTC+8）零点计算</li>
               <li>· "在线人数"基于最近 2 分钟心跳统计，容器重启后会清零</li>

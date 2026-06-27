@@ -31,7 +31,7 @@ interface UserDetail {
 
 // 角色徽章样式
 const ROLE_BADGES: Record<string, { label: string; bg: string; text: string }> = {
-  user: { label: "普通用户", bg: "bg-neutral-100", text: "text-neutral-700" },
+  user: { label: "普通用户", bg: "bg-muted", text: "text-foreground" },
   admin: { label: "管理员", bg: "bg-primary-50", text: "text-primary-700" },
   super_admin: {
     label: "超级管理员",
@@ -383,13 +383,13 @@ export default function AdminUserDetailPage() {
     return (
       <div className="space-y-5">
         <Breadcrumbs label="用户管理" />
-        <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-red-200 bg-white p-12 text-center">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-[var(--radius)] border border-red-200 bg-card p-12 text-center">
           <p className="text-sm text-red-600">
             {error || "加载用户失败"}
           </p>
           <button
             onClick={() => router.push("/admin/users")}
-            className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+            className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
           >
             返回用户列表
           </button>
@@ -401,14 +401,14 @@ export default function AdminUserDetailPage() {
   const roleBadge =
     ROLE_BADGES[detail.role] || {
       label: detail.role,
-      bg: "bg-neutral-100",
-      text: "text-neutral-700",
+      bg: "bg-muted",
+      text: "text-foreground",
     };
   const statusBadge =
     STATUS_BADGES[detail.status] || {
       label: detail.status,
-      bg: "bg-neutral-100",
-      text: "text-neutral-700",
+      bg: "bg-muted",
+      text: "text-foreground",
     };
   const breadcrumbLabel = detail.nickname || "用户";
 
@@ -418,7 +418,7 @@ export default function AdminUserDetailPage() {
       {toast && (
         <div className="fixed left-1/2 top-4 z-[60] -translate-x-1/2">
           <div
-            className={`rounded-lg px-4 py-2 text-sm font-medium shadow-lg ${
+            className={`rounded-[var(--radius-sm)] px-4 py-2 text-sm font-medium ${
               toast.type === "success"
                 ? "bg-success-600 text-white"
                 : "bg-red-600 text-white"
@@ -436,12 +436,12 @@ export default function AdminUserDetailPage() {
           onClick={() => setModal(null)}
         >
           <div
-            className="w-full max-w-md rounded-2xl bg-white p-6"
+            className="w-full max-w-md rounded-[var(--radius)] bg-card p-6"
             onClick={(e) => e.stopPropagation()}
           >
             {modal === "plan" && (
               <>
-                <h3 className="mb-4 text-base font-semibold text-neutral-900">
+                <h3 className="mb-4 text-base font-semibold text-foreground">
                   修改套餐
                 </h3>
                 <div className="space-y-4">
@@ -450,12 +450,12 @@ export default function AdminUserDetailPage() {
                       type="checkbox"
                       checked={planIsSubscribed}
                       onChange={(e) => setPlanIsSubscribed(e.target.checked)}
-                      className="h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
-                    <span className="text-sm text-neutral-700">已订阅</span>
+                    <span className="text-sm text-foreground">已订阅</span>
                   </label>
                   <div>
-                    <label className="mb-1 block text-xs text-neutral-500">
+                    <label className="mb-1 block text-xs text-muted-foreground">
                       套餐名称
                     </label>
                     <input
@@ -463,21 +463,21 @@ export default function AdminUserDetailPage() {
                       value={planName}
                       onChange={(e) => setPlanName(e.target.value)}
                       placeholder="输入套餐名称（可留空）"
-                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
                 </div>
                 <div className="mt-6 flex justify-end gap-2">
                   <button
                     onClick={() => setModal(null)}
-                    className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                    className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
                   >
                     取消
                   </button>
                   <button
                     onClick={handleSubmitPlan}
                     disabled={actionLoading}
-                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                    className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
                   >
                     确定
                   </button>
@@ -487,12 +487,12 @@ export default function AdminUserDetailPage() {
 
             {modal === "credits" && (
               <>
-                <h3 className="mb-4 text-base font-semibold text-neutral-900">
+                <h3 className="mb-4 text-base font-semibold text-foreground">
                   修改余额
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-1 block text-xs text-neutral-500">
+                    <label className="mb-1 block text-xs text-muted-foreground">
                       积分余额（非负整数）
                     </label>
                     <input
@@ -501,7 +501,7 @@ export default function AdminUserDetailPage() {
                       step={1}
                       value={creditsInput}
                       onChange={(e) => setCreditsInput(e.target.value)}
-                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -512,7 +512,7 @@ export default function AdminUserDetailPage() {
                           String(Number(creditsInput || 0) + 50),
                         )
                       }
-                      className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                      className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                     >
                       +50
                     </button>
@@ -523,7 +523,7 @@ export default function AdminUserDetailPage() {
                           String(Number(creditsInput || 0) + 100),
                         )
                       }
-                      className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                      className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                     >
                       +100
                     </button>
@@ -534,26 +534,26 @@ export default function AdminUserDetailPage() {
                           String(Number(creditsInput || 0) + 500),
                         )
                       }
-                      className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                      className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                     >
                       +500
                     </button>
                   </div>
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     当前余额：{detail.credits}
                   </p>
                 </div>
                 <div className="mt-6 flex justify-end gap-2">
                   <button
                     onClick={() => setModal(null)}
-                    className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                    className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
                   >
                     取消
                   </button>
                   <button
                     onClick={handleSubmitCredits}
                     disabled={actionLoading}
-                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                    className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
                   >
                     确定
                   </button>
@@ -563,12 +563,12 @@ export default function AdminUserDetailPage() {
 
             {modal === "role" && (
               <>
-                <h3 className="mb-4 text-base font-semibold text-neutral-900">
+                <h3 className="mb-4 text-base font-semibold text-foreground">
                   设置角色
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-1 block text-xs text-neutral-500">
+                    <label className="mb-1 block text-xs text-muted-foreground">
                       角色
                     </label>
                     <select
@@ -578,7 +578,7 @@ export default function AdminUserDetailPage() {
                           e.target.value as UserRoleLiteral,
                         )
                       }
-                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     >
                       <option value="user">普通用户</option>
                       <option value="admin">管理员</option>
@@ -587,7 +587,7 @@ export default function AdminUserDetailPage() {
                   </div>
                   {currentUser?.id === detail.id &&
                     roleSelect !== "super_admin" && (
-                      <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                      <p className="rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
                         注意：不允许修改自己的角色
                       </p>
                     )}
@@ -595,14 +595,14 @@ export default function AdminUserDetailPage() {
                 <div className="mt-6 flex justify-end gap-2">
                   <button
                     onClick={() => setModal(null)}
-                    className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                    className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
                   >
                     取消
                   </button>
                   <button
                     onClick={handleSubmitRole}
                     disabled={actionLoading}
-                    className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-800 disabled:opacity-50"
+                    className="rounded-[var(--radius-sm)] bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-800 disabled:opacity-50"
                   >
                     确定
                   </button>
@@ -615,28 +615,28 @@ export default function AdminUserDetailPage() {
 
       {/* 面包屑 + 返回 */}
       <div className="flex items-center justify-between">
-        <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-          <Link href="/admin" className="hover:text-neutral-900">
+        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Link href="/admin" className="hover:text-foreground">
             后台首页
           </Link>
-          <span className="text-neutral-300">/</span>
-          <Link href="/admin/users" className="hover:text-neutral-900">
+          <span className="text-muted-foreground">/</span>
+          <Link href="/admin/users" className="hover:text-foreground">
             用户管理
           </Link>
-          <span className="text-neutral-300">/</span>
-          <span className="font-medium text-neutral-900">{breadcrumbLabel}</span>
+          <span className="text-muted-foreground">/</span>
+          <span className="font-medium text-foreground">{breadcrumbLabel}</span>
         </nav>
         <button
           onClick={() => router.push("/admin/users")}
-          className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+          className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted"
         >
           ← 返回
         </button>
       </div>
 
       {/* 卡片1 - 基本信息 */}
-      <section className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-neutral-900">基本信息</h2>
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">基本信息</h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           {detail.avatar ? (
             <img
@@ -651,7 +651,7 @@ export default function AdminUserDetailPage() {
           )}
           <div className="flex-1 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-lg font-semibold text-neutral-900">
+              <span className="text-lg font-semibold text-foreground">
                 {detail.nickname || "未设置昵称"}
               </span>
               <span
@@ -667,32 +667,32 @@ export default function AdminUserDetailPage() {
             </div>
             <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
               <div>
-                <span className="text-neutral-500">邮箱：</span>
-                <span className="text-neutral-900">
+                <span className="text-muted-foreground">邮箱：</span>
+                <span className="text-foreground">
                   {detail.email || "—"}
                 </span>
               </div>
               <div>
-                <span className="text-neutral-500">手机号：</span>
-                <span className="text-neutral-900">
+                <span className="text-muted-foreground">手机号：</span>
+                <span className="text-foreground">
                   {detail.phone || "—"}
                 </span>
               </div>
               <div className="sm:col-span-2">
-                <span className="text-neutral-500">用户 ID：</span>
-                <span className="break-all text-xs text-neutral-700">
+                <span className="text-muted-foreground">用户 ID：</span>
+                <span className="break-all text-xs text-foreground">
                   {detail.id}
                 </span>
               </div>
               <div>
-                <span className="text-neutral-500">注册时间：</span>
-                <span className="text-xs text-neutral-700">
+                <span className="text-muted-foreground">注册时间：</span>
+                <span className="text-xs text-foreground">
                   {formatDate(detail.createdAt)}
                 </span>
               </div>
               <div>
-                <span className="text-neutral-500">最后更新：</span>
-                <span className="text-xs text-neutral-700">
+                <span className="text-muted-foreground">最后更新：</span>
+                <span className="text-xs text-foreground">
                   {formatDate(detail.updatedAt)}
                 </span>
               </div>
@@ -702,8 +702,8 @@ export default function AdminUserDetailPage() {
       </section>
 
       {/* 卡片2 - 套餐与积分 */}
-      <section className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-neutral-900">
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">
           套餐与积分
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -713,7 +713,7 @@ export default function AdminUserDetailPage() {
               detail.isSubscribed ? (
                 <span className="font-medium text-success-700">已订阅</span>
               ) : (
-                <span className="text-neutral-500">未订阅</span>
+                <span className="text-muted-foreground">未订阅</span>
               )
             }
           />
@@ -732,8 +732,8 @@ export default function AdminUserDetailPage() {
       </section>
 
       {/* 卡片3 - 使用统计 */}
-      <section className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-neutral-900">使用统计</h2>
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">使用统计</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <StatCell label="使用记录数" value={detail.usageLogCount} />
           <StatCell label="订单数" value={detail.orderCount} />
@@ -747,13 +747,13 @@ export default function AdminUserDetailPage() {
       </section>
 
       {/* 卡片4 - 操作区 */}
-      <section className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-neutral-900">
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">
           管理操作
         </h2>
         {isSuperAdmin ? (
           <>
-            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            <div className="mb-4 rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
               敏感操作（拉黑 / 解封 / 改套餐 / 改余额 / 设置管理员）将记录到操作日志
             </div>
             <div className="flex flex-wrap gap-3">
@@ -761,35 +761,35 @@ export default function AdminUserDetailPage() {
               <button
                 onClick={handleBlockUnblock}
                 disabled={actionLoading}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
               >
                 {detail.status === "active" ? "拉黑用户" : "解封用户"}
               </button>
               <button
                 onClick={() => openModal("plan")}
                 disabled={actionLoading}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
               >
                 修改套餐
               </button>
               <button
                 onClick={() => openModal("credits")}
                 disabled={actionLoading}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
               >
                 修改余额
               </button>
               <button
                 onClick={() => openModal("role")}
                 disabled={actionLoading}
-                className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-800 disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-800 disabled:opacity-50"
               >
                 设置管理员角色
               </button>
             </div>
           </>
         ) : (
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-6 text-center text-sm text-neutral-500">
+          <div className="rounded-[var(--radius-sm)] border border-border bg-background px-4 py-6 text-center text-sm text-muted-foreground">
             敏感操作仅超级管理员可用
           </div>
         )}
@@ -803,12 +803,12 @@ export default function AdminUserDetailPage() {
  */
 function Breadcrumbs({ label }: { label: string }) {
   return (
-    <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-      <Link href="/admin" className="hover:text-neutral-900">
+    <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+      <Link href="/admin" className="hover:text-foreground">
         后台首页
       </Link>
-      <span className="text-neutral-300">/</span>
-      <span className="font-medium text-neutral-900">{label}</span>
+      <span className="text-muted-foreground">/</span>
+      <span className="font-medium text-foreground">{label}</span>
     </nav>
   );
 }
@@ -827,8 +827,8 @@ function InfoCell({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs text-neutral-500">{label}</span>
-      <span className={small ? "text-xs text-neutral-900" : "text-sm text-neutral-900"}>
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className={small ? "text-xs text-foreground" : "text-sm text-foreground"}>
         {value}
       </span>
     </div>
@@ -848,11 +848,11 @@ function StatCell({
   accent?: "success";
 }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-      <p className="text-xs text-neutral-500">{label}</p>
+    <div className="rounded-[var(--radius-sm)] border border-border bg-background p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
       <p
         className={`mt-1 text-2xl font-semibold ${
-          accent === "success" ? "text-success-700" : "text-neutral-900"
+          accent === "success" ? "text-success-700" : "text-foreground"
         }`}
       >
         {value}

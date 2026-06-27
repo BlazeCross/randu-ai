@@ -243,11 +243,11 @@ export default function AdminActionLogsPage() {
   // 双重保险：非 super_admin 不渲染
   if (!isSuperAdmin) {
     return (
-      <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
-        <p className="text-sm text-neutral-600">权限不足，仅超级管理员可查看操作日志</p>
+      <div className="rounded-[var(--radius)] border border-border bg-card p-12 text-center">
+        <p className="text-sm text-muted-foreground">权限不足，仅超级管理员可查看操作日志</p>
         <Link
           href="/admin"
-          className="mt-4 inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+          className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
         >
           返回后台首页
         </Link>
@@ -258,12 +258,12 @@ export default function AdminActionLogsPage() {
   return (
     <div className="space-y-5">
       {/* 面包屑 */}
-      <nav className="flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link href="/admin" className="hover:text-neutral-900">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/admin" className="hover:text-foreground">
           后台首页
         </Link>
-        <span className="text-neutral-300">/</span>
-        <span className="font-medium text-neutral-900">操作日志</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">操作日志</span>
       </nav>
 
       {/* 顶部工具栏：筛选 + 刷新 */}
@@ -272,7 +272,7 @@ export default function AdminActionLogsPage() {
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="">全部操作</option>
             {ACTION_FILTERS.map((a) => (
@@ -284,7 +284,7 @@ export default function AdminActionLogsPage() {
 
           {/* 固定筛选提示（来自 URL） */}
           {(fixedOperatorId || fixedTargetUserId) && (
-            <div className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-1.5 text-xs text-amber-700">
+            <div className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-amber-50 px-3 py-1.5 text-xs text-amber-700">
               <span>
                 已固定筛选：
                 {fixedOperatorId && `操作者=${fixedOperatorId.slice(0, 8)}…`}
@@ -303,7 +303,7 @@ export default function AdminActionLogsPage() {
         <button
           onClick={() => fetchLogs(page)}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
         >
           <svg
             className="h-4 w-4"
@@ -323,19 +323,19 @@ export default function AdminActionLogsPage() {
       </div>
 
       {/* 说明 */}
-      <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-xs text-neutral-600">
+      <div className="rounded-[var(--radius-sm)] border border-border bg-background px-4 py-2.5 text-xs text-muted-foreground">
         操作日志记录超级管理员对用户的所有敏感操作（拉黑 / 解封 / 修改积分 / 修改套餐 / 设置角色），不可篡改，仅可查看。
       </div>
 
       {/* 错误提示 */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg
@@ -360,12 +360,12 @@ export default function AdminActionLogsPage() {
           </div>
         ) : logs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-neutral-500">暂无操作日志</p>
+            <p className="text-sm text-muted-foreground">暂无操作日志</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-neutral-200 text-xs uppercase text-neutral-500">
+              <thead className="border-b border-border text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">操作者</th>
                   <th className="px-4 py-3 font-medium">目标用户</th>
@@ -375,16 +375,16 @@ export default function AdminActionLogsPage() {
                   <th className="px-4 py-3 font-medium">时间</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-border">
                 {logs.map((log) => {
                   const badge =
                     ACTION_BADGES[log.action] || {
                       label: log.action,
-                      bg: "bg-neutral-100",
-                      text: "text-neutral-700",
+                      bg: "bg-muted",
+                      text: "text-foreground",
                     };
                   return (
-                    <tr key={log.id} className="hover:bg-neutral-50">
+                    <tr key={log.id} className="hover:bg-muted">
                       <td className="px-4 py-3">
                         <button
                           onClick={() =>
@@ -394,11 +394,11 @@ export default function AdminActionLogsPage() {
                           className="text-left hover:text-primary hover:underline"
                           disabled={!log.operator}
                         >
-                          <div className="font-medium text-neutral-900">
+                          <div className="font-medium text-foreground">
                             {getDisplayName(log.operator)}
                           </div>
                           {log.operator?.email && (
-                            <div className="text-xs text-neutral-500">
+                            <div className="text-xs text-muted-foreground">
                               {log.operator.email}
                             </div>
                           )}
@@ -412,17 +412,17 @@ export default function AdminActionLogsPage() {
                             }
                             className="text-left hover:text-primary hover:underline"
                           >
-                            <div className="font-medium text-neutral-900">
+                            <div className="font-medium text-foreground">
                               {getDisplayName(log.targetUser)}
                             </div>
                             {log.targetUser.email && (
-                              <div className="text-xs text-neutral-500">
+                              <div className="text-xs text-muted-foreground">
                                 {log.targetUser.email}
                               </div>
                             )}
                           </button>
                         ) : (
-                          <span className="text-xs text-neutral-400">—</span>
+                          <span className="text-xs text-muted-foreground">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -433,14 +433,14 @@ export default function AdminActionLogsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="max-w-xs truncate text-xs text-neutral-600">
+                        <div className="max-w-xs truncate text-xs text-muted-foreground">
                           {formatDetail(log.detail)}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {log.ipAddress || "—"}
                       </td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {formatDate(log.createdAt)}
                       </td>
                     </tr>
@@ -455,21 +455,21 @@ export default function AdminActionLogsPage() {
       {/* 分页 */}
       {total > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             共 {total} 条，第 {page}/{totalPages} 页
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => fetchLogs(page - 1)}
               disabled={page <= 1 || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
             <button
               onClick={() => fetchLogs(page + 1)}
               disabled={page >= totalPages || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>

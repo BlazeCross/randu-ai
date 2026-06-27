@@ -228,7 +228,7 @@ export default function ImageUploader({
 
       {/* 预览区：有图片时显示 */}
       {showPreview ? (
-        <div className="relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50">
+        <div className="relative overflow-hidden rounded-[var(--radius-sm)] border border-border bg-background">
           {/* 图片预览 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -242,7 +242,7 @@ export default function ImageUploader({
             type="button"
             onClick={handleDelete}
             disabled={uploading}
-            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-neutral-600 shadow-md transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="删除图片"
           >
             <svg
@@ -269,7 +269,7 @@ export default function ImageUploader({
 
           {/* 上传中遮罩 */}
           {uploading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+            <div className="absolute inset-0 flex items-center justify-center bg-card/70">
               <Spinner />
             </div>
           )}
@@ -290,27 +290,27 @@ export default function ImageUploader({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={[
-            "group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-all duration-200",
+            "group flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius)] border-2 border-dashed px-6 py-12 text-center transition-all duration-200",
             isDragOver
-              ? "scale-[1.01] border-primary border-solid bg-primary-50 shadow-lg shadow-primary-600/10"
-              : "border-neutral-300 bg-neutral-50 hover:scale-[1.01] hover:border-primary hover:bg-primary-50/50 hover:shadow-md",
+              ? "scale-[1.01] border-primary border-solid bg-primary-50 shadow-primary-600/10"
+              : "border-border bg-background hover:scale-[1.01] hover:border-primary hover:bg-primary-50/50 hover:shadow-md",
             uploading ? "pointer-events-none opacity-70" : "",
           ].join(" ")}
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-3">
               <Spinner />
-              <p className="text-sm text-neutral-600">上传中...</p>
+              <p className="text-sm text-muted-foreground">上传中...</p>
             </div>
           ) : (
             <>
               {/* 上传图标（拖拽时放大并变色） */}
               <div
                 className={[
-                  "mb-4 flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-200",
+                  "mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius)] transition-all duration-200",
                   isDragOver
                     ? "scale-110 bg-primary-100"
-                    : "bg-neutral-100 group-hover:bg-primary-100",
+                    : "bg-muted group-hover:bg-primary-100",
                 ].join(" ")}
               >
                 <svg
@@ -318,7 +318,7 @@ export default function ImageUploader({
                     "h-8 w-8 transition-colors duration-200",
                     isDragOver
                       ? "text-primary"
-                      : "text-neutral-400 group-hover:text-primary",
+                      : "text-muted-foreground group-hover:text-primary",
                   ].join(" ")}
                   fill="none"
                   stroke="currentColor"
@@ -333,10 +333,10 @@ export default function ImageUploader({
                 </svg>
               </div>
 
-              <p className="text-base font-semibold text-neutral-800">
+              <p className="text-base font-semibold text-foreground">
                 {isDragOver ? "释放即可上传" : "拖拽图片到此处或点击上传"}
               </p>
-              <p className="mt-1.5 text-xs text-neutral-500">
+              <p className="mt-1.5 text-xs text-muted-foreground">
                 支持 JPG / PNG / WebP / GIF，单个文件 ≤ 10MB
               </p>
             </>

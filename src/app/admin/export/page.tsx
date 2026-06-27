@@ -97,39 +97,39 @@ export default function ExportPage() {
     <div className="space-y-6">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">数据导出</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-2xl font-bold text-foreground">数据导出</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           导出用户、API 调用日志、订单记录为 CSV 文件（带 UTF-8 BOM，Excel 可直接打开）。
           单次最多导出 10000 行。
         </p>
       </div>
 
       {/* 日期筛选 */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-        <h2 className="mb-3 text-sm font-semibold text-neutral-900">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-5">
+        <h2 className="mb-3 text-sm font-semibold text-foreground">
           时间范围（可选）
         </h2>
         <div className="flex flex-wrap gap-4">
           <div>
-            <label className="mb-1.5 block text-xs text-neutral-500">
+            <label className="mb-1.5 block text-xs text-muted-foreground">
               起始日期
             </label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-lg border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-primary-500"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm text-foreground outline-none focus:border-primary-500"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs text-neutral-500">
+            <label className="mb-1.5 block text-xs text-muted-foreground">
               结束日期
             </label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-lg border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-primary-500"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm text-foreground outline-none focus:border-primary-500"
             />
           </div>
           {(startDate || endDate) && (
@@ -138,19 +138,19 @@ export default function ExportPage() {
                 setStartDate("");
                 setEndDate("");
               }}
-              className="self-end rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs text-neutral-600 hover:bg-neutral-50"
+              className="self-end rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-xs text-muted-foreground hover:bg-muted"
             >
               清除
             </button>
           )}
         </div>
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-muted-foreground">
           时区：北京时间（UTC+8）。不选日期则导出全部。
         </p>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -160,21 +160,21 @@ export default function ExportPage() {
         {EXPORT_OPTIONS.map((opt) => (
           <div
             key={opt.type}
-            className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-5"
+            className="flex flex-col rounded-[var(--radius)] border border-border bg-card p-5"
           >
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-primary-50 text-primary">
               {opt.icon}
             </div>
-            <h3 className="text-sm font-semibold text-neutral-900">
+            <h3 className="text-sm font-semibold text-foreground">
               {opt.label}
             </h3>
-            <p className="mt-1 flex-1 text-xs text-neutral-500">
+            <p className="mt-1 flex-1 text-xs text-muted-foreground">
               {opt.description}
             </p>
             <button
               onClick={() => handleDownload(opt.type)}
               disabled={downloading !== null}
-              className="mt-4 w-full rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+              className="mt-4 w-full rounded-[var(--radius-sm)] bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
             >
               {downloading === opt.type
                 ? "导出中..."
@@ -187,8 +187,8 @@ export default function ExportPage() {
       </div>
 
       {/* 说明 */}
-      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-xs text-neutral-500">
-        <p className="font-medium text-neutral-700">导出说明：</p>
+      <div className="rounded-[var(--radius)] border border-border bg-background p-5 text-xs text-muted-foreground">
+        <p className="font-medium text-foreground">导出说明：</p>
         <ul className="mt-2 space-y-1">
           <li>· CSV 文件含 UTF-8 BOM 头，Excel 打开时中文不会乱码</li>
           <li>· 单次最多导出 10000 行，建议按日期范围筛选</li>

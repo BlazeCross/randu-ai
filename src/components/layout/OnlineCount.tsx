@@ -50,7 +50,7 @@ export default function OnlineCount() {
 
   return (
     <span
-      className="hidden items-center gap-1.5 rounded-lg bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600 md:inline-flex"
+      className="hidden items-center gap-1.5 rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground md:inline-flex"
       title="最近 2 分钟内的在线用户数"
     >
       <span className="relative flex h-2 w-2">

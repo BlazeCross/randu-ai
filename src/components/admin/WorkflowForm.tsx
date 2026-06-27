@@ -251,12 +251,12 @@ export default function WorkflowForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 基本信息卡片 */}
-      <section className="rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 className="mb-4 text-base font-semibold text-neutral-900">基本信息</h3>
+      <section className="rounded-[var(--radius-sm)] border border-border bg-card p-5">
+        <h3 className="mb-4 text-base font-semibold text-foreground">基本信息</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* 名称 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               工作流名称 <span className="text-red-500">*</span>
             </label>
             <input
@@ -264,10 +264,10 @@ export default function WorkflowForm({
               value={formData.name}
               onChange={(e) => updateField("name", e.target.value)}
               placeholder="如 服装换装视频生成"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 errors.name
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-neutral-300 focus:border-primary focus:ring-primary"
+                  : "border-border focus:border-primary focus:ring-primary"
               }`}
             />
             {errors.name && (
@@ -277,7 +277,7 @@ export default function WorkflowForm({
 
           {/* 分类 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               分类 <span className="text-red-500">*</span>
             </label>
             <input
@@ -285,10 +285,10 @@ export default function WorkflowForm({
               value={formData.category}
               onChange={(e) => updateField("category", e.target.value)}
               placeholder="如 视频生成"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 errors.category
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-neutral-300 focus:border-primary focus:ring-primary"
+                  : "border-border focus:border-primary focus:ring-primary"
               }`}
             />
             {errors.category && (
@@ -298,7 +298,7 @@ export default function WorkflowForm({
 
           {/* 描述 */}
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               描述
             </label>
             <textarea
@@ -306,19 +306,19 @@ export default function WorkflowForm({
               onChange={(e) => updateField("description", e.target.value)}
               placeholder="简要描述工作流功能..."
               rows={3}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
       </section>
 
       {/* 接入配置卡片 */}
-      <section className="rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 className="mb-4 text-base font-semibold text-neutral-900">接入配置</h3>
+      <section className="rounded-[var(--radius-sm)] border border-border bg-card p-5">
+        <h3 className="mb-4 text-base font-semibold text-foreground">接入配置</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* 来源 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               来源
             </label>
             <select
@@ -329,7 +329,7 @@ export default function WorkflowForm({
                   e.target.value as WorkflowFormData["source"],
                 )
               }
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="coze">Coze 工作流</option>
               <option value="volcengine">火山方舟</option>
@@ -338,7 +338,7 @@ export default function WorkflowForm({
 
           {/* Coze 工作流 ID / 火山模型 ID */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               {formData.source === "coze" ? (
                 <>Coze 工作流 ID <span className="text-red-500">*</span></>
               ) : (
@@ -354,10 +354,10 @@ export default function WorkflowForm({
                   ? "如 7654310872097488946"
                   : "如 ep-20260626151538-ktdhg"
               }
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 errors.cozeWorkflowId
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-neutral-300 focus:border-primary focus:ring-primary"
+                  : "border-border focus:border-primary focus:ring-primary"
               }`}
             />
             {errors.cozeWorkflowId && (
@@ -368,7 +368,7 @@ export default function WorkflowForm({
           {/* 火山模型 ID（仅 source=volcengine 时显示） */}
           {formData.source === "volcengine" && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-700">
+              <label className="mb-1 block text-sm font-medium text-foreground">
                 火山模型 ID <span className="text-red-500">*</span>
               </label>
               <input
@@ -376,10 +376,10 @@ export default function WorkflowForm({
                 value={formData.volcModel}
                 onChange={(e) => updateField("volcModel", e.target.value)}
                 placeholder="如 ep-20260626151538-ktdhg"
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                   errors.volcModel
                     ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : "border-neutral-300 focus:border-primary focus:ring-primary"
+                    : "border-border focus:border-primary focus:ring-primary"
                 }`}
               />
               {errors.volcModel && (
@@ -390,7 +390,7 @@ export default function WorkflowForm({
 
           {/* 输出类型 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               输出类型
             </label>
             <select
@@ -401,7 +401,7 @@ export default function WorkflowForm({
                   e.target.value as WorkflowFormData["outputType"],
                 )
               }
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="text">文本</option>
               <option value="image">图片</option>
@@ -411,7 +411,7 @@ export default function WorkflowForm({
 
           {/* 消耗点数 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               消耗点数
             </label>
             <input
@@ -421,10 +421,10 @@ export default function WorkflowForm({
               onChange={(e) =>
                 updateField("creditsRequired", Number(e.target.value) || 0)
               }
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
                 errors.creditsRequired
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-neutral-300 focus:border-primary focus:ring-primary"
+                  : "border-border focus:border-primary focus:ring-primary"
               }`}
             />
             {errors.creditsRequired && (
@@ -434,7 +434,7 @@ export default function WorkflowForm({
 
           {/* 状态 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               状态
             </label>
             <select
@@ -445,7 +445,7 @@ export default function WorkflowForm({
                   e.target.value as WorkflowFormData["status"],
                 )
               }
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="active">上架</option>
               <option value="inactive">下架</option>
@@ -454,7 +454,7 @@ export default function WorkflowForm({
 
           {/* 排序 */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               排序值（越小越靠前）
             </label>
             <input
@@ -463,13 +463,13 @@ export default function WorkflowForm({
               onChange={(e) =>
                 updateField("sortOrder", Number(e.target.value) || 0)
               }
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
           {/* 飞书文档 URL */}
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               飞书文档 URL（可选）
             </label>
             <input
@@ -477,15 +477,15 @@ export default function WorkflowForm({
               value={formData.feishuDocUrl}
               onChange={(e) => updateField("feishuDocUrl", e.target.value)}
               placeholder="https://..."
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
       </section>
 
       {/* 封面图卡片 */}
-      <section className="rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 className="mb-4 text-base font-semibold text-neutral-900">封面图</h3>
+      <section className="rounded-[var(--radius-sm)] border border-border bg-card p-5">
+        <h3 className="mb-4 text-base font-semibold text-foreground">封面图</h3>
         <div className="flex items-start gap-4">
           {/* 预览 */}
           <div className="flex-shrink-0">
@@ -493,17 +493,17 @@ export default function WorkflowForm({
               <img
                 src={formData.coverImage}
                 alt="封面预览"
-                className="h-24 w-40 rounded-lg border border-neutral-200 object-cover"
+                className="h-24 w-40 rounded-[var(--radius-sm)] border border-border object-cover"
               />
             ) : (
-              <div className="flex h-24 w-40 items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-neutral-50">
-                <span className="text-xs text-neutral-400">暂无封面</span>
+              <div className="flex h-24 w-40 items-center justify-center rounded-[var(--radius-sm)] border border-dashed border-border bg-background">
+                <span className="text-xs text-muted-foreground">暂无封面</span>
               </div>
             )}
           </div>
           {/* 上传按钮 */}
           <div className="flex-1">
-            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50">
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -519,7 +519,7 @@ export default function WorkflowForm({
             {coverUploadError && (
               <p className="mt-2 text-xs text-red-600">{coverUploadError}</p>
             )}
-            <p className="mt-2 text-xs text-neutral-400">
+            <p className="mt-2 text-xs text-muted-foreground">
               支持 JPG/PNG/WebP/GIF，最大 5MB，建议尺寸 800×400
             </p>
             {formData.coverImage && (
@@ -536,13 +536,13 @@ export default function WorkflowForm({
       </section>
 
       {/* 参数定义器卡片 */}
-      <section className="rounded-xl border border-neutral-200 bg-white p-5">
+      <section className="rounded-[var(--radius-sm)] border border-border bg-card p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-neutral-900">
+            <h3 className="text-base font-semibold text-foreground">
               输入参数定义
             </h3>
-            <p className="mt-0.5 text-xs text-neutral-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               定义工作流所需的输入参数，前台将自动生成对应表单
             </p>
           </div>
@@ -561,7 +561,7 @@ export default function WorkflowForm({
         <button
           type="submit"
           disabled={submitting || coverUploading}
-          className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover disabled:opacity-50"
+          className="rounded-[var(--radius-sm)] bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
         >
           {submitting ? "提交中..." : submitLabel}
         </button>

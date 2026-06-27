@@ -37,7 +37,7 @@ interface Pagination {
 // 状态标签样式
 const STATUS_STYLES: Record<string, { label: string; bg: string; text: string }> = {
   active: { label: "上架中", bg: "bg-success-100", text: "text-success-700" },
-  inactive: { label: "已下架", bg: "bg-neutral-100", text: "text-neutral-600" },
+  inactive: { label: "已下架", bg: "bg-muted", text: "text-muted-foreground" },
 };
 
 // 来源标签
@@ -228,12 +228,12 @@ export default function AdminWorkflowsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索工作流名称..."
-            className="w-full max-w-xs rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="">全部状态</option>
             <option value="active">上架中</option>
@@ -241,14 +241,14 @@ export default function AdminWorkflowsPage() {
           </select>
           <button
             type="submit"
-            className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+            className="rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
           >
             搜索
           </button>
         </form>
         <button
           onClick={() => router.push("/admin/workflows/new")}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -259,13 +259,13 @@ export default function AdminWorkflowsPage() {
 
       {/* 错误提示 */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+      <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-card">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg className="h-8 w-8 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
@@ -275,7 +275,7 @@ export default function AdminWorkflowsPage() {
           </div>
         ) : workflows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-neutral-500">暂无工作流</p>
+            <p className="text-sm text-muted-foreground">暂无工作流</p>
             <Link
               href="/admin/workflows/new"
               className="mt-3 text-sm font-medium text-primary hover:text-primary-hover"
@@ -286,7 +286,7 @@ export default function AdminWorkflowsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-neutral-200 bg-neutral-50 text-xs uppercase text-neutral-500">
+              <thead className="border-b border-border bg-background text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">名称</th>
                   <th className="px-4 py-3 font-medium">分类</th>
@@ -299,11 +299,11 @@ export default function AdminWorkflowsPage() {
                   <th className="px-4 py-3 text-right font-medium">操作</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-border">
                 {workflows.map((w) => {
                   const statusStyle = STATUS_STYLES[w.status] || STATUS_STYLES.inactive;
                   return (
-                    <tr key={w.id} className="hover:bg-neutral-50">
+                    <tr key={w.id} className="hover:bg-muted">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {w.coverImage ? (
@@ -313,33 +313,33 @@ export default function AdminWorkflowsPage() {
                               className="h-8 w-8 flex-shrink-0 rounded object-cover"
                             />
                           ) : (
-                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-neutral-100 text-xs text-neutral-400">
+                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
                               {w.name[0] || "?"}
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-neutral-900">{w.name}</p>
+                            <p className="truncate font-medium text-foreground">{w.name}</p>
                             {w.description && (
-                              <p className="truncate text-xs text-neutral-500">{w.description}</p>
+                              <p className="truncate text-xs text-muted-foreground">{w.description}</p>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">{w.category}</td>
-                      <td className="px-4 py-3 text-neutral-600">
+                      <td className="px-4 py-3 text-muted-foreground">{w.category}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
                         {SOURCE_LABELS[w.source] || w.source}
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {OUTPUT_TYPE_LABELS[w.outputType] || w.outputType}
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">{w.creditsRequired}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{w.creditsRequired}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}>
                           {statusStyle.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-neutral-600">{w._count.usageLogs}</td>
-                      <td className="px-4 py-3 text-xs text-neutral-500">
+                      <td className="px-4 py-3 text-muted-foreground">{w._count.usageLogs}</td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {formatDate(w.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -354,7 +354,7 @@ export default function AdminWorkflowsPage() {
                           <button
                             onClick={() => handleToggleStatus(w)}
                             disabled={actionLoading === w.id}
-                            className="text-xs font-medium text-neutral-600 hover:text-neutral-900 disabled:opacity-50"
+                            className="text-xs font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
                           >
                             {w.status === "active" ? "下架" : "上架"}
                           </button>
@@ -379,21 +379,21 @@ export default function AdminWorkflowsPage() {
       {/* 分页 */}
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             共 {pagination.total} 条，第 {pagination.page}/{pagination.totalPages} 页
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => fetchWorkflows(pagination.page - 1)}
               disabled={pagination.page <= 1 || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               上一页
             </button>
             <button
               onClick={() => fetchWorkflows(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages || loading}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
             >
               下一页
             </button>

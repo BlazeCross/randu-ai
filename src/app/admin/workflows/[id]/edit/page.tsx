@@ -145,7 +145,7 @@ export default function EditWorkflowPage() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          <p className="text-sm text-neutral-500">加载中...</p>
+          <p className="text-sm text-muted-foreground">加载中...</p>
         </div>
       </div>
     );
@@ -155,7 +155,7 @@ export default function EditWorkflowPage() {
   if (loadError || !initialData) {
     return (
       <div className="space-y-6">
-        <nav aria-label="面包屑" className="text-sm text-neutral-500">
+        <nav aria-label="面包屑" className="text-sm text-muted-foreground">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
               <Link href="/admin" className="hover:text-primary">
@@ -169,18 +169,18 @@ export default function EditWorkflowPage() {
               </Link>
             </li>
             <li aria-hidden>/</li>
-            <li className="font-medium text-neutral-900" aria-current="page">
+            <li className="font-medium text-foreground" aria-current="page">
               编辑工作流
             </li>
           </ol>
         </nav>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-sm text-red-700">
             {loadError || "工作流不存在或加载失败"}
           </p>
           <Link
             href="/admin/workflows"
-            className="mt-4 inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+            className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
           >
             返回工作流管理
           </Link>
@@ -192,7 +192,7 @@ export default function EditWorkflowPage() {
   return (
     <div className="space-y-6">
       {/* 面包屑 */}
-      <nav aria-label="面包屑" className="text-sm text-neutral-500">
+      <nav aria-label="面包屑" className="text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/admin" className="hover:text-primary">
@@ -206,7 +206,7 @@ export default function EditWorkflowPage() {
             </Link>
           </li>
           <li aria-hidden>/</li>
-          <li className="font-medium text-neutral-900" aria-current="page">
+          <li className="font-medium text-foreground" aria-current="page">
             编辑工作流
           </li>
         </ol>
@@ -214,17 +214,17 @@ export default function EditWorkflowPage() {
 
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           编辑工作流
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           {initialData.name ? `正在编辑：${initialData.name}` : "修改工作流配置"}
         </p>
       </div>
 
       {/* 错误提示 */}
       {submitError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-700">{submitError}</p>
         </div>
       )}

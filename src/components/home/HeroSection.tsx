@@ -28,7 +28,7 @@ export default function HeroSection() {
       <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
         <div className="mx-auto max-w-3xl text-center">
           {/* 顶部标签 */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-primary-700 shadow-sm backdrop-blur">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-card/80 px-4 py-1.5 text-sm font-medium text-primary-700 backdrop-blur">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-success-500" />
@@ -37,7 +37,7 @@ export default function HeroSection() {
           </div>
 
           {/* 主标题 */}
-          <h1 className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-6xl lg:text-7xl">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             让 AI 工作流
             <br />
             <span className="bg-gradient-to-r from-primary-600 to-success-500 bg-clip-text text-transparent">
@@ -46,7 +46,7 @@ export default function HeroSection() {
           </h1>
 
           {/* 价值主张 */}
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-neutral-600 sm:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
             百款AI工作流，即开即用，覆盖视频生成、内容创作、数据处理等全场景，
             让AI真正为你的业务创造价值
           </p>
@@ -55,7 +55,7 @@ export default function HeroSection() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/register"
-              className="group inline-flex items-center justify-center rounded-xl bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl hover:shadow-primary-600/30 active:scale-[0.98]"
+              className="group inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-primary-600/25 transition-all hover:bg-primary-hover hover:shadow-xl hover:shadow-primary-600/30 active:scale-[0.98]"
             >
               立即体验
               <svg
@@ -74,20 +74,20 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/workspace"
-              className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-8 py-3.5 text-base font-semibold text-neutral-700 transition-all hover:border-primary hover:text-primary"
+              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary hover:text-primary"
             >
               浏览工作流
             </Link>
           </div>
 
           {/* 数据统计 */}
-          <dl className="mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-4 border-t border-neutral-200 pt-8 sm:mt-20 sm:gap-8 sm:pt-10">
+          <dl className="mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-4 border-t border-border pt-8 sm:mt-20 sm:gap-8 sm:pt-10">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <dt className="text-xs font-medium text-neutral-500 sm:text-sm">
+                <dt className="text-xs font-medium text-muted-foreground sm:text-sm">
                   {stat.label}
                 </dt>
-                <dd className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+                <dd className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                   {stat.value}
                 </dd>
               </div>

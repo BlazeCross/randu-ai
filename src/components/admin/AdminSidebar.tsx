@@ -279,20 +279,20 @@ export default function AdminSidebar({
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-neutral-200 bg-white transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-card transition-transform duration-300 md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* 品牌区 */}
-        <div className="flex h-16 items-center gap-2 border-b border-neutral-200 px-5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 text-white">
+        <div className="flex h-16 items-center gap-2 border-b border-border px-5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-br from-primary-500 to-primary-700 text-white">
             燃
           </span>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold text-neutral-900">
+            <span className="text-sm font-bold text-foreground">
               燃渡AI 后台
             </span>
-            <span className="text-[10px] text-neutral-500">
+            <span className="text-[10px] text-muted-foreground">
               {role === "super_admin" ? "超级管理员" : "管理员"}
             </span>
           </div>
@@ -307,14 +307,14 @@ export default function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm font-medium transition-colors ${
                   active
                     ? "bg-primary-50 text-primary-700"
-                    : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
                 <span
-                  className={active ? "text-primary-600" : "text-neutral-400"}
+                  className={active ? "text-primary-600" : "text-muted-foreground"}
                 >
                   {item.icon}
                 </span>
@@ -325,14 +325,14 @@ export default function AdminSidebar({
         </nav>
 
         {/* 底部：返回前台 */}
-        <div className="border-t border-neutral-200 p-3">
+        <div className="border-t border-border p-3">
           <Link
             href="/"
             onClick={onClose}
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+            className="flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <svg
-              className="h-5 w-5 text-neutral-400"
+              className="h-5 w-5 text-muted-foreground"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
