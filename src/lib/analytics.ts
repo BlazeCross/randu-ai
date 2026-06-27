@@ -2,17 +2,17 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 /**
- * 用户行为埋点工具（18.1）
+ * 用户行为埋点工具（18.1）- 服务端专用
  *
  * 将事件写入 event_logs 表，用于关键指标统计与留存分析。
  * 设计原则：
  * - 异步且静默失败，绝不阻断主流程（埋点失败不应影响用户体验）
- * - 服务端调用：trackEvent
- * - 客户端调用：trackEventClient（走 /api/track 接口）
+ * - 服务端调用：trackEvent / trackEventWithContext
+ * - 客户端调用：trackEventClient（已迁移至 src/lib/analytics-client.ts，走 /api/track 接口）
+ *
+ * ⚠️ 此文件引入了 Prisma，仅可在服务端组件/API route 中使用，
+ *    不可被 "use client" 组件直接或间接引用，否则会把 Prisma 打包进客户端 bundle。
  */
-
-// localStorage 中存储 token 的键名（与 auth-context.tsx 保持一致）
-const TOKEN_KEY = "randu_token";
 
 /**
  * 服务端埋点：将事件写入 event_logs 表
@@ -77,41 +77,6 @@ export async function trackEventWithContext(
   }
 }
 
-/**
- * 客户端埋点：通过 /api/track 接口上报事件
- *
- * 从 localStorage 读取 token 鉴权；未登录时静默跳过。
- * 使用 keepalive 保证页面跳转时请求也能发出。
- * 失败时静默处理，不影响任何交互。
- *
- * @param eventName  事件名
- * @param properties 附加属性
- */
-export function trackEventClient(
-  eventName: string,
-  properties?: Record<string, unknown>,
-): void {
-  try {
-    const token =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem(TOKEN_KEY)
-        : null;
-
-    // 未登录用户不上报（/api/track 需鉴权）
-    if (!token) return;
-
-    void fetch("/api/track", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ event: eventName, properties }),
-      keepalive: true,
-    }).catch(() => {
-      // 埋点失败静默处理
-    });
-  } catch {
-    // 静默失败
-  }
-}
+// 客户端埋点函数 trackEventClient 已迁移至 src/lib/analytics-client.ts
+// 避免将 Prisma 等服务端依赖打包进客户端 bundle
+// 客户端代码请直接 import from "@/lib/analytics-client"

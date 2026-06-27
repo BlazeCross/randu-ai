@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { trackEventClient } from "@/lib/analytics";
+import { trackEventClient } from "@/lib/analytics-client";
 
 /**
  * 客户端埋点 Hook（18.1）
