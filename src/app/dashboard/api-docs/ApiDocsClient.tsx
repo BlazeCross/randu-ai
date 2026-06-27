@@ -463,7 +463,7 @@ Content-Type: application/json`}</code>
                   onClick={() => setActiveTag("all")}
                   className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors ${
                     activeTag === "all"
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "border border-border bg-card text-foreground hover:bg-muted"
                   }`}
                 >

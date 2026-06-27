@@ -1,11 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrackPageView } from "@/hooks/useTrack";
 import AppShell from "@/components/layout/AppShell";
+import Avatar from "@/components/ui/Avatar";
+import Badge from "@/components/ui/Badge";
+
+// 简单的 className 拼接工具（过滤 falsy 值）
+function cx(...args: Array<string | false | null | undefined>): string {
+  return args.filter(Boolean).join(" ");
+}
 
 // 消息类型
 interface ChatMessage {
@@ -17,20 +24,43 @@ interface ChatMessage {
   createdAt: number;
 }
 
-// localStorage 存储结构
-interface StoredConversation {
+// 单条会话
+interface Conversation {
+  id: string;
+  title: string; // 首条用户消息前 20 字
+  messages: ChatMessage[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+// 多会话存储结构
+interface ConversationsStore {
+  conversations: Conversation[];
+  currentId: string | null;
+}
+
+// 旧结构（单对话），用于迁移检测
+interface LegacyStoredConversation {
   messages: ChatMessage[];
   updatedAt: number;
 }
 
 const STORAGE_KEY = "randu-chat-history";
-const MAX_HISTORY_MESSAGES = 50;
+const MAX_CONVERSATIONS = 20;
 
 /**
- * 生成唯一消息 ID
+ * 生成唯一 ID（用于消息和会话）
  */
 function genId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/**
+ * 从用户消息文本生成会话标题（前 20 字，去除换行）
+ */
+function genTitleFromMessage(text: string): string {
+  const cleaned = text.replace(/[\r\n]+/g, " ").trim();
+  return cleaned.slice(0, 20) || "新对话";
 }
 
 /**
@@ -44,30 +74,54 @@ function formatTime(ts: number): string {
 }
 
 /**
- * 从 localStorage 加载对话历史
+ * 从 localStorage 加载会话列表
+ * - 兼容旧结构 {messages, updatedAt}：自动迁移为单会话列表
+ * - 返回 ConversationsStore，currentId 默认指向第一个会话或 null
  */
-function loadHistory(): ChatMessage[] {
+function loadConversations(): ConversationsStore {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const data = JSON.parse(raw) as StoredConversation;
-    if (!Array.isArray(data.messages)) return [];
-    return data.messages.slice(-MAX_HISTORY_MESSAGES);
+    if (!raw) return { conversations: [], currentId: null };
+    const data = JSON.parse(raw);
+
+    // 新结构：{ conversations, currentId }
+    if (data && Array.isArray((data as ConversationsStore).conversations)) {
+      const store = data as ConversationsStore;
+      return {
+        conversations: store.conversations.slice(0, MAX_CONVERSATIONS),
+        currentId: store.currentId ?? null,
+      };
+    }
+
+    // 旧结构：{ messages, updatedAt } → 迁移为单会话
+    if (data && Array.isArray((data as LegacyStoredConversation).messages)) {
+      const legacy = data as LegacyStoredConversation;
+      if (legacy.messages.length === 0) {
+        return { conversations: [], currentId: null };
+      }
+      const firstUser = legacy.messages.find((m) => m.role === "user");
+      const conv: Conversation = {
+        id: genId(),
+        title: firstUser ? genTitleFromMessage(firstUser.content) : "新对话",
+        messages: legacy.messages,
+        createdAt: legacy.updatedAt || Date.now(),
+        updatedAt: legacy.updatedAt || Date.now(),
+      };
+      return { conversations: [conv], currentId: conv.id };
+    }
+
+    return { conversations: [], currentId: null };
   } catch {
-    return [];
+    return { conversations: [], currentId: null };
   }
 }
 
 /**
- * 保存对话历史到 localStorage
+ * 保存整个会话 store 到 localStorage
  */
-function saveHistory(messages: ChatMessage[]) {
+function saveConversations(store: ConversationsStore) {
   try {
-    const data: StoredConversation = {
-      messages: messages.slice(-MAX_HISTORY_MESSAGES),
-      updatedAt: Date.now(),
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   } catch {
     // localStorage 满或不可用时静默失败
   }
@@ -77,11 +131,11 @@ function saveHistory(messages: ChatMessage[]) {
  * 智能体对话页面
  *
  * 功能：
+ * - 多会话管理（创建/切换/删除，最多 20 个）
  * - 多轮对话（上下文记忆，最近 10 条发给后端）
  * - 智能路由：检测到"画/生成图"等关键词 → 自动调用 Seedream 生图
  * - 图片预览与下载
  * - 历史记录持久化到 localStorage（不跨设备）
- * - 清空对话
  * - 积分余额显示
  * - 语音输入（Web Speech API）
  * - 图片上传（/api/upload）
@@ -94,7 +148,15 @@ export default function ChatPage() {
   const { user, token, loading: authLoading } = useAuth();
   useTrackPageView("chat");
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // 多会话状态
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  // 派生：当前会话的消息列表（useMemo 保持引用稳定，避免不必要的 effect 触发）
+  const messages = useMemo(
+    () => conversations.find((c) => c.id === currentId)?.messages ?? [],
+    [conversations, currentId],
+  );
+
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,14 +182,20 @@ export default function ChatPage() {
   // 消息列表底部滚动容器
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 初始加载历史记录
+  // 初始加载会话
   useEffect(() => {
-    setMessages(loadHistory());
+    const store = loadConversations();
+    setConversations(store.conversations);
+    setCurrentId(store.currentId);
   }, []);
 
-  // 消息变化时保存到 localStorage + 自动滚动到底部
+  // conversations / currentId 变化时保存到 localStorage
   useEffect(() => {
-    saveHistory(messages);
+    saveConversations({ conversations, currentId });
+  }, [conversations, currentId]);
+
+  // 当前消息列表变化时滚动到底部
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -194,16 +262,51 @@ export default function ChatPage() {
   }, []);
 
   /**
+   * 创建新会话
+   * - 加入列表头部
+   * - 超过 MAX_CONVERSATIONS 时淘汰最旧
+   * - 设为当前会话
+   * - 返回新会话 id
+   */
+  const createConversation = useCallback((title?: string): string => {
+    const id = genId();
+    const now = Date.now();
+    const newConv: Conversation = {
+      id,
+      title: title || "新对话",
+      messages: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    setConversations((prev) => {
+      const next = [newConv, ...prev];
+      if (next.length > MAX_CONVERSATIONS) {
+        next.pop();
+      }
+      return next;
+    });
+    setCurrentId(id);
+    return id;
+  }, []);
+
+  /**
    * 核心发送函数（可复用）
    * - baseMessages 可选，用于"重新生成"场景显式指定历史消息
-   * - 默认使用当前 messages 闭包作为历史
+   * - 若当前无会话，先创建新会话
    */
   const sendMessage = useCallback(
     async (text: string, baseMessages?: ChatMessage[]) => {
       const trimmed = text.trim();
       if (!trimmed || !token) return;
 
-      const historySource = baseMessages ?? messages;
+      // 确定目标会话；无当前会话则新建
+      let activeId = currentId;
+      if (!activeId) {
+        activeId = createConversation(genTitleFromMessage(trimmed));
+      }
+
+      const currentConv = conversations.find((c) => c.id === activeId);
+      const historySource = baseMessages ?? (currentConv?.messages ?? []);
 
       // 创建用户消息
       const userMessage: ChatMessage = {
@@ -220,7 +323,13 @@ export default function ChatPage() {
         content: m.content,
       }));
 
-      setMessages((prev) => [...prev, userMessage]);
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === activeId
+            ? { ...c, messages: [...c.messages, userMessage], updatedAt: Date.now() }
+            : c,
+        ),
+      );
       setSending(true);
       setError(null);
 
@@ -265,7 +374,13 @@ export default function ChatPage() {
           createdAt: Date.now(),
         };
 
-        setMessages((prev) => [...prev, assistantMessage]);
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === activeId
+              ? { ...c, messages: [...c.messages, assistantMessage], updatedAt: Date.now() }
+              : c,
+          ),
+        );
 
         // 更新积分余额
         if (typeof data.creditsCost === "number" && creditsBalance !== null) {
@@ -280,7 +395,7 @@ export default function ChatPage() {
         setSending(false);
       }
     },
-    [messages, token, creditsBalance],
+    [conversations, currentId, token, creditsBalance, createConversation],
   );
 
   /**
@@ -391,38 +506,73 @@ export default function ChatPage() {
    */
   const handleRegenerate = useCallback(
     (aiMessageId: string) => {
-      if (sending) return;
-      const aiIndex = messages.findIndex((m) => m.id === aiMessageId);
+      if (sending || !currentId) return;
+      const currentConv = conversations.find((c) => c.id === currentId);
+      if (!currentConv) return;
+
+      const aiIndex = currentConv.messages.findIndex(
+        (m) => m.id === aiMessageId,
+      );
       if (aiIndex < 0) return;
       // 找到前一条用户消息
       let userIdx = aiIndex - 1;
-      while (userIdx >= 0 && messages[userIdx].role !== "user") userIdx--;
+      while (
+        userIdx >= 0 &&
+        currentConv.messages[userIdx].role !== "user"
+      )
+        userIdx--;
       if (userIdx < 0) return;
 
-      const userText = messages[userIdx].content;
+      const userText = currentConv.messages[userIdx].content;
       // 构造去除 AI 消息 + 前一条用户消息后的新历史
-      const newMessages = messages.filter(
+      const newMessages = currentConv.messages.filter(
         (_, i) => i !== aiIndex && i !== userIdx,
       );
-      setMessages(newMessages);
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === currentId
+            ? { ...c, messages: newMessages, updatedAt: Date.now() }
+            : c,
+        ),
+      );
       sendMessage(userText, newMessages);
     },
-    [messages, sending, sendMessage],
+    [conversations, currentId, sending, sendMessage],
   );
 
   /**
-   * 清空对话
+   * 新建对话：清空输入，开始新会话（不清空历史）
    */
   const handleClear = () => {
-    if (!window.confirm("确定清空所有对话记录？")) return;
-    setMessages([]);
+    setInput("");
     setError(null);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // 静默
-    }
+    setCurrentId(null);
   };
+
+  /**
+   * 切换会话
+   */
+  const switchConversation = useCallback((id: string) => {
+    setCurrentId(id);
+    setError(null);
+  }, []);
+
+  /**
+   * 删除会话
+   * - 从 conversations 移除该 id
+   * - 如果删除的是当前会话，currentId 设为列表第一个会话的 id 或 null
+   */
+  const deleteConversation = useCallback(
+    (id: string) => {
+      const next = conversations.filter((c) => c.id !== id);
+      setConversations(next);
+      setCurrentId((curr) => {
+        if (curr !== id) return curr;
+        return next.length > 0 ? next[0].id : null;
+      });
+    },
+    [conversations],
+  );
 
   /**
    * 回车发送（Shift+Enter 换行）
@@ -434,12 +584,15 @@ export default function ChatPage() {
     }
   };
 
+  // 用户显示名
+  const userName = user?.nickname || user?.email || "用户";
+
   // 加载中
   if (authLoading) {
     return (
       <AppShell
-        title="智能体对话"
-        subtitle="文本对话 1 积分/次 · AI 生图 5 积分/次"
+        title="燃渡Ai助手"
+        subtitle="你的 AI 助手"
         sidebar={<div className="p-3" />}
       >
         <div className="flex h-full items-center justify-center bg-background">
@@ -471,8 +624,8 @@ export default function ChatPage() {
   if (!user || !token) {
     return (
       <AppShell
-        title="智能体对话"
-        subtitle="文本对话 1 积分/次 · AI 生图 5 积分/次"
+        title="燃渡Ai助手"
+        subtitle="你的 AI 助手"
         sidebar={<div className="p-3" />}
       >
         <div className="flex h-full items-center justify-center bg-background px-4">
@@ -496,7 +649,7 @@ export default function ChatPage() {
               请先登录
             </h2>
             <p className="mb-6 text-sm text-muted-foreground">
-              登录后即可使用智能体对话
+              登录后即可使用燃渡Ai助手
             </p>
             <button
               onClick={() => router.push("/login")}
@@ -512,56 +665,125 @@ export default function ChatPage() {
 
   return (
     <AppShell
-      title="智能体对话"
-      subtitle="文本对话 1 积分/次 · AI 生图 5 积分/次"
+      title="燃渡Ai助手"
+      subtitle="你的 AI 助手"
       sidebar={
-        <div className="flex flex-col gap-2 p-3">
+        <div className="flex h-full flex-col">
           {/* 新对话按钮 */}
-          <button
-            onClick={handleClear}
-            className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={1.7}
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div className="p-3">
+            <button
+              onClick={handleClear}
+              className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
             >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            新对话
-          </button>
-
-          {/* 快捷提问 */}
-          <div className="mt-4">
-            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              快捷提问
-            </div>
-            {[
-              "帮我写一段产品介绍",
-              "画一只穿着汉服的猫",
-              "推荐三本好看的科幻小说",
-              "如何提高编程能力？",
-            ].map((q) => (
-              <button
-                key={q}
-                onClick={() => setInput(q)}
-                className="block w-full rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={1.7}
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {q}
-              </button>
-            ))}
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              新对话
+            </button>
           </div>
 
-          {/* 积分余额 (底部) */}
-          {creditsBalance !== null && (
-            <div className="mt-auto rounded-[var(--radius-sm)] bg-muted p-3">
-              <div className="text-xs text-muted-foreground">积分余额</div>
-              <div className="text-lg font-semibold text-foreground">
-                {creditsBalance} 点
+          {/* 历史对话列表（可滚动） */}
+          <div className="flex-1 overflow-y-auto px-2">
+            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              历史对话
+            </div>
+            {conversations.length === 0 ? (
+              <div className="px-3 py-4 text-center text-xs text-muted-foreground">
+                暂无历史对话
+              </div>
+            ) : (
+              conversations.map((conv) => (
+                <div
+                  key={conv.id}
+                  onClick={() => switchConversation(conv.id)}
+                  className={cx(
+                    "group relative flex cursor-pointer items-start gap-2 rounded-[var(--radius-sm)] px-3 py-2 transition-colors",
+                    conv.id === currentId
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  <svg
+                    className="mt-0.5 h-3.5 w-3.5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.7}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">
+                      {conv.title || "新对话"}
+                    </div>
+                    <div className="text-xs text-muted-foreground/70">
+                      {new Date(conv.updatedAt).toLocaleDateString("zh-CN", {
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </div>
+                  </div>
+                  {/* 删除按钮（hover 显示） */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteConversation(conv.id);
+                    }}
+                    className="absolute right-1 top-1 hidden h-5 w-5 place-items-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive group-hover:grid"
+                    aria-label="删除对话"
+                  >
+                    <svg
+                      className="h-3 w-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                    </svg>
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* 底部用户信息块 */}
+          {user && (
+            <div className="flex-none border-t border-sidebar-border p-3">
+              <div className="flex items-center gap-2">
+                <Avatar
+                  src={user.avatar ?? undefined}
+                  name={userName}
+                  size="md"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium text-foreground">
+                    {userName}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant="primary">
+                      {user.subscriptionPlan || "免费版"}
+                    </Badge>
+                    {creditsBalance !== null && (
+                      <span className="text-xs text-muted-foreground">
+                        {creditsBalance} 点
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -596,23 +818,6 @@ export default function ChatPage() {
                 <p className="mb-6 max-w-md text-sm text-muted-foreground">
                   我可以帮你回答问题、撰写文案、提供建议。直接输入"画一张..."还可以生成图片哦！
                 </p>
-                {/* 快捷提问 */}
-                <div className="flex flex-wrap justify-center gap-2">
-                  {[
-                    "帮我写一段产品介绍",
-                    "画一只穿着汉服的猫",
-                    "推荐三本好看的科幻小说",
-                    "如何提高编程能力？",
-                  ].map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => setInput(q)}
-                      className="rounded-full border border-border bg-background px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
               </div>
             ) : (
               <div className="space-y-4">

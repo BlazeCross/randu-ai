@@ -8,12 +8,12 @@ const stats = [
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-white to-white">
+    <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
       {/* 装饰性背景元素 */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary-200/40 blur-3xl" />
-        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-success-200/30 blur-3xl" />
-        <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-100/20 blur-3xl" />
+        <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-success/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
         {/* 网格纹理 */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -28,7 +28,7 @@ export default function HeroSection() {
       <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
         <div className="mx-auto max-w-3xl text-center">
           {/* 顶部标签 */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-card/80 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-success-500" />
@@ -74,7 +74,7 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/workspace"
-              className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary hover:text-primary"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary hover:text-primary"
             >
               浏览工作流
             </Link>

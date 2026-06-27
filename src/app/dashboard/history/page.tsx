@@ -198,7 +198,7 @@ export default function HistoryPage() {
               onClick={() => handleFilterChange(opt.value)}
               className={`rounded-[var(--radius-sm)] px-4 py-1.5 text-sm font-medium transition-colors ${
                 statusFilter === opt.value
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "border border-border bg-card text-muted-foreground hover:bg-muted"
               }`}
             >

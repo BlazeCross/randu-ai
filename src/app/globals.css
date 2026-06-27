@@ -152,91 +152,89 @@
 }
 
 /* ============================================================
- * 暗色模式（系统跟随，token 级完整映射）
+ * 暗色模式（手动控制，由 html.dark 类触发）
  * 不再使用中性灰反转 hack，直接映射 Doubao 暗色 token
  * ============================================================ */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0e1115;
-    --foreground: #eff1f4;
-    --card: #0e1115;
-    --card-foreground: #eff1f4;
-    --popover: #22252a;
-    --popover-foreground: #e5e5e5;
+html.dark {
+  --background: #0e1115;
+  --foreground: #eff1f4;
+  --card: #0e1115;
+  --card-foreground: #eff1f4;
+  --popover: #22252a;
+  --popover-foreground: #e5e5e5;
 
-    --primary: #0065fd;
-    --primary-foreground: #ffffff;
-    --secondary: #22252a;
-    --secondary-foreground: #e5e5e5;
-    --muted: #161a20;
-    --muted-foreground: #afbbcb;
-    --accent: #00266b;
-    --accent-foreground: #bfdbfe;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --border: #333942;
-    --input: #333942;
-    --ring: #00266b;
+  --primary: #0065fd;
+  --primary-foreground: #ffffff;
+  --secondary: #22252a;
+  --secondary-foreground: #e5e5e5;
+  --muted: #161a20;
+  --muted-foreground: #afbbcb;
+  --accent: #00266b;
+  --accent-foreground: #bfdbfe;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #333942;
+  --input: #333942;
+  --ring: #00266b;
 
-    --chart-1: #60a5fa;
-    --chart-2: #3b82f6;
-    --chart-3: #2563eb;
-    --chart-4: #1d4ed8;
-    --chart-5: #1e40af;
-    --sidebar: #171717;
-    --sidebar-foreground: #e5e5e5;
-    --sidebar-primary: #0065fd;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #00266b;
-    --sidebar-accent-foreground: #bfdbfe;
-    --sidebar-border: #404040;
-    --sidebar-ring: #00266b;
+  --chart-1: #60a5fa;
+  --chart-2: #3b82f6;
+  --chart-3: #2563eb;
+  --chart-4: #1d4ed8;
+  --chart-5: #1e40af;
+  --sidebar: #171717;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #00266b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #404040;
+  --sidebar-ring: #00266b;
 
-    /* 中性灰映射为暗色梯度 */
-    --color-neutral-50: #0e1115;
-    --color-neutral-100: #161a20;
-    --color-neutral-200: #1f2937;
-    --color-neutral-300: #2a2a2a;
-    --color-neutral-400: #525252;
-    --color-neutral-500: #afbbcb;
-    --color-neutral-600: #d4d4d4;
-    --color-neutral-700: #e5e5e5;
-    --color-neutral-800: #ededed;
-    --color-neutral-900: #f5f5f5;
+  /* 中性灰映射为暗色梯度 */
+  --color-neutral-50: #0e1115;
+  --color-neutral-100: #161a20;
+  --color-neutral-200: #1f2937;
+  --color-neutral-300: #2a2a2a;
+  --color-neutral-400: #525252;
+  --color-neutral-500: #afbbcb;
+  --color-neutral-600: #d4d4d4;
+  --color-neutral-700: #e5e5e5;
+  --color-neutral-800: #ededed;
+  --color-neutral-900: #f5f5f5;
 
-    /* primary 在暗色模式提亮以保持对比度 */
-    --color-primary: #60a5fa;
-    --color-primary-hover: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-  }
+  /* primary 在暗色模式提亮以保持对比度 */
+  --color-primary: #60a5fa;
+  --color-primary-hover: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+}
 
-  /* 暗色模式：覆盖 bg-white 工具类（现有组件大量使用）
-   * 映射到 Doubao 暗色 card 表面，避免「白卡片嵌在深色背景」 */
-  .bg-white {
-    background-color: var(--card) !important;
-  }
-  .bg-white\/80 {
-    background-color: rgba(14, 17, 21, 0.8) !important;
-  }
-  .bg-white\/90 {
-    background-color: rgba(14, 17, 21, 0.9) !important;
-  }
-  .bg-white\/95 {
-    background-color: rgba(14, 17, 21, 0.95) !important;
-  }
-  .bg-white\/70 {
-    background-color: rgba(14, 17, 21, 0.7) !important;
-  }
+/* 暗色模式：覆盖 bg-white 工具类（现有组件大量使用）
+ * 映射到 Doubao 暗色 card 表面，避免「白卡片嵌在深色背景」 */
+html.dark .bg-white {
+  background-color: var(--card) !important;
+}
+html.dark .bg-white\/80 {
+  background-color: rgba(14, 17, 21, 0.8) !important;
+}
+html.dark .bg-white\/90 {
+  background-color: rgba(14, 17, 21, 0.9) !important;
+}
+html.dark .bg-white\/95 {
+  background-color: rgba(14, 17, 21, 0.95) !important;
+}
+html.dark .bg-white\/70 {
+  background-color: rgba(14, 17, 21, 0.7) !important;
+}
 
-  /* 暗色模式：边框适配 */
-  .border-neutral-200 {
-    border-color: var(--sidebar-border) !important;
-  }
-  .border-neutral-300 {
-    border-color: var(--color-neutral-700) !important;
-  }
+/* 暗色模式：边框适配 */
+html.dark .border-neutral-200 {
+  border-color: var(--sidebar-border) !important;
+}
+html.dark .border-neutral-300 {
+  border-color: var(--color-neutral-700) !important;
 }
 
 /* ============================================================

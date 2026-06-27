@@ -51,7 +51,7 @@ export default function AdBanner() {
 
   return (
     <section className="bg-background py-10 sm:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-4 lg:px-8">
         <div className="relative overflow-hidden rounded-[var(--radius-lg)]">
           {/* 轮播容器 */}
           <div className="relative h-64 sm:h-72 lg:h-80">

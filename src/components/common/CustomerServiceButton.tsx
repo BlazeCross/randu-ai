@@ -142,7 +142,7 @@ export default function CustomerServiceButton() {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "关闭客服面板" : "打开客服面板"}
         aria-expanded={open}
-        className="tap-feedback flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 sm:h-14 sm:w-14"
+        className="tap-feedback flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 sm:h-14 sm:w-14"
       >
         {open ? (
           <svg

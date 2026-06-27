@@ -2,9 +2,6 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import OnlineCount from "@/components/layout/OnlineCount";
-import NotificationBell from "@/components/layout/NotificationBell";
-import UserQuickMenu from "@/components/ui/UserQuickMenu";
 
 // 简单的 className 拼接工具（过滤 falsy 值）
 function cx(...args: Array<string | false | null | undefined>): string {
@@ -98,16 +95,6 @@ export default function AppShell({
             </svg>
           </button>
 
-          {/* Logo（小） */}
-          <Link href="/" className="flex flex-none items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.png"
-              alt="燃渡AI"
-              className="h-6 w-auto invert dark:invert-0"
-            />
-          </Link>
-
           {/* 标题区 */}
           {(title || subtitle) && (
             <div className="min-w-0">
@@ -149,15 +136,6 @@ export default function AppShell({
               <span className="hidden sm:inline">教程</span>
             </Link>
           )}
-
-          {/* 在线人数 */}
-          <OnlineCount />
-
-          {/* 通知铃铛 */}
-          <NotificationBell />
-
-          {/* 用户快捷菜单（头像/名字/套餐/积分 + 悬浮功能面板） */}
-          <UserQuickMenu variant="navbar" />
         </header>
 
         {/* 主内容区（可滚动） */}

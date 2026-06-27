@@ -10,6 +10,8 @@ import SubscriptionCard, {
   type TrialStatus,
 } from "@/components/dashboard/SubscriptionCard";
 import { SkeletonListItem } from "@/components/ui/Skeleton";
+import Avatar from "@/components/ui/Avatar";
+import Badge from "@/components/ui/Badge";
 
 // 使用记录类型（对应 /api/user/usage 返回的 usageLogs 元素）
 interface UsageLog {
@@ -83,6 +85,15 @@ function formatDate(dateStr: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+// 格式化日期（仅日期，yyyy-MM-dd）
+function formatDateOnly(dateStr: string): string {
+  const d = new Date(dateStr);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 export default function DashboardPage() {
@@ -203,42 +214,41 @@ export default function DashboardPage() {
   return (
     <main className="flex-1 bg-background">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* 页面标题 */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">个人中心</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              管理你的账号、试用状态和使用记录
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        {/* 页面标题 + 次级导航 */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground">个人中心</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            管理你的账号、试用状态和使用记录
+          </p>
+          <nav className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
             <Link
               href="/dashboard/history"
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+              className="text-muted-foreground transition-colors hover:text-foreground"
             >
               任务历史
             </Link>
             <Link
               href="/dashboard/orders"
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+              className="text-muted-foreground transition-colors hover:text-foreground"
             >
               订单管理
             </Link>
             <Link
               href="/dashboard/invite"
-              className="rounded-full border border-accent bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_80%,var(--background))]"
+              className="text-muted-foreground transition-colors hover:text-foreground"
             >
               邀请奖励
             </Link>
             <Link
               href="/dashboard/keys"
-              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+              className="text-muted-foreground transition-colors hover:text-foreground"
             >
               API Key 管理
             </Link>
             <Link
               href="/dashboard/api-docs"
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"            >
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
               API 文档
             </Link>
             <button
@@ -246,10 +256,62 @@ export default function DashboardPage() {
                 logout();
                 router.push("/login");
               }}
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+              className="text-muted-foreground transition-colors hover:text-foreground"
             >
               退出登录
             </button>
+          </nav>
+        </div>
+
+        {/* 个人资料卡片：页面顶部主视觉 */}
+        <div className="mb-6 rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
+          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+            <Avatar
+              src={user.avatar ?? undefined}
+              name={user.nickname || "用户"}
+              size="lg"
+              className="!h-20 !w-20 text-2xl sm:!h-24 sm:!w-24 sm:text-3xl"
+            />
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-2xl font-bold text-foreground">
+                {user.nickname || "用户"}
+              </h2>
+              <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                <Badge variant="primary">
+                  {user.subscriptionPlan || "免费版"}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  积分余额 {user.credits} 点
+                </span>
+              </div>
+              <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                <div>邮箱：{user.email || "未绑定"}</div>
+                <div>手机：{user.phone || "未绑定"}</div>
+                <div>
+                  注册时间：
+                  {user.createdAt ? formatDateOnly(user.createdAt) : "未知"}
+                </div>
+              </div>
+              <Link
+                href="/dashboard/profile"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                  />
+                </svg>
+                编辑资料
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -304,7 +366,7 @@ export default function DashboardPage() {
               onClick={() =>
                 setUpgradeReason(isTrialExpired ? "expired" : "limit_reached")
               }
-              className={`inline-flex flex-shrink-0 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-colors ${
+              className={`inline-flex flex-shrink-0 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors ${
                 isTrialExpired
                   ? "bg-destructive hover:bg-[color-mix(in_srgb,var(--destructive)_90%,#000)]"
                   : "bg-primary hover:bg-primary-hover"
@@ -315,38 +377,38 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* 顶部：用户信息卡片 + 订阅状态卡片 */}
+        {/* 账号信息卡片（次要区块）+ 订阅状态卡片 */}
         <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* 用户信息卡片 */}
-          <div className="rounded-[var(--radius)] border border-border bg-card p-6">
-            <h2 className="mb-4 text-base font-semibold text-foreground">
+          {/* 账号信息卡片：样式弱化 */}
+          <div className="rounded-[var(--radius)] border border-border bg-card p-4 sm:p-5">
+            <h3 className="mb-3 text-sm font-medium text-muted-foreground">
               账号信息
-            </h2>
-            <div className="space-y-3">
+            </h3>
+            <div className="space-y-2.5">
               {/* 邮箱 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">邮箱</span>
+                <span className="text-xs text-muted-foreground">邮箱</span>
                 <span className="text-sm font-medium text-foreground">
                   {user.email || "未绑定"}
                 </span>
               </div>
               {/* 手机号 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">手机号</span>
+                <span className="text-xs text-muted-foreground">手机号</span>
                 <span className="text-sm font-medium text-foreground">
                   {user.phone || "未绑定"}
                 </span>
               </div>
               {/* 注册时间 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">注册时间</span>
+                <span className="text-xs text-muted-foreground">注册时间</span>
                 <span className="text-sm font-medium text-foreground">
                   {formatDate(user.createdAt)}
                 </span>
               </div>
               {/* 套餐状态 */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">套餐状态</span>
+                <span className="text-xs text-muted-foreground">套餐状态</span>
                 {isSubscribed ? (
                   <span className="inline-flex items-center rounded-full bg-success/15 px-3 py-0.5 text-xs font-medium text-success">
                     已订阅
@@ -386,10 +448,18 @@ export default function DashboardPage() {
 
         {/* 使用记录列表 */}
         <div className="rounded-[var(--radius)] border border-border bg-card">
-          <div className="border-b border-border px-4 py-4 sm:px-6">
+          <div className="flex items-center justify-between border-b border-border px-4 py-4 sm:px-6">
             <h2 className="text-base font-semibold text-foreground">
               使用记录
             </h2>
+            {usageData && usageData.usageLogs.length > 0 && (
+              <Link
+                href="/dashboard/history"
+                className="text-sm font-medium text-primary hover:text-primary-hover"
+              >
+                查看全部 →
+              </Link>
+            )}
           </div>
 
           {usageLoading ? (
@@ -400,9 +470,9 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : usageData && usageData.usageLogs.length > 0 ? (
-            // 使用记录列表
+            // 使用记录列表（默认仅展示前 5 条）
             <div className="divide-y divide-border">
-              {usageData.usageLogs.map((log) => {
+              {usageData.usageLogs.slice(0, 5).map((log) => {
                 const status =
                   statusConfig[log.status] || statusConfig.pending;
                 return (

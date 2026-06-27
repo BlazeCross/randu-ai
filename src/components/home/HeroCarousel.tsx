@@ -119,7 +119,7 @@ export default function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="平台功能轮播"
     >
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-[1600px] px-4 lg:px-8">
         <div className="relative h-[280px] overflow-hidden rounded-[var(--radius-lg)] border border-border sm:h-[360px] lg:h-[440px]">
           {slides.map((slide, index) => (
             <Link

@@ -247,7 +247,7 @@ export default function TutorialPage() {
             <button
               type="button"
               onClick={handleReload}
-              className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+              className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
             >
               重新加载
             </button>

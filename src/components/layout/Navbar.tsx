@@ -8,6 +8,7 @@ import { useHeartbeat } from "@/hooks/useHeartbeat";
 import OnlineCount from "@/components/layout/OnlineCount";
 import NotificationBell from "@/components/layout/NotificationBell";
 import UserQuickMenu from "@/components/ui/UserQuickMenu";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 // 简单的 className 拼接工具（过滤 falsy 值）
 function cx(...args: Array<string | false | null | undefined>): string {
@@ -54,7 +55,7 @@ export default function Navbar() {
     pathname.startsWith("/academy/articles") ||
     pathname.startsWith("/academy/videos") ||
     pathname.startsWith("/tutorial");
-  if (isAppShellRoute) return null;
+  const headerHeight = isAppShellRoute ? "h-12" : "h-16";
 
   // 判断链接是否激活
   const isActive = (href: string) => {
@@ -80,7 +81,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <nav className={cx("mx-auto flex w-full items-center justify-between px-4 lg:px-8", headerHeight)}>
         {/* 左侧：Logo + 桌面端导航链接 */}
         <div className="flex items-center gap-8">
           {/* Logo */}
@@ -95,6 +96,7 @@ export default function Navbar() {
               alt="燃渡AI"
               className="h-8 w-auto invert dark:invert-0"
             />
+            <span className="hidden text-lg font-bold text-foreground sm:inline">燃渡Ai</span>
           </Link>
 
           {/* 桌面端导航链接 */}
@@ -172,6 +174,7 @@ export default function Navbar() {
         {/* 右侧：用户操作区 */}
         <div className="hidden items-center gap-3 md:flex">
           <OnlineCount />
+          <ThemeToggle />
           {loading ? (
             // 加载中：显示占位
             <div className="h-8 w-20 animate-pulse rounded-full bg-muted" />

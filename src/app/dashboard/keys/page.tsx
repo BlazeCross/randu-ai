@@ -819,7 +819,7 @@ export default function KeysPage() {
                     : handleReset(confirmAction.key.id)
                 }
                 disabled={actionKeyId === confirmAction.key.id}
-                className={`flex-1 rounded-full px-4 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50 ${
+                className={`flex-1 rounded-full px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors disabled:opacity-50 ${
                   confirmAction.type === "revoke"
                     ? "bg-destructive hover:bg-[color-mix(in_srgb,var(--destructive)_90%,#000)]"
                     : "bg-primary hover:bg-primary-hover"
@@ -964,7 +964,7 @@ export default function KeysPage() {
               <button
                 onClick={handleSaveLimit}
                 disabled={savingLimit || !!newWebhookSecret}
-                className="flex-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                className="flex-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:opacity-50"
               >
                 {savingLimit ? "保存中..." : "保存"}
               </button>

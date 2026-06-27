@@ -13,7 +13,7 @@ const quickLinks = [
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-foreground">
-      <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-6 py-12 sm:py-16 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* 公司信息 */}
           <div className="md:col-span-2">

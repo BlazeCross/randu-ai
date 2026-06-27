@@ -247,7 +247,7 @@ export default function ProfilePage() {
               {uploadingAvatar && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/40">
                   <svg
-                    className="h-6 w-6 animate-spin text-white"
+                    className="h-6 w-6 animate-spin text-primary-foreground"
                     fill="none"
                     viewBox="0 0 24 24"
                   >

@@ -264,7 +264,7 @@ export default function OrdersPage() {
                       isCurrent
                         ? "cursor-not-allowed bg-muted text-muted-foreground"
                         : paymentEnabled
-                          ? "bg-primary text-white hover:bg-primary-hover disabled:opacity-50"
+                          ? "bg-primary text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
                           : "cursor-not-allowed bg-muted text-muted-foreground"
                     }`}
                   >
@@ -320,7 +320,7 @@ export default function OrdersPage() {
                     }
                     className={`mt-3 w-full rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
                       paymentEnabled
-                        ? "bg-primary text-white hover:bg-primary-hover disabled:opacity-50"
+                        ? "bg-primary text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
                         : "cursor-not-allowed bg-muted text-muted-foreground"
                     }`}
                   >

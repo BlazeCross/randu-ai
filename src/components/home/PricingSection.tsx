@@ -52,7 +52,7 @@ const plans = [
 export default function PricingSection() {
   return (
     <section className="bg-background py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-6 lg:px-8">
         {/* 标题区 */}
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-primary">
@@ -80,7 +80,7 @@ export default function PricingSection() {
               {/* 推荐标签 */}
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white">
+                  <span className="inline-flex rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
                     最受欢迎
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export default function PricingSection() {
                 href={plan.href}
                 className={`mt-8 block rounded-full px-4 py-3 text-center text-sm font-semibold transition-colors ${
                   plan.highlighted
-                    ? "bg-primary text-white hover:bg-primary-hover"
+                    ? "rounded-full bg-primary text-primary-foreground hover:bg-primary-hover"
                     : "border border-border bg-background text-foreground hover:bg-muted"
                 }`}
               >

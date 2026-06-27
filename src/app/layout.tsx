@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import Navbar from "@/components/layout/Navbar";
 import UserOnboarding from "@/components/common/UserOnboarding";
 import CustomerServiceButton from "@/components/common/CustomerServiceButton";
+import ThemeProvider from "@/components/providers/ThemeProvider";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randu.ai";
@@ -77,22 +78,34 @@ export const viewport: Viewport = {
   ],
 };
 
+const themeScript = `(function() {
+  try {
+    var t = localStorage.getItem('randu-theme');
+    if (t === 'dark') document.documentElement.classList.add('dark');
+  } catch(e) {}
+})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="h-full antialiased">
+    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <ToastProvider>
-            <Navbar />
-            {children}
-            <UserOnboarding />
-            <CustomerServiceButton />
-          </ToastProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <Navbar />
+              {children}
+              <UserOnboarding />
+              <CustomerServiceButton />
+            </ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
