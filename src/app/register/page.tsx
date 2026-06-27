@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, type FormEvent } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,7 +13,8 @@ type InviteStatus =
   | { state: "valid"; inviterNickname: string | null }
   | { state: "invalid" };
 
-export default function RegisterPage() {
+// 注册页面内容（使用 useSearchParams，必须包裹在 Suspense 边界中）
+function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
@@ -499,5 +500,15 @@ export default function RegisterPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+// 注册页面默认导出：用 Suspense 包裹使用 useSearchParams 的子组件
+// Next.js 16 生产构建要求 useSearchParams 必须在 Suspense 边界内
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterContent />
+    </Suspense>
   );
 }
