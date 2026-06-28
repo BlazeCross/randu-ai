@@ -45,12 +45,8 @@ services:
 
   # ---------- Next.js 应用 ----------
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        # 构建时注入的公开变量
-        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    # 国内服务器 docker build 的 npm ci 经常卡死，改用 node:20-alpine 镜像 + volume mount 主机代码
+    image: node:20-alpine
     container_name: randu-app
     restart: unless-stopped
     depends_on:
@@ -58,8 +54,6 @@ services:
         condition: service_healthy
     environment:
       # 数据库连接（指向 db 容器）
-      # connection_limit 限制 Prisma 连接池大小，避免 2核4G 下超 PostgreSQL max_connections
-      # pool_timeout 获取连接超时（秒），避免请求无限堆积
       DATABASE_URL: "postgresql://${POSTGRES_USER:-randu}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-randu_ai}?connection_limit=5&pool_timeout=10&schema=public"
       # Coze API
       COZE_API_TOKEN: ${COZE_API_TOKEN:?请在.env.production中设置COZE_API_TOKEN}
@@ -79,6 +73,16 @@ services:
       # 应用配置
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       TZ: Asia/Shanghai
+      # Prisma 引擎镜像（国内服务器无法访问 binaries.prisma.sh，使用镜像源）
+      PRISMA_ENGINES_MIRROR: https://registry.npmmirror.com/-/binary/prisma
+    volumes:
+      # 挂载主机代码到容器（不重新构建镜像，避免 npm ci 卡死）
+      - ./:/app
+      # 排除主机 node_modules，使用容器内独立的 node_modules（避免权限/平台问题）
+      - /app/node_modules
+    working_dir: /app
+    # 启动命令：安装 OpenSSL + 安装依赖 + 生成 Prisma Client + 构建 + 启动
+    command: sh -c "apk add --no-cache openssl && npm config set registry https://registry.npmmirror.com && npm install --no-audit --no-fund && npx prisma generate && npm run build && npm start"
     ports:
       # 对外暴露 3000 端口（后续可用 Nginx 反向代理）
       - "3000:3000"
