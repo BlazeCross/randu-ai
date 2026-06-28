@@ -66,9 +66,11 @@ COPY --from=builder /app/public ./public
 # 复制 Prisma 相关文件（运行迁移需要）
 COPY --from=builder /app/prisma ./prisma
 # 复制 Prisma Client 和 CLI（包含 wasm 引擎文件）
+# 注意：@prisma/config 依赖 effect 包，需一并复制到运行镜像
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/effect ./node_modules/effect
 COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
 
 # 创建启动脚本（数据库 schema 已通过 SQL 脚本在主机同步，容器启动时不再迁移）
