@@ -463,7 +463,7 @@ export default function AdminUserDetailPage() {
                       value={planName}
                       onChange={(e) => setPlanName(e.target.value)}
                       placeholder="输入套餐名称（可留空）"
-                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -477,7 +477,7 @@ export default function AdminUserDetailPage() {
                   <button
                     onClick={handleSubmitPlan}
                     disabled={actionLoading}
-                    className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                    className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] disabled:opacity-50"
                   >
                     确定
                   </button>
@@ -501,7 +501,7 @@ export default function AdminUserDetailPage() {
                       step={1}
                       value={creditsInput}
                       onChange={(e) => setCreditsInput(e.target.value)}
-                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -553,7 +553,7 @@ export default function AdminUserDetailPage() {
                   <button
                     onClick={handleSubmitCredits}
                     disabled={actionLoading}
-                    className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                    className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] disabled:opacity-50"
                   >
                     确定
                   </button>
@@ -578,7 +578,7 @@ export default function AdminUserDetailPage() {
                           e.target.value as UserRoleLiteral,
                         )
                       }
-                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
                     >
                       <option value="user">普通用户</option>
                       <option value="admin">管理员</option>
@@ -635,7 +635,7 @@ export default function AdminUserDetailPage() {
       </div>
 
       {/* 卡片1 - 基本信息 */}
-      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         <h2 className="mb-4 text-sm font-semibold text-foreground">基本信息</h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           {detail.avatar ? (
@@ -702,7 +702,7 @@ export default function AdminUserDetailPage() {
       </section>
 
       {/* 卡片2 - 套餐与积分 */}
-      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         <h2 className="mb-4 text-sm font-semibold text-foreground">
           套餐与积分
         </h2>
@@ -732,7 +732,7 @@ export default function AdminUserDetailPage() {
       </section>
 
       {/* 卡片3 - 使用统计 */}
-      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         <h2 className="mb-4 text-sm font-semibold text-foreground">使用统计</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <StatCell label="使用记录数" value={detail.usageLogCount} />
@@ -747,7 +747,7 @@ export default function AdminUserDetailPage() {
       </section>
 
       {/* 卡片4 - 操作区 */}
-      <section className="rounded-[var(--radius)] border border-border bg-card p-6">
+      <section className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         <h2 className="mb-4 text-sm font-semibold text-foreground">
           管理操作
         </h2>
@@ -768,14 +768,14 @@ export default function AdminUserDetailPage() {
               <button
                 onClick={() => openModal("plan")}
                 disabled={actionLoading}
-                className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] disabled:opacity-50"
               >
                 修改套餐
               </button>
               <button
                 onClick={() => openModal("credits")}
                 disabled={actionLoading}
-                className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+                className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] disabled:opacity-50"
               >
                 修改余额
               </button>
@@ -851,7 +851,7 @@ function StatCell({
     <div className="rounded-[var(--radius-sm)] border border-border bg-background p-4">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p
-        className={`mt-1 text-2xl font-semibold ${
+        className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${
           accent === "success" ? "text-success-700" : "text-foreground"
         }`}
       >

@@ -139,7 +139,7 @@ export default function WorkspacePage() {
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="搜索工作流..."
-            className="w-full rounded-[var(--radius-sm)] border border-transparent bg-background py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none"
+            className="w-full rounded-[var(--radius-sm)] border border-transparent bg-background py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           />
         </div>
       }
@@ -176,7 +176,7 @@ export default function WorkspacePage() {
             {Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
-                className="animate-pulse rounded-[var(--radius)] border border-border bg-card p-6"
+                className="animate-shimmer rounded-[var(--radius)] border border-border bg-card p-6"
               >
                 <div className="mb-4 h-12 w-12 rounded-[var(--radius-lg)] bg-muted" />
                 <div className="mb-3 h-5 w-2/3 rounded bg-muted" />
@@ -215,10 +215,10 @@ export default function WorkspacePage() {
             {workflows.map((workflow) => (
               <article
                 key={workflow.id}
-                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))]"
+                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all duration-300 hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
               >
                 {/* 图标 */}
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-accent text-2xl transition-colors group-hover:bg-accent">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-gradient-to-br from-accent to-primary/8 text-2xl group-hover:scale-110 group-hover:shadow-[var(--shadow-sm)] transition-all duration-300">
                   {workflow.icon || "🤖"}
                 </div>
 
@@ -243,7 +243,7 @@ export default function WorkspacePage() {
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/workspace/${workflow.id}/use`}
-                    className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+                    className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 text-white shadow-[var(--shadow-xs)] px-4 py-2 text-sm font-medium transition-colors hover:bg-primary-hover"
                   >
                     使用
                   </Link>

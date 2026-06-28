@@ -105,7 +105,7 @@ export default function ExportPage() {
       </div>
 
       {/* 日期筛选 */}
-      <div className="rounded-[var(--radius)] border border-border bg-card p-5">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-5 shadow-[var(--shadow-xs)]">
         <h2 className="mb-3 text-sm font-semibold text-foreground">
           时间范围（可选）
         </h2>
@@ -118,7 +118,7 @@ export default function ExportPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm text-foreground outline-none focus:border-primary-500"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:shadow-[var(--glow-primary)] outline-none transition-all duration-200"
             />
           </div>
           <div>
@@ -129,7 +129,7 @@ export default function ExportPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm text-foreground outline-none focus:border-primary-500"
+              className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:shadow-[var(--glow-primary)] outline-none transition-all duration-200"
             />
           </div>
           {(startDate || endDate) && (
@@ -160,7 +160,7 @@ export default function ExportPage() {
         {EXPORT_OPTIONS.map((opt) => (
           <div
             key={opt.type}
-            className="flex flex-col rounded-[var(--radius)] border border-border bg-card p-5"
+            className="flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 shadow-[var(--shadow-xs)]"
           >
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-primary-50 text-primary">
               {opt.icon}
@@ -174,7 +174,7 @@ export default function ExportPage() {
             <button
               onClick={() => handleDownload(opt.type)}
               disabled={downloading !== null}
-              className="mt-4 w-full rounded-[var(--radius-sm)] bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+              className="mt-4 w-full rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-3 py-2 text-xs font-semibold text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-colors disabled:opacity-50"
             >
               {downloading === opt.type
                 ? "导出中..."
@@ -187,7 +187,7 @@ export default function ExportPage() {
       </div>
 
       {/* 说明 */}
-      <div className="rounded-[var(--radius)] border border-border bg-background p-5 text-xs text-muted-foreground">
+      <div className="rounded-[var(--radius)] border border-border bg-background p-5 text-xs text-muted-foreground shadow-[var(--shadow-xs)]">
         <p className="font-medium text-foreground">导出说明：</p>
         <ul className="mt-2 space-y-1">
           <li>· CSV 文件含 UTF-8 BOM 头，Excel 打开时中文不会乱码</li>

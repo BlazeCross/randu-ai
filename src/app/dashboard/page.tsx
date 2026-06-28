@@ -223,31 +223,31 @@ export default function DashboardPage() {
           <nav className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
             <Link
               href="/dashboard/history"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
             >
               任务历史
             </Link>
             <Link
               href="/dashboard/orders"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
             >
               订单管理
             </Link>
             <Link
               href="/dashboard/invite"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
             >
               邀请奖励
             </Link>
             <Link
               href="/dashboard/keys"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
             >
               API Key 管理
             </Link>
             <Link
               href="/dashboard/api-docs"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
             >
               API 文档
             </Link>
@@ -264,7 +264,8 @@ export default function DashboardPage() {
         </div>
 
         {/* 个人资料卡片：页面顶部主视觉 */}
-        <div className="mb-6 rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
+        <div className="mb-6 relative overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary-400 to-primary/50" aria-hidden />
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
             <Avatar
               src={user.avatar ?? undefined}
@@ -294,7 +295,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/dashboard/profile"
-                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all duration-200 hover:shadow-[var(--glow-primary)] hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
               >
                 <svg
                   className="h-4 w-4"
@@ -318,12 +319,15 @@ export default function DashboardPage() {
         {/* 试用过期/次数用完提示横幅：已订阅用户不显示 */}
         {!isSubscribed && (isTrialExpired || trialLimitReached) && (
           <div
-            className={`mb-6 flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border p-5 sm:flex-row sm:items-center ${
+            className={`mb-6 relative overflow-hidden flex flex-col items-start justify-between gap-4 rounded-[var(--radius)] border p-5 sm:flex-row sm:items-center ${
               isTrialExpired
                 ? "border-destructive/30 bg-destructive/10"
                 : "border-accent bg-accent"
             }`}
           >
+            {isTrialExpired && (
+              <div className="absolute left-0 inset-y-0 w-1 bg-gradient-to-b from-destructive to-destructive/50" />
+            )}
             <div className="flex items-start gap-3">
               <svg
                 className={`mt-0.5 h-5 w-5 flex-shrink-0 ${
@@ -479,7 +483,7 @@ export default function DashboardPage() {
                   <Link
                     key={log.id}
                     href="/dashboard/history"
-                    className="flex items-center justify-between px-4 py-4 transition-colors hover:bg-muted sm:px-6"
+                    className="flex items-center justify-between px-4 py-4 transition-all duration-150 hover:bg-muted/80 sm:px-6"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">

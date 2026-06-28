@@ -673,7 +673,7 @@ export default function ChatPage() {
           <div className="p-3">
             <button
               onClick={handleClear}
-              className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
+              className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-3 py-2.5 text-sm font-medium text-primary-foreground shadow-[var(--shadow-sm)] transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
             >
               <svg
                 className="h-4 w-4"
@@ -707,7 +707,7 @@ export default function ChatPage() {
                   className={cx(
                     "group relative flex cursor-pointer items-start gap-2 rounded-[var(--radius-sm)] px-3 py-2 transition-colors",
                     conv.id === currentId
-                      ? "bg-accent text-accent-foreground"
+                      ? "border-l-2 border-primary bg-accent text-accent-foreground pl-[10px]"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
@@ -797,7 +797,7 @@ export default function ChatPage() {
             {/* 空状态：欢迎语 */}
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-accent">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-gradient-to-br from-accent to-primary/10">
                   <svg
                     className="h-8 w-8 text-primary"
                     fill="none"
@@ -824,7 +824,7 @@ export default function ChatPage() {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex gap-3 ${
+                    className={`animate-message-in flex gap-3 ${
                       msg.role === "user" ? "flex-row-reverse" : ""
                     }`}
                   >
@@ -847,8 +847,8 @@ export default function ChatPage() {
                       <div
                         className={`rounded-[var(--radius)] px-4 py-2.5 text-sm ${
                           msg.role === "user"
-                            ? "bg-primary text-white"
-                            : "bg-card text-foreground border border-border"
+                            ? "bg-gradient-to-br from-primary to-primary-600 text-white shadow-[var(--shadow-sm)]"
+                            : "bg-card text-foreground border border-border/60 shadow-[var(--shadow-xs)]"
                         }`}
                       >
                         {/* 图片类型消息 */}
@@ -1034,7 +1034,7 @@ export default function ChatPage() {
         {/* 输入区 */}
         <div className="flex-none border-t border-border bg-background">
           <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
-            <div className="flex items-end gap-2 border border-border rounded-[22px] bg-card p-3.5 pb-2.5 transition-all focus-within:border-[var(--ring)] focus-within:ring-[3px] focus-within:ring-[color-mix(in_srgb,var(--ring)_18%,transparent)]">
+            <div className="flex items-end gap-2 border border-border rounded-[22px] bg-card p-3.5 pb-2.5 transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-[var(--glow-primary)]">
               {/* 隐藏的文件上传 input */}
               <input
                 ref={fileInputRef}
@@ -1145,7 +1145,7 @@ export default function ChatPage() {
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || sending}
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white hover:shadow-[var(--shadow-sm)] hover:scale-105 active:scale-95 transition-all duration-150 disabled:opacity-50"
                 aria-label="发送"
               >
                 {sending ? (

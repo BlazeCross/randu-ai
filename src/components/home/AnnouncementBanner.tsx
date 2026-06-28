@@ -89,7 +89,7 @@ export default function AnnouncementBanner() {
     : {};
 
   return (
-    <div className="border-b border-border bg-accent">
+    <div className="border-b border-border bg-gradient-to-r from-accent via-accent to-accent/80">
       <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-2.5 lg:px-8">
         {/* 左侧喇叭图标 */}
         <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-muted text-accent-foreground">
@@ -146,7 +146,7 @@ export default function AnnouncementBanner() {
           type="button"
           onClick={handleDismiss}
           aria-label="关闭公告"
-          className="flex-shrink-0 rounded-full p-1 text-primary transition-colors hover:bg-muted hover:text-accent-foreground"
+          className="flex-shrink-0 rounded-full p-1 text-primary transition-colors hover:bg-muted hover:text-accent-foreground hover:scale-110 transition-all duration-200"
         >
           <svg
             className="h-3.5 w-3.5"

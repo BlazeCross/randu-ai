@@ -73,14 +73,14 @@ export default function PricingSection() {
               key={plan.name}
               className={`relative rounded-[var(--radius)] border bg-card p-6 transition-all sm:p-8 ${
                 plan.highlighted
-                  ? "border-primary hover:border-primary/30"
+                  ? "shadow-[0_0_0_1px_var(--primary)] hover:shadow-[0_0_0_1px_var(--primary),var(--shadow-md)] hover:-translate-y-1 scale-[1.01] transition-all duration-300"
                   : "border-border hover:border-primary/30"
               }`}
             >
               {/* 推荐标签 */}
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
+                  <span className="inline-flex rounded-full bg-gradient-to-r from-primary to-primary-400 px-4 py-1 text-xs font-semibold text-white shadow-[var(--shadow-sm)]">
                     最受欢迎
                   </span>
                 </div>
@@ -105,8 +105,8 @@ export default function PricingSection() {
                 href={plan.href}
                 className={`mt-8 block rounded-full px-4 py-3 text-center text-sm font-semibold transition-colors ${
                   plan.highlighted
-                    ? "rounded-full bg-primary text-primary-foreground hover:bg-primary-hover"
-                    : "border border-border bg-background text-foreground hover:bg-muted"
+                    ? "rounded-full bg-gradient-to-r from-primary to-primary-400 text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:brightness-110 transition-all duration-200"
+                    : "border border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent/20 transition-all duration-200"
                 }`}
               >
                 {plan.cta}
@@ -120,7 +120,7 @@ export default function PricingSection() {
                     className="flex items-start gap-3 text-sm text-muted-foreground"
                   >
                     <svg
-                      className="mt-0.5 h-5 w-5 flex-shrink-0 text-success-500"
+                      className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

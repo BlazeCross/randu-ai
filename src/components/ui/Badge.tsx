@@ -11,11 +11,12 @@ type BadgeVariant =
   | "primary"
   | "success"
   | "danger"
-  | "outline";
+  | "outline"
+  | "gradient";
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement> {
-  /** 变体：default 默认灰 / primary 品牌蓝 / success 绿 / danger 红 / outline 描边 */
+  /** 变体：default 默认灰 / primary 品牌蓝 / success 绿 / danger 红 / outline 描边 / gradient 渐变 */
   variant?: BadgeVariant;
   /** 是否显示圆点前缀 */
   dot?: boolean;
@@ -23,18 +24,19 @@ export interface BadgeProps
 
 // 各变体样式
 const BADGE_STYLES: Record<BadgeVariant, string> = {
-  default: "bg-muted text-foreground",
-  primary: "bg-accent text-accent-foreground",
+  default: "bg-muted text-foreground shadow-[var(--shadow-xs)]",
+  primary: "bg-accent text-accent-foreground shadow-[var(--shadow-xs)]",
   success: "bg-success/15 text-success",
   danger: "bg-destructive/15 text-destructive",
   outline: "border border-border text-foreground",
+  gradient: "bg-gradient-to-r from-primary to-primary-400 text-white shadow-[var(--shadow-xs)]",
 };
 
 /**
  * Badge 标签
  *
  * 基于 Doubao 设计系统的胶囊标签，用于状态标记与分类。
- * 支持 5 种变体与可选圆点前缀。
+ * 支持 6 种变体与可选圆点前缀。
  */
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   (

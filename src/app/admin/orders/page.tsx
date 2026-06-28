@@ -174,12 +174,12 @@ export default function AdminOrdersPage() {
           return (
             <div
               key={s}
-              className="rounded-[var(--radius-sm)] border border-border bg-card p-4"
+              className="rounded-[var(--radius-sm)] border border-border bg-card p-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-200"
             >
               <p className="text-xs font-medium text-muted-foreground">
                 {config.label}
               </p>
-              <p className={`mt-1 text-2xl font-bold ${config.text}`}>
+              <p className={`mt-1 font-mono text-2xl font-bold tabular-nums ${config.text}`}>
                 {stats[s] ?? 0}
               </p>
             </div>
@@ -188,7 +188,7 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* 筛选区 */}
-      <div className="rounded-[var(--radius)] border border-border bg-card p-4">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {/* 状态筛选 */}
           <div>
@@ -198,7 +198,7 @@ export default function AdminOrdersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             >
               <option value="">全部状态</option>
               <option value="pending">待支付</option>
@@ -216,7 +216,7 @@ export default function AdminOrdersPage() {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             >
               <option value="">全部类型</option>
               <option value="subscription">套餐订阅</option>
@@ -234,14 +234,14 @@ export default function AdminOrdersPage() {
               value={orderNoSearch}
               onChange={(e) => setOrderNoSearch(e.target.value)}
               placeholder="输入订单号"
-              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
         </div>
       </div>
 
       {/* 订单列表 */}
-      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card shadow-[var(--shadow-xs)]">
         {error && (
           <div className="border-b border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6">
             {error}
@@ -277,7 +277,7 @@ export default function AdminOrdersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-border">
-              <thead className="bg-background">
+              <thead className="bg-muted/50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground sm:px-6">
                     订单
@@ -311,7 +311,7 @@ export default function AdminOrdersPage() {
                     text: "text-muted-foreground",
                   };
                   return (
-                    <tr key={order.id} className="hover:bg-muted">
+                    <tr key={order.id} className="hover:bg-muted/30 transition-colors duration-100">
                       <td className="px-4 py-3 text-sm sm:px-6">
                         <div className="font-mono text-xs text-foreground">
                           {order.orderNo}
@@ -343,7 +343,7 @@ export default function AdminOrdersPage() {
                           {type.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-foreground">
+                      <td className="px-4 py-3 text-sm font-mono font-semibold tabular-nums text-foreground">
                         ¥{order.amount.toFixed(2)}
                       </td>
                       <td className="px-4 py-3">

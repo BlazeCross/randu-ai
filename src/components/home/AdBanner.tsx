@@ -8,8 +8,8 @@ const slides = [
     description: "注册即享全部工作流7天免费体验，无门槛开启AI提效之旅",
     badge: "限时活动",
     gradient: "from-primary-600 to-primary-800",
-    badgeBg: "bg-success-400",
-    badgeText: "text-primary-900",
+    badgeBg: "bg-gradient-to-r from-success-400 to-success-500 shadow-[var(--shadow-xs)]",
+    badgeText: "text-white",
   },
   {
     title: "百款工作流持续更新",
@@ -52,7 +52,7 @@ export default function AdBanner() {
   return (
     <section className="bg-background py-10 sm:py-16">
       <div className="mx-auto max-w-[1600px] px-4 lg:px-8">
-        <div className="relative overflow-hidden rounded-[var(--radius-lg)]">
+        <div className="relative overflow-hidden rounded-2xl shadow-[var(--shadow-md)]">
           {/* 轮播容器 */}
           <div className="relative h-64 sm:h-72 lg:h-80">
             {slides.map((slide, index) => (
@@ -86,6 +86,10 @@ export default function AdBanner() {
               </div>
             ))}
           </div>
+
+          {/* 浮动光斑装饰 */}
+          <div className="pointer-events-none absolute right-10 top-1/4 h-32 w-32 rounded-full bg-white/8 blur-2xl animate-bounce" style={{animationDuration:'6s'}} />
+          <div className="pointer-events-none absolute left-1/4 bottom-1/4 h-24 w-24 rounded-full bg-white/5 blur-xl animate-bounce" style={{animationDuration:'8s',animationDelay:'1s'}} />
 
           {/* 左箭头 */}
           <button

@@ -96,7 +96,7 @@ export default function AdminRetentionPage() {
       </nav>
 
       {/* 日期范围选择器 */}
-      <div className="rounded-[var(--radius)] border border-border bg-card p-4">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">
@@ -105,7 +105,7 @@ export default function AdminRetentionPage() {
             <select
               value={days}
               onChange={(e) => setDays(Number(e.target.value))}
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             >
               {DAYS_OPTIONS.map((d) => (
                 <option key={d} value={d}>
@@ -116,7 +116,7 @@ export default function AdminRetentionPage() {
           </div>
           <button
             onClick={fetchRetention}
-            className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
+            className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-colors"
           >
             查询
           </button>
@@ -139,7 +139,7 @@ export default function AdminRetentionPage() {
       </div>
 
       {/* Cohort 留存表格 */}
-      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card shadow-[var(--shadow-sm)]">
         <div className="border-b border-border px-4 py-3 sm:px-6">
           <h2 className="text-sm font-semibold text-foreground">
             Cohort 留存矩阵
@@ -181,17 +181,17 @@ export default function AdminRetentionPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-sm">
               <thead>
-                <tr className="border-b border-border bg-background">
-                  <th className="sticky left-0 z-10 bg-background px-3 py-2.5 text-left font-medium text-muted-foreground">
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="sticky left-0 z-10 bg-muted/50 px-3 py-2.5 text-left text-xs uppercase tracking-wider font-medium text-muted-foreground">
                     注册日期
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">
+                  <th className="px-3 py-2.5 text-right text-xs uppercase tracking-wider font-medium text-muted-foreground">
                     注册人数
                   </th>
                   {RETENTION_COLUMNS.map((col) => (
                     <th
                       key={col.key}
-                      className="px-3 py-2.5 text-center font-medium text-muted-foreground"
+                      className="px-3 py-2.5 text-center text-xs uppercase tracking-wider font-medium text-muted-foreground"
                     >
                       {col.label}
                     </th>

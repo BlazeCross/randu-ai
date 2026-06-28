@@ -319,7 +319,7 @@ export default function ProfilePage() {
                 }}
                 maxLength={NICKNAME_MAX_LENGTH}
                 placeholder="请输入昵称"
-                className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                className="w-full rounded-[var(--radius-sm)] border border-border px-4 py-2.5 text-sm text-foreground outline-none focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 {nickname.length}/{NICKNAME_MAX_LENGTH} 字
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                 !nickname.trim() ||
                 (nicknameDirty && nickname.trim() === (user.nickname ?? ""))
               }
-              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-full bg-gradient-to-r from-primary to-primary-500 px-6 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {savingNickname ? "保存中..." : "保存"}
             </button>

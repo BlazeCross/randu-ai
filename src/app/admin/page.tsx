@@ -95,12 +95,12 @@ function StatCard({
   const styles = ACCENT_STYLES[accent];
   return (
     <div
-      className={`relative overflow-hidden rounded-[var(--radius)] border border-border bg-gradient-to-br ${styles.bg} p-5 transition-shadow hover:shadow-md`}
+      className={`relative overflow-hidden rounded-[var(--radius)] border border-border bg-gradient-to-br ${styles.bg} p-5 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-200`}
     >
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
+          <p className="mt-2 font-mono text-3xl font-bold tabular-nums text-foreground">{value}</p>
           {subtitle && (
             <p className="mt-1 text-xs text-muted-foreground">
               {highlight ? (
@@ -114,7 +114,7 @@ function StatCard({
           )}
         </div>
         <div
-          className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] ${styles.iconBg} ${styles.iconText}`}
+          className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-br from-accent to-primary/8 ${styles.iconText}`}
         >
           {icon}
         </div>
@@ -457,7 +457,7 @@ export default function AdminHomePage() {
       )}
 
       {/* 提示信息 */}
-      <div className="rounded-[var(--radius-sm)] border border-border bg-card p-4">
+      <div className="rounded-[var(--radius-sm)] border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
         <div className="flex items-start gap-3">
           <svg
             className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground"

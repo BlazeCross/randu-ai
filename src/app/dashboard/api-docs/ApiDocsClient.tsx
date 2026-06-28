@@ -175,7 +175,7 @@ function OperationCard({
   const fullUrl = `${baseUrl}${path}`;
 
   return (
-    <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+    <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card hover:shadow-[var(--shadow-sm)] transition-all duration-200">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -461,7 +461,7 @@ Content-Type: application/json`}</code>
               <div className="mb-6 flex flex-wrap gap-2">
                 <button
                   onClick={() => setActiveTag("all")}
-                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                     activeTag === "all"
                       ? "bg-primary text-primary-foreground"
                       : "border border-border bg-card text-foreground hover:bg-muted"
@@ -473,7 +473,7 @@ Content-Type: application/json`}</code>
                   <button
                     key={tag.name}
                     onClick={() => setActiveTag(tag.name)}
-                    className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                       activeTag === tag.name
                         ? "bg-primary text-white"
                         : "border border-border bg-card text-foreground hover:bg-muted"

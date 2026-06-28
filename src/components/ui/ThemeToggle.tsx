@@ -19,12 +19,12 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label={isDark ? "切换到白天模式" : "切换到暗色模式"}
-      className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground hover:rotate-12"
     >
       {isDark ? (
         // 太阳图标
         <svg
-          className="h-5 w-5"
+          className="h-5 w-5 transition-transform duration-300"
           fill="none"
           stroke="currentColor"
           strokeWidth={1.7}
@@ -39,7 +39,7 @@ export default function ThemeToggle() {
       ) : (
         // 月亮图标（含加载中占位）
         <svg
-          className="h-5 w-5"
+          className="h-5 w-5 transition-transform duration-300"
           fill="none"
           stroke="currentColor"
           strokeWidth={1.7}

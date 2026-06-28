@@ -264,10 +264,10 @@ export default function WorkflowForm({
               value={formData.name}
               onChange={(e) => updateField("name", e.target.value)}
               placeholder="如 服装换装视频生成"
-              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200 ${
                 errors.name
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-border focus:border-primary focus:ring-primary"
+                  : "border-border"
               }`}
             />
             {errors.name && (
@@ -285,10 +285,10 @@ export default function WorkflowForm({
               value={formData.category}
               onChange={(e) => updateField("category", e.target.value)}
               placeholder="如 视频生成"
-              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200 ${
                 errors.category
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-border focus:border-primary focus:ring-primary"
+                  : "border-border"
               }`}
             />
             {errors.category && (
@@ -306,7 +306,7 @@ export default function WorkflowForm({
               onChange={(e) => updateField("description", e.target.value)}
               placeholder="简要描述工作流功能..."
               rows={3}
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
         </div>
@@ -329,7 +329,7 @@ export default function WorkflowForm({
                   e.target.value as WorkflowFormData["source"],
                 )
               }
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             >
               <option value="coze">Coze 工作流</option>
               <option value="volcengine">火山方舟</option>
@@ -354,10 +354,10 @@ export default function WorkflowForm({
                   ? "如 7654310872097488946"
                   : "如 ep-20260626151538-ktdhg"
               }
-              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200 ${
                 errors.cozeWorkflowId
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-border focus:border-primary focus:ring-primary"
+                  : "border-border"
               }`}
             />
             {errors.cozeWorkflowId && (
@@ -376,10 +376,10 @@ export default function WorkflowForm({
                 value={formData.volcModel}
                 onChange={(e) => updateField("volcModel", e.target.value)}
                 placeholder="如 ep-20260626151538-ktdhg"
-                className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200 ${
                   errors.volcModel
                     ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : "border-border focus:border-primary focus:ring-primary"
+                    : "border-border"
                 }`}
               />
               {errors.volcModel && (
@@ -401,7 +401,7 @@ export default function WorkflowForm({
                   e.target.value as WorkflowFormData["outputType"],
                 )
               }
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             >
               <option value="text">文本</option>
               <option value="image">图片</option>
@@ -421,10 +421,10 @@ export default function WorkflowForm({
               onChange={(e) =>
                 updateField("creditsRequired", Number(e.target.value) || 0)
               }
-              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+              className={`w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200 ${
                 errors.creditsRequired
                   ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-border focus:border-primary focus:ring-primary"
+                  : "border-border"
               }`}
             />
             {errors.creditsRequired && (
@@ -445,7 +445,7 @@ export default function WorkflowForm({
                   e.target.value as WorkflowFormData["status"],
                 )
               }
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             >
               <option value="active">上架</option>
               <option value="inactive">下架</option>
@@ -463,7 +463,7 @@ export default function WorkflowForm({
               onChange={(e) =>
                 updateField("sortOrder", Number(e.target.value) || 0)
               }
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
 
@@ -477,7 +477,7 @@ export default function WorkflowForm({
               value={formData.feishuDocUrl}
               onChange={(e) => updateField("feishuDocUrl", e.target.value)}
               placeholder="https://..."
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
         </div>
@@ -561,7 +561,7 @@ export default function WorkflowForm({
         <button
           type="submit"
           disabled={submitting || coverUploading}
-          className="rounded-[var(--radius-sm)] bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+          className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-6 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-colors disabled:opacity-50"
         >
           {submitting ? "提交中..." : submitLabel}
         </button>

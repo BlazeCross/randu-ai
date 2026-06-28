@@ -159,7 +159,7 @@ export default function AdminNotificationsPage() {
       </nav>
 
       {/* 创建公告卡片 */}
-      <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         <h2 className="mb-4 text-base font-semibold text-foreground">
           发布新公告
         </h2>
@@ -187,7 +187,7 @@ export default function AdminNotificationsPage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="如：系统维护通知"
               maxLength={100}
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
             <p className="mt-1 text-xs text-muted-foreground">
               {title.length}/100 字
@@ -205,7 +205,7 @@ export default function AdminNotificationsPage() {
               placeholder="公告详细内容..."
               rows={4}
               maxLength={1000}
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
             <p className="mt-1 text-xs text-muted-foreground">
               {content.length}/1000 字
@@ -222,7 +222,7 @@ export default function AdminNotificationsPage() {
               value={link}
               onChange={(e) => setLink(e.target.value)}
               placeholder="https://..."
-              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function AdminNotificationsPage() {
             <button
               type="submit"
               disabled={submitting || !title.trim()}
-              className="rounded-[var(--radius-sm)] bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+              className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-5 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-colors disabled:opacity-50"
             >
               {submitting ? "发送中..." : "发布公告"}
             </button>
@@ -243,7 +243,7 @@ export default function AdminNotificationsPage() {
       </div>
 
       {/* 公告列表 */}
-      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">
             历史公告

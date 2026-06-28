@@ -240,8 +240,8 @@ function ToastItemView({
 
   return (
     <div
-      className={`animate-fade-in pointer-events-auto flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg ${styles.wrapper} ${
-        exiting ? "opacity-0 transition-opacity duration-150" : ""
+      className={`animate-toast-in backdrop-blur-lg border-[var(--glass-border)] pointer-events-auto flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg ${styles.wrapper} ${
+        exiting ? "animate-[toast-out_150ms_var(--ease-in)_forwards]" : ""
       }`}
       role="alert"
     >

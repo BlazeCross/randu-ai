@@ -58,13 +58,18 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md">
+    <main className="relative flex flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -left-20 bottom-20 h-60 w-60 rounded-full bg-primary/3 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.02]" style={{backgroundImage:"linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",backgroundSize:"48px 48px"}} />
+      </div>
+      <div className="relative w-full max-w-md">
         {/* 品牌 Logo */}
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-bold tracking-tight">
-              <span className="text-foreground font-bold">
+              <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent font-bold">
                 燃渡AI
               </span>
             </h1>
@@ -75,7 +80,7 @@ export default function LoginPage() {
         </div>
 
         {/* 登录卡片 */}
-        <div className="rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-md)] sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 账号输入框 */}
             <div>
@@ -92,7 +97,7 @@ export default function LoginPage() {
                 onChange={(e) => setAccount(e.target.value)}
                 placeholder="邮箱或手机号"
                 autoComplete="username"
-                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
               />
             </div>
 
@@ -112,7 +117,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="请输入密码"
                   autoComplete="current-password"
-                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
                 />
                 <button
                   type="button"
@@ -171,7 +176,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-base font-semibold text-primary-foreground transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center rounded-full bg-gradient-to-r from-primary to-primary-500 px-4 py-3 text-base font-semibold text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:brightness-110 active:scale-[0.98] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>

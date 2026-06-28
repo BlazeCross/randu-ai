@@ -122,7 +122,7 @@ export default function AdminCostPage() {
       </nav>
 
       {/* 日期范围选择器 */}
-      <div className="rounded-[var(--radius)] border border-border bg-card p-4">
+      <div className="rounded-[var(--radius)] border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">
@@ -132,7 +132,7 @@ export default function AdminCostPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
           <div>
@@ -143,12 +143,12 @@ export default function AdminCostPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-[var(--radius-sm)] border border-border bg-card px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
             />
           </div>
           <button
             onClick={fetchCost}
-            className="rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
+            className="rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-colors"
           >
             查询
           </button>
@@ -167,12 +167,12 @@ export default function AdminCostPage() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="rounded-[var(--radius-sm)] border border-border bg-card p-4"
+            className="rounded-[var(--radius-sm)] border border-border bg-card p-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-200"
           >
             <p className="text-xs font-medium text-muted-foreground">
               {card.label}
             </p>
-            <p className={`mt-1 text-2xl font-bold ${card.color}`}>
+            <p className={`mt-1 font-mono text-2xl font-bold tabular-nums ${card.color}`}>
               {loading ? "—" : card.value}
             </p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">{card.desc}</p>
@@ -181,7 +181,7 @@ export default function AdminCostPage() {
       </div>
 
       {/* 按接口分组的成本明细 */}
-      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card shadow-[var(--shadow-xs)]">
         <div className="border-b border-border px-4 py-3 sm:px-6">
           <h2 className="text-sm font-semibold text-foreground">
             接口成本明细
@@ -222,7 +222,7 @@ export default function AdminCostPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-border">
-              <thead className="bg-background">
+              <thead className="bg-muted/50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground sm:px-6">
                     接口
@@ -245,7 +245,7 @@ export default function AdminCostPage() {
                       ? (item.cost / data.totalCost) * 100
                       : 0;
                   return (
-                    <tr key={item.endpoint} className="hover:bg-muted">
+                    <tr key={item.endpoint} className="hover:bg-muted/30 transition-colors duration-100">
                       <td className="px-4 py-3 text-sm font-mono text-foreground sm:px-6">
                         {item.endpoint}
                       </td>
@@ -290,7 +290,7 @@ export default function AdminCostPage() {
 
       {/* 每日成本趋势 */}
       {data && data.dailyTrend.length > 0 && (
-        <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+        <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card shadow-[var(--shadow-xs)]">
           <div className="border-b border-border px-4 py-3 sm:px-6">
             <h2 className="text-sm font-semibold text-foreground">
               每日成本趋势
@@ -298,7 +298,7 @@ export default function AdminCostPage() {
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-border">
-              <thead className="bg-background">
+              <thead className="bg-muted/50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground sm:px-6">
                     日期
@@ -313,7 +313,7 @@ export default function AdminCostPage() {
               </thead>
               <tbody className="divide-y divide-border bg-card">
                 {data.dailyTrend.map((item) => (
-                  <tr key={item.date} className="hover:bg-muted">
+                  <tr key={item.date} className="hover:bg-muted/30 transition-colors duration-100">
                     <td className="px-4 py-3 text-sm text-foreground sm:px-6">
                       {item.date}
                     </td>

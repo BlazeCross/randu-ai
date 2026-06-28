@@ -23,10 +23,10 @@ export interface ButtonProps
 // 各变体样式
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-primary-foreground hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)] active:translate-y-px",
+    "bg-primary text-primary-foreground hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)] active:translate-y-px shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:brightness-110",
   ghost:
-    "bg-muted text-foreground hover:bg-[color-mix(in_srgb,var(--muted)_80%,var(--foreground)_12%)]",
-  outline: "bg-background text-foreground border border-border hover:bg-muted",
+    "bg-transparent text-foreground hover:bg-muted transition-all duration-150",
+  outline: "bg-background text-foreground border border-border hover:border-primary/40 hover:bg-accent/30 transition-all duration-200",
   destructive:
     "bg-destructive text-destructive-foreground hover:bg-[color-mix(in_srgb,var(--destructive)_90%,#000)] active:translate-y-px",
 };
@@ -71,8 +71,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={type}
         className={cx(
-          "inline-flex items-center justify-center gap-1.5 rounded-full font-medium whitespace-nowrap select-none transition-colors",
-          "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
+          "inline-flex items-center justify-center gap-1.5 rounded-full font-medium whitespace-nowrap select-none transition-colors active:scale-[0.97]",
+          "focus-visible:outline-none focus-visible:shadow-[var(--glow-primary)]",
           "disabled:opacity-45 disabled:cursor-not-allowed",
           VARIANT_STYLES[variant],
           isIconOnly ? ICON_ONLY_STYLES : SIZE_STYLES[size],

@@ -279,10 +279,13 @@ export default function AdminSidebar({
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-card transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-gradient-to-b from-card to-surface-elevated transition-transform duration-300 md:translate-x-0 relative ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* 品牌光晕 */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" aria-hidden />
+
         {/* 品牌区 */}
         <div className="flex h-16 items-center gap-2 border-b border-border px-5">
           <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-br from-primary-500 to-primary-700 text-white">
@@ -307,14 +310,14 @@ export default function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
                   active
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary/10 text-primary border-l-2 border-primary"
+                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground border-l-2 border-transparent"
                 }`}
               >
                 <span
-                  className={active ? "text-primary-600" : "text-muted-foreground"}
+                  className={active ? "text-primary" : "text-muted-foreground"}
                 >
                   {item.icon}
                 </span>
@@ -329,7 +332,7 @@ export default function AdminSidebar({
           <Link
             href="/"
             onClick={onClose}
-            className="flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-150 hover:bg-muted/80 hover:text-foreground"
           >
             <svg
               className="h-5 w-5 text-muted-foreground"

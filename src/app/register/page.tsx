@@ -179,13 +179,18 @@ function RegisterContent() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md">
+    <main className="relative flex flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -left-20 bottom-20 h-60 w-60 rounded-full bg-primary/3 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.02]" style={{backgroundImage:"linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",backgroundSize:"48px 48px"}} />
+      </div>
+      <div className="relative w-full max-w-md">
         {/* 品牌 Logo */}
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-bold tracking-tight">
-              <span className="text-foreground font-bold">
+              <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent font-bold">
                 燃渡AI
               </span>
             </h1>
@@ -216,7 +221,7 @@ function RegisterContent() {
         </div>
 
         {/* 注册卡片 */}
-        <div className="rounded-[var(--radius)] border border-border bg-card p-6 sm:p-8">
+        <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-md)] sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 邮箱输入框（可选） */}
             <div>
@@ -233,7 +238,7 @@ function RegisterContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="请输入邮箱"
                 autoComplete="email"
-                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
               />
             </div>
 
@@ -252,7 +257,7 @@ function RegisterContent() {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="请输入手机号"
                 autoComplete="tel"
-                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 邮箱和手机号至少填写一个
@@ -275,7 +280,7 @@ function RegisterContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="至少 6 位密码"
                   autoComplete="new-password"
-                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
                 />
                 <button
                   type="button"
@@ -336,7 +341,7 @@ function RegisterContent() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="请再次输入密码"
                 autoComplete="new-password"
-                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-[var(--radius-sm)] border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
               />
             </div>
 
@@ -358,12 +363,12 @@ function RegisterContent() {
                 placeholder="请输入邀请码"
                 maxLength={8}
                 autoComplete="off"
-                className={`w-full rounded-[var(--radius-sm)] border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors focus:outline-none focus:ring-2 ${
+                className={`w-full rounded-[var(--radius-sm)] border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200 ${
                   inviteStatus.state === "valid"
-                    ? "border-success focus:ring-[var(--ring)]"
+                    ? "border-success"
                     : inviteStatus.state === "invalid"
-                      ? "border-destructive focus:ring-[var(--ring)]"
-                      : "border-border focus:border-primary focus:ring-primary/20"
+                      ? "border-destructive"
+                      : "border-border"
                 }`}
               />
               {/* 邀请码状态提示 */}
@@ -392,7 +397,7 @@ function RegisterContent() {
                 </p>
               )}
               {inviteStatus.state === "valid" && (
-                <p className="mt-1.5 flex items-center gap-1 text-xs text-success">
+                <p className="mt-1.5 flex items-center gap-1 animate-fade-scale text-xs text-success">
                   <svg
                     className="h-3 w-3"
                     fill="none"
@@ -456,7 +461,7 @@ function RegisterContent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-base font-semibold text-primary-foreground transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center rounded-full bg-gradient-to-r from-primary to-primary-500 px-4 py-3 text-base font-semibold text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:brightness-110 active:scale-[0.98] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>

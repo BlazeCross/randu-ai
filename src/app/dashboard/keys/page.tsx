@@ -389,7 +389,7 @@ export default function KeysPage() {
             </div>
             <button
               onClick={() => setShowCreateForm((v) => !v)}
-              className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
+              className="rounded-full bg-gradient-to-r from-primary to-primary-500 px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110"
             >
               {showCreateForm ? "取消" : "创建新 Key"}
             </button>
@@ -545,7 +545,7 @@ export default function KeysPage() {
                 return (
                   <div
                     key={key.id}
-                    className="px-4 py-4 transition-colors hover:bg-muted sm:px-6"
+                    className="px-4 py-4 transition-colors duration-150 hover:bg-muted/50 sm:px-6"
                   >
                     <div className="flex items-start justify-between gap-4">
                       {/* 左侧：Key 信息 */}

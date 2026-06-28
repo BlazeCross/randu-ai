@@ -50,12 +50,12 @@ export default function NotificationBell() {
     <button
       type="button"
       onClick={() => router.push("/dashboard/notifications")}
-      className="relative rounded-[var(--radius-sm)] p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="relative rounded-[var(--radius-sm)] p-2 text-muted-foreground transition-all duration-200 hover:scale-110 hover:text-primary"
       aria-label="通知"
       title="通知"
     >
       <svg
-        className="h-5 w-5"
+        className="h-5 w-5 transition-transform duration-300"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -68,7 +68,7 @@ export default function NotificationBell() {
         />
       </svg>
       {unread > 0 && (
-        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white animate-pulse">
           {unread > 99 ? "99+" : unread}
         </span>
       )}

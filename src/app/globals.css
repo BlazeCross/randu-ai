@@ -4,6 +4,7 @@
  * 燃渡AI 设计系统 v2.0（基于 Doubao Design Library）
  * 极简 · 冷调 · 技术感 · 平静
  * 核心原则：边框优先于阴影、紧凑仪表盘密度、单一圆角 token
+ * V2.0 新增：分层阴影、品牌光晕、玻璃拟态、过渡分级、微噪点纹理
  * ============================================================ */
 
 :root {
@@ -46,16 +47,57 @@
   --sidebar-ring: #0065fd;
 
   /* ---- 字体 ---- */
-  --font-sans: "Stack Sans Text", "PingFang SC", "Microsoft YaHei", ui-sans-serif, sans-serif, system-ui;
+  --font-sans: "Inter", "Stack Sans Text", "PingFang SC", "Microsoft YaHei", ui-sans-serif, sans-serif, system-ui;
   --font-serif: "Source Serif 4", serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 
   /* ---- 圆角与间距（Doubao token） ---- */
-  --radius: 1.2rem;          /* 基础圆角，用于卡片/面板 */
-  --radius-sm: 10px;         /* 控件圆角，用于输入框/按钮容器 */
-  --radius-lg: 14px;         /* 大圆角，用于侧栏/面板 */
-  --radius-full: 999px;      /* 胶囊，用于按钮/标签/头像 */
-  --spacing: 0.24rem;        /* 紧凑仪表盘间距单位 */
+  --radius: 1.2rem;
+  --radius-sm: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+  --spacing: 0.24rem;
+
+  /* ---- V2.0 新增：阴影系统（参考 Semi Design 5 级阴影） ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+
+  /* ---- V2.0 新增：品牌光晕（参考豆包输入框 focus 光晕） ---- */
+  --glow-primary: 0 0 0 3px rgba(0, 101, 253, 0.15);
+  --glow-primary-strong: 0 0 0 4px rgba(0, 101, 253, 0.25), 0 0 20px rgba(0, 101, 253, 0.1);
+
+  /* ---- V2.0 新增：玻璃拟态（参考豆包/火山方舟导航） ---- */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-blur: 20px;
+
+  /* ---- V2.0 新增：过渡系统（参考扣子 90ms-1800ms 分级） ---- */
+  --duration-instant: 90ms;
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 800ms;
+
+  /* ---- V2.0 新增：缓动曲线（参考 OpenAI 自定义 ease-curve） ---- */
+  --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-in: cubic-bezier(0.42, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.58, 1);
+  --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- V2.0 新增：微噪点纹理 ---- */
+  --noise-opacity: 0.018;
+
+  /* ---- V2.0 新增：语义色 ---- */
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+
+  /* ---- V2.0 新增：表面层叠 ---- */
+  --surface-elevated: #ffffff;
+  --surface-overlay: rgba(255, 255, 255, 0.85);
 
   /* ---- 兼容旧组件的中性灰梯度（映射到 Doubao 色系） ---- */
   --color-neutral-50: #f9fafb;
@@ -72,8 +114,6 @@
 
 /* ============================================================
  * Tailwind v4 主题映射
- * 让 bg-primary / text-muted-foreground / border-border
- * / bg-sidebar / bg-card 等工具类可用
  * ============================================================ */
 @theme inline {
   --color-background: var(--background);
@@ -110,6 +150,21 @@
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+
+  /* V2.0 新增：阴影工具类映射 */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+
+  /* V2.0 新增：表面 token 映射 */
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-overlay: var(--surface-overlay);
+
+  /* V2.0 新增：warning 映射 */
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 
   /* 保留旧 primary-50~900 梯度供现有组件使用 */
   --color-primary-50: #eff6ff;
@@ -153,14 +208,14 @@
 
 /* ============================================================
  * 暗色模式（手动控制，由 html.dark 类触发）
- * 不再使用中性灰反转 hack，直接映射 Doubao 暗色 token
+ * V2.0：优化 4 级表面层级，增强对比度
  * ============================================================ */
 html.dark {
-  --background: #0e1115;
-  --foreground: #eff1f4;
-  --card: #0e1115;
-  --card-foreground: #eff1f4;
-  --popover: #22252a;
+  --background: #0a0d11;
+  --foreground: #e8eaed;
+  --card: #12161c;
+  --card-foreground: #e8eaed;
+  --popover: #1a1f27;
   --popover-foreground: #e5e5e5;
 
   --primary: #0065fd;
@@ -168,13 +223,13 @@ html.dark {
   --secondary: #22252a;
   --secondary-foreground: #e5e5e5;
   --muted: #161a20;
-  --muted-foreground: #afbbcb;
+  --muted-foreground: #9ba8b8;
   --accent: #00266b;
   --accent-foreground: #bfdbfe;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #333942;
-  --input: #333942;
+  --border: #2a303c;
+  --input: #2a303c;
   --ring: #00266b;
 
   --chart-1: #60a5fa;
@@ -182,17 +237,39 @@ html.dark {
   --chart-3: #2563eb;
   --chart-4: #1d4ed8;
   --chart-5: #1e40af;
-  --sidebar: #171717;
+  --sidebar: #0f1318;
   --sidebar-foreground: #e5e5e5;
   --sidebar-primary: #0065fd;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #00266b;
   --sidebar-accent-foreground: #bfdbfe;
-  --sidebar-border: #404040;
+  --sidebar-border: #252b35;
   --sidebar-ring: #00266b;
 
+  /* V2.0 暗色阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+  /* V2.0 暗色品牌光晕 */
+  --glow-primary: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  --glow-primary-strong: 0 0 0 4px rgba(96, 165, 250, 0.3), 0 0 24px rgba(96, 165, 250, 0.15);
+
+  /* V2.0 暗色玻璃拟态 */
+  --glass-bg: rgba(10, 13, 17, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.04);
+
+  /* V2.0 暗色表面层叠 */
+  --surface-elevated: #171b22;
+  --surface-overlay: rgba(14, 17, 21, 0.85);
+
+  /* V2.0 暗色噪点降低 */
+  --noise-opacity: 0.025;
+
   /* 中性灰映射为暗色梯度 */
-  --color-neutral-50: #0e1115;
+  --color-neutral-50: #0a0d11;
   --color-neutral-100: #161a20;
   --color-neutral-200: #1f2937;
   --color-neutral-300: #2a2a2a;
@@ -211,22 +288,21 @@ html.dark {
   --color-primary-600: #2563eb;
 }
 
-/* 暗色模式：覆盖 bg-white 工具类（现有组件大量使用）
- * 映射到 Doubao 暗色 card 表面，避免「白卡片嵌在深色背景」 */
+/* 暗色模式：覆盖 bg-white 工具类（现有组件大量使用） */
 html.dark .bg-white {
   background-color: var(--card) !important;
 }
 html.dark .bg-white\/80 {
-  background-color: rgba(14, 17, 21, 0.8) !important;
+  background-color: rgba(18, 22, 28, 0.8) !important;
 }
 html.dark .bg-white\/90 {
-  background-color: rgba(14, 17, 21, 0.9) !important;
+  background-color: rgba(18, 22, 28, 0.9) !important;
 }
 html.dark .bg-white\/95 {
-  background-color: rgba(14, 17, 21, 0.95) !important;
+  background-color: rgba(18, 22, 28, 0.95) !important;
 }
 html.dark .bg-white\/70 {
-  background-color: rgba(14, 17, 21, 0.7) !important;
+  background-color: rgba(18, 22, 28, 0.7) !important;
 }
 
 /* 暗色模式：边框适配 */
@@ -248,6 +324,28 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* V2.0：微噪点纹理叠加（营造纸质感） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* V2.0：全局选中色使用品牌蓝 */
+::selection {
+  background-color: rgba(0, 101, 253, 0.2);
+  color: inherit;
+}
+html.dark ::selection {
+  background-color: rgba(96, 165, 250, 0.25);
+}
+
 /* 自定义滚动条（Doubao 风格） */
 ::-webkit-scrollbar {
   width: 8px;
@@ -265,10 +363,10 @@ body {
 }
 
 /* ============================================================
- * 动画类（保留原有，供工作流进度条、卡片入场、弹窗使用）
+ * 动画类（V2.0 扩展）
  * ============================================================ */
 
-/* 工作流任务进度条动画：模拟从 0% 到 95% 缓慢推进（约 4 分钟） */
+/* 工作流任务进度条动画 */
 @keyframes workflow-progress {
   0% { width: 0%; }
   100% { width: 95%; }
@@ -277,7 +375,7 @@ body {
   animation: workflow-progress 240s ease-out forwards;
 }
 
-/* 淡入动画：用于卡片、提示等元素入场 */
+/* 淡入动画 */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -286,7 +384,7 @@ body {
   animation: fade-in 0.3s ease-out;
 }
 
-/* 弹窗入场动画：用于模态框、提示弹窗 */
+/* 弹窗入场动画 */
 @keyframes scale-in {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
@@ -295,7 +393,7 @@ body {
   animation: scale-in 0.2s ease-out;
 }
 
-/* 触摸反馈：可点击元素的按压缩放 */
+/* 触摸反馈 */
 .tap-feedback {
   transition: transform 0.15s ease;
 }
@@ -312,6 +410,123 @@ body {
   animation: carousel-fade 0.6s ease-out;
 }
 
+/* ---- V2.0 新增动画 ---- */
+
+/* 淡入上移（元素入场默认） */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up var(--duration-normal) var(--ease-out) both;
+}
+
+/* 淡入缩放（卡片入场） */
+@keyframes fade-scale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-scale {
+  animation: fade-scale var(--duration-normal) var(--ease-out) both;
+}
+
+/* 滑入左侧（侧栏元素） */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-left {
+  animation: slide-in-left var(--duration-normal) var(--ease-out) both;
+}
+
+/* 滑入右侧 */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right var(--duration-normal) var(--ease-out) both;
+}
+
+/* 展开高度（下拉菜单/手风琴） */
+@keyframes expand {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+.animate-expand {
+  animation: expand var(--duration-slow) var(--ease-out) both;
+  overflow: hidden;
+}
+
+/* 脉冲光晕（CTA 按钮 focus） */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: var(--glow-primary); }
+  50% { box-shadow: var(--glow-primary-strong); }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s var(--ease-in-out) infinite;
+}
+
+/* 数字计数（统计数字滚动） */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-count-up {
+  animation: count-up var(--duration-slow) var(--ease-out) both;
+}
+
+/* Shimmer 骨架屏（比 animate-pulse 更精致） */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    color-mix(in srgb, var(--muted) 70%, var(--foreground) 10%) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Toast 滑入 */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(100%) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+.animate-toast-in {
+  animation: toast-in var(--duration-normal) var(--ease-spring) both;
+}
+
+/* Toast 滑出 */
+@keyframes toast-out {
+  to { opacity: 0; transform: translateX(100%) scale(0.95); }
+}
+
+/* 消息气泡入场（对话页） */
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-message-in {
+  animation: message-in var(--duration-fast) var(--ease-out) both;
+}
+
+/* ---- 交错入场延迟工具类 ---- */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }
+.stagger-9 { animation-delay: 450ms; }
+.stagger-10 { animation-delay: 500ms; }
+
 /* 尊重用户「减少动态效果」的系统偏好 */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -320,5 +535,13 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) {
+  .tap-feedback:active {
+    transform: scale(0.97);
+    opacity: 0.8;
   }
 }

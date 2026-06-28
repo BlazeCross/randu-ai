@@ -30,7 +30,7 @@ const slides: Slide[] = [
     description: "百款 AI 工作流，即开即用，覆盖视频生成、内容创作、数据处理等全场景",
     cta: "浏览工作流",
     href: "/workspace",
-    gradient: "linear-gradient(135deg, #0065fd 0%, #4d8bff 50%, #e5e9ff 100%)",
+    gradient: "radial-gradient(ellipse at 30% 50%, #0065fd 0%, #00266b 60%, #0e1115 100%)",
   },
   {
     id: "video",
@@ -41,7 +41,7 @@ const slides: Slide[] = [
     description: "输入文字描述，一键生成高质量视频，支持服装换装、场景变换等多种创意玩法",
     cta: "立即体验",
     href: "/workspace",
-    gradient: "linear-gradient(135deg, #0e1115 0%, #1a3a5f 50%, #0065fd 100%)",
+    gradient: "radial-gradient(ellipse at 30% 50%, #0065fd 0%, #00266b 60%, #0e1115 100%)",
   },
   {
     id: "academy",
@@ -52,7 +52,7 @@ const slides: Slide[] = [
     description: "图文教程 + 视频教程，从入门到精通，掌握每一个 AI 工作流的使用技巧",
     cta: "进入学院",
     href: "/academy",
-    gradient: "linear-gradient(135deg, #e5e9ff 0%, #c7d2fe 50%, #0065fd 100%)",
+    gradient: "radial-gradient(ellipse at 30% 50%, #0065fd 0%, #00266b 60%, #0e1115 100%)",
   },
   {
     id: "api",
@@ -63,7 +63,7 @@ const slides: Slide[] = [
     description: "提供 RESTful API 与 SDK，Python / Node.js 一行代码调用，轻松接入你的系统",
     cta: "查看文档",
     href: "/dashboard",
-    gradient: "linear-gradient(135deg, #00266b 0%, #0065fd 50%, #4d8bff 100%)",
+    gradient: "radial-gradient(ellipse at 30% 50%, #0065fd 0%, #00266b 60%, #0e1115 100%)",
   },
 ];
 
@@ -120,7 +120,7 @@ export default function HeroCarousel() {
       aria-label="平台功能轮播"
     >
       <div className="relative mx-auto max-w-[1600px] px-4 lg:px-8">
-        <div className="relative h-[280px] overflow-hidden rounded-[var(--radius-lg)] border border-border sm:h-[360px] lg:h-[440px]">
+        <div className="relative h-[320px] overflow-hidden rounded-[var(--radius-lg)] border border-border shadow-[var(--shadow-lg)] sm:h-[420px] lg:h-[500px]">
           {slides.map((slide, index) => (
             <Link
               key={slide.id}
@@ -148,6 +148,14 @@ export default function HeroCarousel() {
                   backgroundSize: "48px 48px",
                 }}
               />
+              {/* 粒子装饰 */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute right-[15%] top-[20%] h-1.5 w-1.5 rounded-full bg-white/30 animate-pulse" />
+                <div className="absolute right-[35%] top-[60%] h-1 w-1 rounded-full bg-white/20 animate-pulse [animation-delay:500ms]" />
+                <div className="absolute right-[55%] top-[30%] h-2 w-2 rounded-full bg-white/15 animate-pulse [animation-delay:1000ms]" />
+                <div className="absolute right-[75%] top-[70%] h-1 w-1 rounded-full bg-white/25 animate-pulse [animation-delay:1500ms]" />
+                <div className="absolute right-[25%] top-[45%] h-1.5 w-1.5 rounded-full bg-white/10 animate-pulse [animation-delay:2000ms]" />
+              </div>
               {/* 内容 */}
               <div className="relative flex h-full flex-col justify-center px-8 sm:px-12 lg:px-16">
                 <div className="max-w-xl">
@@ -155,7 +163,7 @@ export default function HeroCarousel() {
                   {slide.badge && (
                     <span
                       className={cx(
-                        "mb-4 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm",
+                        "mb-4 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm animate-fade-up stagger-1",
                         BADGE_STYLES[slide.badgeVariant ?? "primary"]
                       )}
                     >
@@ -163,7 +171,7 @@ export default function HeroCarousel() {
                     </span>
                   )}
                   {/* 标题 */}
-                  <h2 className="text-2xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                  <h2 className="text-2xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl animate-fade-up stagger-2">
                     {slide.title}
                     {slide.highlight && (
                       <>
@@ -175,11 +183,11 @@ export default function HeroCarousel() {
                     )}
                   </h2>
                   {/* 描述 */}
-                  <p className="mt-4 max-w-lg text-sm text-white/80 sm:text-base lg:text-lg">
+                  <p className="mt-4 max-w-lg text-sm text-white/80 sm:text-base lg:text-lg animate-fade-up stagger-3">
                     {slide.description}
                   </p>
                   {/* CTA 按钮 */}
-                  <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/95 px-5 py-2.5 text-sm font-medium text-foreground shadow-lg transition-transform hover:scale-105 sm:text-base">
+                  <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-[var(--shadow-md)] px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-105 hover:shadow-[var(--shadow-lg)] sm:text-base animate-fade-up stagger-4">
                     {slide.cta}
                     <svg
                       className="h-4 w-4"
@@ -205,7 +213,7 @@ export default function HeroCarousel() {
               e.preventDefault();
               prev();
             }}
-            className="absolute left-3 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/30"
+            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/25 hover:border-white/30 hover:scale-110"
             aria-label="上一张"
           >
             <svg
@@ -228,7 +236,7 @@ export default function HeroCarousel() {
               e.preventDefault();
               next();
             }}
-            className="absolute right-3 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/30"
+            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/25 hover:border-white/30 hover:scale-110"
             aria-label="下一张"
           >
             <svg
@@ -257,7 +265,7 @@ export default function HeroCarousel() {
                 className={cx(
                   "h-2 rounded-full transition-all duration-300",
                   index === current
-                    ? "w-6 bg-white"
+                    ? "w-6 bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]"
                     : "w-2 bg-white/40 hover:bg-white/70"
                 )}
                 aria-label={`第 ${index + 1} 张`}

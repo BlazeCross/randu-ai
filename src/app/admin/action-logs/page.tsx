@@ -247,7 +247,7 @@ export default function AdminActionLogsPage() {
         <p className="text-sm text-muted-foreground">权限不足，仅超级管理员可查看操作日志</p>
         <Link
           href="/admin"
-          className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+          className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]"
         >
           返回后台首页
         </Link>
@@ -272,7 +272,7 @@ export default function AdminActionLogsPage() {
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           >
             <option value="">全部操作</option>
             {ACTION_FILTERS.map((a) => (
@@ -335,7 +335,7 @@ export default function AdminActionLogsPage() {
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg
@@ -365,7 +365,7 @@ export default function AdminActionLogsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-border text-xs uppercase text-muted-foreground">
+              <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider font-medium text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">操作者</th>
                   <th className="px-4 py-3 font-medium">目标用户</th>
@@ -384,7 +384,7 @@ export default function AdminActionLogsPage() {
                       text: "text-foreground",
                     };
                   return (
-                    <tr key={log.id} className="hover:bg-muted">
+                    <tr key={log.id} className="hover:bg-muted/30 transition-colors duration-100">
                       <td className="px-4 py-3">
                         <button
                           onClick={() =>

@@ -12,12 +12,14 @@ const quickLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-foreground">
+    <footer className="border-t border-border bg-gradient-to-b from-foreground to-[#080a0e]">
       <div className="mx-auto max-w-[1600px] px-6 py-12 sm:py-16 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* 公司信息 */}
           <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold text-background">四川燃渡传媒</h3>
+            <h3 className="text-lg font-semibold">
+              <span className="text-background">四川</span><span className="bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent">燃渡</span><span className="text-background">传媒</span>
+            </h3>
             <p className="mt-4 max-w-sm text-sm leading-6 text-background/60">
               燃渡AI工作流服务平台，致力于让AI技术触手可及，
               为个人和企业提供高效、便捷的AI工作流解决方案。
@@ -52,7 +54,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-background/60 transition-colors hover:text-primary-400"
+                    className="text-background/60 transition-colors hover:text-primary-400 relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary-400 after:transition-all hover:after:w-full"
                   >
                     {link.label}
                   </a>
@@ -63,7 +65,7 @@ export default function Footer() {
         </div>
 
         {/* 底部版权 */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-border/50 pt-8 sm:flex-row sm:justify-between">
           <p className="text-sm text-background/60">
             © 2026 四川燃渡传媒. 保留所有权利.
           </p>

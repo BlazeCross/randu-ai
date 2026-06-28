@@ -51,13 +51,23 @@ export default function AppShell({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+      {/* 移动端侧栏遮罩 */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-10 bg-foreground/30 backdrop-blur-sm md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
       {/* 侧栏 */}
       <aside
         className={cx(
-          "flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out",
+          "flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out relative overflow-hidden",
           sidebarOpen ? "w-[248px]" : "w-0 overflow-hidden"
         )}
       >
+        {/* 装饰性发光圆 */}
+        <div className="pointer-events-none absolute -top-20 -left-20 h-40 w-40 rounded-full bg-primary/5 blur-3xl" />
         {/* 侧栏顶部（搜索框等） */}
         {sidebarHeader && (
           <div className="flex-none border-b border-sidebar-border p-3">
@@ -73,7 +83,7 @@ export default function AppShell({
       {/* 主区域 */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* 低调顶栏（48px，无边框，非视觉核心） */}
-        <header className="flex h-12 flex-none items-center gap-2 px-4">
+        <header className="flex h-12 flex-none items-center gap-2 px-4 bg-[var(--surface-elevated)] border-b border-border/50">
           {/* 侧栏切换按钮 */}
           <button
             type="button"

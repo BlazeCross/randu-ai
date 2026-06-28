@@ -228,12 +228,12 @@ export default function AdminWorkflowsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索工作流名称..."
-            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           >
             <option value="">全部状态</option>
             <option value="active">上架中</option>
@@ -248,7 +248,7 @@ export default function AdminWorkflowsPage() {
         </form>
         <button
           onClick={() => router.push("/admin/workflows/new")}
-          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-colors"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -265,7 +265,7 @@ export default function AdminWorkflowsPage() {
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-card">
+      <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-card shadow-[var(--shadow-xs)]">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg className="h-8 w-8 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
@@ -286,7 +286,7 @@ export default function AdminWorkflowsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-background text-xs uppercase text-muted-foreground">
+              <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider font-medium text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">名称</th>
                   <th className="px-4 py-3 font-medium">分类</th>
@@ -303,7 +303,7 @@ export default function AdminWorkflowsPage() {
                 {workflows.map((w) => {
                   const statusStyle = STATUS_STYLES[w.status] || STATUS_STYLES.inactive;
                   return (
-                    <tr key={w.id} className="hover:bg-muted">
+                    <tr key={w.id} className="hover:bg-muted/30 transition-colors duration-100">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {w.coverImage ? (

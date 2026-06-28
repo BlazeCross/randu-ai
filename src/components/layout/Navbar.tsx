@@ -80,7 +80,7 @@ export default function Navbar() {
     );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 border-b border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[var(--glass-blur)] transition-all duration-300">
       <nav className={cx("mx-auto flex w-full items-center justify-between px-4 lg:px-8", headerHeight)}>
         {/* 左侧：Logo + 桌面端导航链接 */}
         <div className="flex items-center gap-8">
@@ -195,7 +195,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/register"
-                className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
+                className="rounded-full bg-gradient-to-r from-primary to-primary-500 px-4 py-1.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-sm)] transition-all duration-200 hover:shadow-[var(--shadow-md)] hover:scale-[1.02] active:scale-[0.98]"
               >
                 免费注册
               </Link>
@@ -206,7 +206,7 @@ export default function Navbar() {
         {/* 移动端：汉堡菜单按钮 */}
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-[var(--radius-sm)] p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+          className="inline-flex items-center justify-center rounded-[var(--radius-sm)] p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden active:scale-90"
           aria-label="切换菜单"
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((v) => !v)}
@@ -245,7 +245,7 @@ export default function Navbar() {
 
       {/* 移动端展开菜单 */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background md:hidden">
+        <div className="border-t border-border bg-background md:hidden animate-expand">
           <div className="space-y-1 px-4 py-3">
             {navLinks.map((link) => (
               <Link

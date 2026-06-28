@@ -180,7 +180,7 @@ export default function EditWorkflowPage() {
           </p>
           <Link
             href="/admin/workflows"
-            className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+            className="mt-4 inline-flex items-center rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 px-4 py-2 text-sm font-medium text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]"
           >
             返回工作流管理
           </Link>

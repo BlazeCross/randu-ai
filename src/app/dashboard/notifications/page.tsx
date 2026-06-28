@@ -289,8 +289,8 @@ export default function NotificationsPage() {
                 return (
                   <div
                     key={item.id}
-                    className={`px-4 py-4 transition-colors sm:px-6 ${
-                      item.isRead ? "bg-card" : "bg-primary/5"
+                    className={`px-4 py-4 transition-colors duration-150 sm:px-6 ${
+                      item.isRead ? "bg-card hover:bg-muted/30" : "bg-primary/5 hover:bg-muted/30"
                     }`}
                   >
                     <div className="flex items-start gap-3">

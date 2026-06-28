@@ -722,7 +722,7 @@ export default function WorkflowUsePage() {
 
               {/* 结果展示区 */}
               {isCompleted && (
-                <div className="animate-fade-in rounded-[var(--radius)] border border-success/30 bg-success/10 p-6">
+                <div className="animate-fade-scale animate-fade-in rounded-[var(--radius)] border border-success/30 bg-success/10 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <svg
                       className="h-5 w-5 text-success"

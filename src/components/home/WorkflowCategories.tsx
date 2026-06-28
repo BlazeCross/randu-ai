@@ -45,6 +45,7 @@ export default function WorkflowCategories() {
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
             覆盖全场景的 AI 工作流
           </h2>
+          <span className="mt-2 block h-1 w-16 rounded-full bg-gradient-to-r from-primary to-primary-400 mx-auto" aria-hidden />
           <p className="mt-4 text-base text-muted-foreground sm:text-lg">
             从内容创作到数据处理，百款精选工作流满足不同业务需求
           </p>
@@ -56,10 +57,12 @@ export default function WorkflowCategories() {
             <Link
               key={category.name}
               href="/workspace"
-              className="group relative rounded-[var(--radius)] border border-border bg-card p-6 transition-all hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] sm:p-8"
+              className="group relative rounded-[var(--radius)] border border-border bg-card p-6 transition-all duration-300 hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] hover:shadow-[var(--shadow-md)] hover:-translate-y-1 sm:p-8"
             >
+              {/* 悬停光晕叠加层 */}
+              <div className="pointer-events-none absolute inset-0 rounded-[var(--radius)] bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               {/* 图标 */}
-              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-sm)] bg-accent text-3xl transition-colors group-hover:bg-accent">
+              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-br from-accent to-primary/10 text-3xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-[var(--shadow-sm)]">
                 {category.icon}
               </div>
 

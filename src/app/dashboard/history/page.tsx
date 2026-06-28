@@ -261,7 +261,7 @@ export default function HistoryPage() {
                 return (
                   <div
                     key={item.id}
-                    className="flex items-start gap-4 px-4 py-4 transition-colors hover:bg-muted sm:px-6"
+                    className="flex items-start gap-4 px-4 py-4 transition-colors duration-150 hover:bg-muted/50 sm:px-6"
                   >
                     {/* 缩略图 / 占位 */}
                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-muted">

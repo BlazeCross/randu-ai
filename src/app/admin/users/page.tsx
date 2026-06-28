@@ -249,12 +249,12 @@ export default function AdminUsersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索昵称 / 邮箱 / 手机号..."
-            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full max-w-xs rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           >
             <option value="">全部角色</option>
             <option value="user">普通用户</option>
@@ -264,7 +264,7 @@ export default function AdminUsersPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-[var(--radius-sm)] border border-border px-3 py-2 text-sm focus:border-primary/50 focus:shadow-[var(--glow-primary)] focus:outline-none transition-all duration-200"
           >
             <option value="">全部状态</option>
             <option value="active">正常</option>
@@ -307,7 +307,7 @@ export default function AdminUsersPage() {
       )}
 
       {/* 列表表格 */}
-      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <svg
@@ -337,7 +337,7 @@ export default function AdminUsersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-border text-xs uppercase text-muted-foreground">
+              <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider font-medium text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">用户</th>
                   <th className="px-4 py-3 font-medium">角色</th>
@@ -364,7 +364,7 @@ export default function AdminUsersPage() {
                       text: "text-foreground",
                     };
                   return (
-                    <tr key={u.id} className="hover:bg-muted">
+                    <tr key={u.id} className="hover:bg-muted/30 transition-colors duration-100">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {u.avatar ? (

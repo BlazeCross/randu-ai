@@ -51,7 +51,7 @@ export function Skeleton({
 
   return (
     <div
-      className={`animate-pulse bg-muted ${finalRounded} ${className}`}
+      className={`animate-shimmer bg-muted ${finalRounded} ${className}`}
       style={style}
       aria-hidden="true"
     />
@@ -109,7 +109,7 @@ export function SkeletonListItem() {
  */
 export function SkeletonCard() {
   return (
-    <div className="rounded-[var(--radius)] border border-border bg-card p-6" aria-hidden="true">
+    <div className="rounded-[var(--radius)] border border-border bg-card p-6 shadow-[var(--shadow-xs)]" aria-hidden="true">
       <Skeleton shape="text" width="30%" className="mb-4" />
       <div className="space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (

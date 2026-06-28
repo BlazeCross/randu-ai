@@ -195,7 +195,7 @@ export default function InvitePage() {
                   onClick={() =>
                     copyToClipboard(inviteInfo.inviteCode, "code")
                   }
-                  className="flex-shrink-0 rounded-full bg-primary px-5 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
+                  className="flex-shrink-0 rounded-full bg-primary px-5 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-hover active:scale-95 transition-transform"
                 >
                   {copiedField === "code" ? "已复制" : "复制"}
                 </button>
@@ -216,7 +216,7 @@ export default function InvitePage() {
                     onClick={() =>
                       copyToClipboard(inviteInfo.inviteUrl, "url")
                     }
-                    className="flex-shrink-0 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+                    className="flex-shrink-0 rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground active:scale-95 transition-transform"
                   >
                     {copiedField === "url" ? "已复制" : "复制链接"}
                   </button>

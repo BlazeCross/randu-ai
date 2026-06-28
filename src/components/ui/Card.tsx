@@ -22,9 +22,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cx(
-          "bg-card border border-border rounded-[var(--radius)] transition",
+          "bg-card border border-border rounded-[var(--radius)] transition-all duration-200",
           hover &&
-            "cursor-pointer hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))]",
+            "cursor-pointer hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5",
           className,
         )}
         {...rest}
@@ -48,7 +48,7 @@ export function CardHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cx("border-b border-border px-5 py-4", className)}
+      className={cx("border-b border-border/60 px-5 py-4", className)}
       {...rest}
     >
       {children}
@@ -83,7 +83,7 @@ export function CardFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cx("border-t border-border px-5 py-4", className)}
+      className={cx("border-t border-border/60 px-5 py-4", className)}
       {...rest}
     >
       {children}

@@ -411,7 +411,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-base font-bold text-foreground">
+                        <div className="text-base font-bold font-mono tabular-nums text-foreground">
                           ¥{order.amount.toFixed(2)}
                         </div>
                         {order.status === "pending" && (
