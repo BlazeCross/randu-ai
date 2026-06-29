@@ -790,7 +790,7 @@ export default function ChatPage() {
       <div className="flex h-full flex-col">
         {/* 消息列表 */}
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+          <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
             {/* 空状态：欢迎语 */}
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -991,7 +991,7 @@ export default function ChatPage() {
 
         {/* 错误提示 */}
         {error && (
-          <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 flex-none">
+          <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 flex-none">
             <div className="mb-2 flex items-start gap-3 rounded-[var(--radius-sm)] border border-destructive/30 bg-destructive/10 p-3">
               <svg
                 className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive"
@@ -1031,7 +1031,7 @@ export default function ChatPage() {
 
         {/* 输入区 */}
         <div className="flex-none border-t border-border bg-background">
-          <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
+          <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-end gap-2 border border-border rounded-[22px] bg-card p-3.5 pb-2.5 transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-[var(--glow-primary)]">
               {/* 隐藏的文件上传 input */}
               <input
