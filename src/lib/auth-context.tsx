@@ -77,6 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       Promise.resolve().then(() => setLoading(false));
       return;
     }
+    // 同步到 cookie，让 middleware/proxy 能检测到登录状态（兼容老用户）
+    document.cookie = `token=${storedToken}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
     // 延迟 setToken 到微任务，避免 effect 内同步 setState
     Promise.resolve().then(() => setToken(storedToken));
     fetchUserProfile(storedToken).then((profile) => {
@@ -85,23 +87,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         // token 无效，清除
         localStorage.removeItem(TOKEN_KEY);
+        document.cookie = "token=; path=/; max-age=0";
         setToken(null);
       }
       setLoading(false);
     });
   }, []);
 
-  // 登录：保存 token 到 localStorage 并获取用户信息
+  // 登录：保存 token 到 localStorage + cookie 并获取用户信息
   const login = useCallback(async (newToken: string) => {
     localStorage.setItem(TOKEN_KEY, newToken);
+    // 同步到 cookie，让 middleware/proxy 能检测到登录状态
+    document.cookie = `token=${newToken}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
     setToken(newToken);
     const profile = await fetchUserProfile(newToken);
     setUser(profile);
   }, []);
 
-  // 登出：清除 localStorage token 和用户信息
+  // 登出：清除 localStorage token、cookie 和用户信息
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
+    // 清除 cookie
+    document.cookie = "token=; path=/; max-age=0";
     setToken(null);
     setUser(null);
   }, []);

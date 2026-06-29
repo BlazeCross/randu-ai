@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrack } from "@/hooks/useTrack";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const { track } = useTrack();
 
@@ -49,7 +50,9 @@ export default function LoginPage() {
       // 保存 token 并获取用户信息，然后跳转
       await login(data.token);
       track("login");
-      router.push("/dashboard");
+      // 优先跳转到 redirect 参数指定的页面，否则默认 /dashboard
+      const redirect = searchParams.get("redirect");
+      router.push(redirect || "/dashboard");
     } catch {
       setError("网络错误，请稍后重试");
     } finally {
