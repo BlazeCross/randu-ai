@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import FAQAccordion from "./FAQAccordion";
+import BookingButton from "@/components/common/BookingButton";
 
 export const metadata: Metadata = {
   title: "燃渡学院 - 系统学习 AI 工作流",
@@ -403,7 +404,7 @@ function difficultyClasses(difficulty: "入门" | "进阶" | "实战") {
 export default function AcademyPage() {
   return (
     <main className="flex-1 bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1400px] px-6 py-14 sm:px-8 lg:px-12 lg:py-20">
         {/* 1. Hero 区域 */}
         <section className="mx-auto max-w-3xl text-center">
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -422,12 +423,7 @@ export default function AcademyPage() {
             视频到 Seedream 出图、从豆包文案到自动化运营的全链路实战课程。每个章节配套可运行的工作流，学完即用。
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/register"
-              className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
-            >
-              免费注册抢先体验
-            </Link>
+            <BookingButton label="免费预约抢先体验" />
             <Link
               href="/workspace"
               className="rounded-full border border-border bg-card px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
@@ -482,7 +478,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 3. 学习路径板块（6 条） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               按方向选择你的学习路径
@@ -541,7 +537,7 @@ export default function AcademyPage() {
                   {path.outcome}
                 </div>
                 <Link
-                  href="/register"
+                  href="/academy/articles"
                   className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
                 >
                   查看路径详情
@@ -566,7 +562,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 4. 推荐课程板块（8 张） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               精选教程，立即可学
@@ -663,7 +659,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 5. 讲师介绍板块（6 位） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               由一线 AI 实践者带学
@@ -718,7 +714,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 6. 完整学习数据统计（6 项） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               用数据说话
@@ -751,7 +747,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 7. 学员评价板块（6 条） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               学员真实反馈
@@ -796,7 +792,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 8. FAQ 板块（8 个，可折叠） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               常见问题
@@ -809,7 +805,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 9. 配套资源板块（沿用现有，微调） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="mb-8 max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               为什么选择燃渡学院
@@ -868,7 +864,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 10. 教程入口（图文 / 视频，沿用现有，下移） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <h2 className="mb-6 text-xl font-semibold text-foreground">
             立即可用教程
           </h2>
@@ -913,7 +909,7 @@ export default function AcademyPage() {
         </section>
 
         {/* 底部 CTA（转化兜底） */}
-        <section className="mt-16 sm:mt-20">
+        <section className="mt-20 sm:mt-28">
           <div className="rounded-[var(--radius)] border border-border bg-gradient-to-br from-accent/60 to-background p-8 text-center sm:p-12">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               准备好开始你的 AI 工作流学习了吗？
@@ -922,12 +918,7 @@ export default function AcademyPage() {
               注册即可调用 18+ 个平台真实工作流，跟着图文与视频教程，从入门到能独立搭建工作流。
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/register"
-                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_srgb,var(--primary)_90%,#000)]"
-              >
-                免费注册抢先体验
-              </Link>
+              <BookingButton label="免费预约抢先体验" />
               <Link
                 href="/workspace"
                 className="rounded-full border border-border bg-card px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"

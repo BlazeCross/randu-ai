@@ -17,8 +17,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* 公司信息 */}
           <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold">
-              <span className="text-foreground">四川</span><span className="bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent">燃渡</span><span className="text-foreground">文化传媒有限公司</span>
+            <h3 className="text-lg font-semibold text-foreground">
+              四川燃渡文化传媒有限公司
             </h3>
             <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
               燃渡AI工作流服务平台，致力于让AI技术触手可及，
@@ -40,8 +40,8 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-foreground">联系方式</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li>邮箱：contact@randuai.com</li>
-              <li>电话：400-888-8888</li>
+              <li>邮箱：1967948530@qq.com</li>
+              <li>电话：17683255002</li>
               <li>地址：四川省成都市</li>
             </ul>
           </div>

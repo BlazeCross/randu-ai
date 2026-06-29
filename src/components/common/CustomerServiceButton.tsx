@@ -3,23 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-// 微信客服二维码占位图
-const QR_IMAGE_URL =
-  "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=WeChat%20customer%20service%20QR%20code%20placeholder&image_size=square_hd";
-
 /**
  * 浮动客服按钮
  *
  * - 固定在页面右下角，z-50
- * - 点击展开客服面板（微信二维码、邮箱、工作时间）
- * - 点击外部关闭面板
- * - 移动端适配：按钮稍小，面板宽度自适应屏幕
+ * - 点击展开客服面板（微信二维码、邮箱、电话、工作时间）
+ * - 图标使用耳机/对话气泡（符合客服语义）
  */
 export default function CustomerServiceButton() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 点击外部关闭面板
   useEffect(() => {
     if (!open) return;
     const handlePointerDown = (e: MouseEvent | TouchEvent) => {
@@ -36,7 +30,6 @@ export default function CustomerServiceButton() {
     };
   }, [open]);
 
-  // 打开时按 Esc 关闭
   useEffect(() => {
     if (!open) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -57,6 +50,7 @@ export default function CustomerServiceButton() {
           {/* 头部 */}
           <div className="flex items-center gap-2 border-b border-border pb-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-accent text-primary">
+              {/* 耳机图标 */}
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -67,7 +61,7 @@ export default function CustomerServiceButton() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M18 10c0-3.866-3.582-7-8-7s-8 3.134-8 7c0 1.657.617 3.18 1.657 4.406L3 21l4.219-1.406A8.97 8.97 0 0010 20c4.418 0 8-3.134 8-7z"
+                  d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829a5 5 0 010-7.07l2.829-2.829m-12.728 0a9 9 0 000 12.728m0 0l2.829-2.829a5 5 0 000-7.07L5.636 5.636M9 22h6M12 11h.01"
                 />
               </svg>
             </span>
@@ -81,8 +75,8 @@ export default function CustomerServiceButton() {
           <div className="mt-3 flex flex-col items-center">
             <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-background p-2">
               <Image
-                src={QR_IMAGE_URL}
-                alt="微信客服二维码"
+                src="/qrcode-wechat.jpg"
+                alt="企业微信二维码"
                 width={128}
                 height={128}
                 unoptimized
@@ -113,7 +107,26 @@ export default function CustomerServiceButton() {
               </svg>
               <dt className="text-muted-foreground">邮箱</dt>
               <dd className="ml-auto font-medium text-foreground">
-                support@randuai.cn
+                1967948530@qq.com
+              </dd>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg
+                className="h-4 w-4 flex-shrink-0 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                />
+              </svg>
+              <dt className="text-muted-foreground">电话</dt>
+              <dd className="ml-auto font-medium text-foreground">
+                17683255002
               </dd>
             </div>
             <div className="flex items-center gap-2">
@@ -139,7 +152,7 @@ export default function CustomerServiceButton() {
         </div>
       )}
 
-      {/* 浮动按钮 */}
+      {/* 浮动按钮 - 耳机图标 */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -172,7 +185,7 @@ export default function CustomerServiceButton() {
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M18 10A8 8 0 116.343 6.343M22 6l-10 7-3-3"
+              d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829a5 5 0 010-7.07l2.829-2.829m-12.728 0a9 9 0 000 12.728m0 0l2.829-2.829a5 5 0 000-7.07L5.636 5.636M9 22h6M12 11h.01"
             />
           </svg>
         )}
