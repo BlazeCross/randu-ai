@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -44,6 +52,40 @@ interface LegacyStoredConversation {
 
 const STORAGE_KEY = "randu-chat-history";
 const MAX_CONVERSATIONS = 20;
+
+// 用户快捷菜单项
+const USER_MENU_ITEMS: Array<{ label: string; href: string; icon: ReactNode }> = [
+  {
+    label: "个人资料",
+    href: "/dashboard/profile",
+    icon: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" />
+      </>
+    ),
+  },
+  {
+    label: "套餐等级",
+    href: "/pricing",
+    icon: <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />,
+  },
+  {
+    label: "积分余额",
+    href: "/credits",
+    icon: <path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />,
+  },
+  {
+    label: "我的订单",
+    href: "/dashboard/orders",
+    icon: (
+      <>
+        <rect x="5" y="4" width="14" height="18" rx="2" />
+        <path d="M9 4a1 1 0 011-1h4a1 1 0 011 1" />
+      </>
+    ),
+  },
+];
 
 /**
  * 生成唯一 ID（用于消息和会话）
@@ -142,7 +184,7 @@ function saveConversations(store: ConversationsStore) {
  */
 export default function ChatPage() {
   const router = useRouter();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, token, loading: authLoading, logout } = useAuth();
   useTrackPageView("chat");
 
   // 多会话状态
@@ -179,6 +221,14 @@ export default function ChatPage() {
   // 消息列表底部滚动容器
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 用户快捷菜单状态
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{
+    bottom: number;
+    left: number;
+  } | null>(null);
+  const userBlockRef = useRef<HTMLDivElement>(null);
+
   // 初始加载会话
   useEffect(() => {
     const store = loadConversations();
@@ -202,6 +252,39 @@ export default function ChatPage() {
       setCreditsBalance(user.credits);
     }
   }, [user]);
+
+  // 用户快捷菜单：外部点击 / Escape / 滚动 / 窗口缩放时关闭
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      const trigger = userBlockRef.current;
+      const panel = document.getElementById("chat-user-menu");
+      if (
+        trigger &&
+        !trigger.contains(e.target as Node) &&
+        panel &&
+        !panel.contains(e.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setUserMenuOpen(false);
+    };
+    const handleClose = () => setUserMenuOpen(false);
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKey);
+    window.addEventListener("scroll", handleClose, true);
+    window.addEventListener("resize", handleClose);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKey);
+      window.removeEventListener("scroll", handleClose, true);
+      window.removeEventListener("resize", handleClose);
+    };
+  }, [userMenuOpen]);
 
   /**
    * 初始化语音识别（Web Speech API）
@@ -581,6 +664,24 @@ export default function ChatPage() {
     }
   };
 
+  // 切换用户快捷菜单（打开时测量触发器位置，弹窗向上展开）
+  const toggleUserMenu = () => {
+    if (!userMenuOpen && userBlockRef.current) {
+      const rect = userBlockRef.current.getBoundingClientRect();
+      setMenuPos({
+        bottom: window.innerHeight - rect.top + 8,
+        left: rect.left,
+      });
+    }
+    setUserMenuOpen((v) => !v);
+  };
+
+  // 退出登录
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
+
   // 用户显示名
   const userName = user?.nickname || user?.email || "用户";
 
@@ -757,10 +858,14 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* 底部用户信息块 */}
+          {/* 底部用户信息块（点击展开快捷菜单） */}
           {user && (
             <div className="flex-none border-t border-sidebar-border p-3">
-              <div className="flex items-center gap-2">
+              <div
+                ref={userBlockRef}
+                onClick={toggleUserMenu}
+                className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] p-1 transition-colors hover:bg-muted"
+              >
                 <Avatar
                   src={user.avatar ?? undefined}
                   name={userName}
@@ -781,6 +886,21 @@ export default function ChatPage() {
                     )}
                   </div>
                 </div>
+                <svg
+                  className={cx(
+                    "h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform",
+                    userMenuOpen && "rotate-180",
+                  )}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.7}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
               </div>
             </div>
           )}
@@ -1186,6 +1306,102 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      {/* 用户快捷菜单弹窗（portal 渲染到 body，避免被 sidebar overflow 裁切） */}
+      {userMenuOpen &&
+        menuPos &&
+        user &&
+        createPortal(
+          <div
+            id="chat-user-menu"
+            className="fixed z-[100] w-[280px] animate-scale-in rounded-[var(--radius)] border border-border bg-popover p-1.5 shadow-2xl"
+            style={{
+              bottom: `${menuPos.bottom}px`,
+              left: `${menuPos.left}px`,
+            }}
+          >
+            {/* 用户信息头部 */}
+            <div className="flex items-center gap-3 p-2">
+              <Avatar
+                src={user.avatar ?? undefined}
+                name={userName}
+                size="lg"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-semibold text-foreground">
+                  {userName}
+                </div>
+                {user.email && (
+                  <div className="truncate text-xs text-muted-foreground">
+                    {user.email}
+                  </div>
+                )}
+                <div className="mt-1 flex items-center gap-2">
+                  <Badge variant="primary">
+                    {user.subscriptionPlan || "免费版"}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    余额 {creditsBalance ?? user.credits} 点
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 分割线 */}
+            <div className="my-1 border-t border-border" />
+
+            {/* 菜单链接 */}
+            <div className="py-0.5">
+              {USER_MENU_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <svg
+                    className="h-4 w-4 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.7}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    {item.icon}
+                  </svg>
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* 分割线 */}
+            <div className="my-1 border-t border-border" />
+
+            {/* 退出登录 */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+            >
+              <svg
+                className="h-4 w-4 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={1.7}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+              <span>退出登录</span>
+            </button>
+          </div>,
+          document.body,
+        )}
     </AppShell>
   );
 }
