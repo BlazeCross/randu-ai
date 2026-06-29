@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -285,7 +286,7 @@ export default function AdminWorkflowsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-full text-left text-sm">
               <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider font-medium text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">名称</th>
@@ -307,9 +308,11 @@ export default function AdminWorkflowsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {w.coverImage ? (
-                            <img
+                            <Image
                               src={w.coverImage}
                               alt={w.name}
+                              width={32}
+                              height={32}
                               className="h-8 w-8 flex-shrink-0 rounded object-cover"
                             />
                           ) : (

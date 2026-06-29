@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { SkeletonListItem } from "@/components/ui/Skeleton";
+import EmptyState from "@/components/ui/EmptyState";
 
 interface OrderItem {
   id: string;
@@ -358,12 +359,11 @@ export default function OrdersPage() {
               ))}
             </div>
           ) : orders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-sm text-muted-foreground">暂无订单</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                选择上方套餐或积分包即可创建订单
-              </p>
-            </div>
+            <EmptyState
+              title="暂无订单"
+              description="购买套餐或积分后会在这里显示"
+              action={{ label: "查看定价", href: "/pricing" }}
+            />
           ) : (
             <div className="divide-y divide-border">
               {orders.map((order) => {

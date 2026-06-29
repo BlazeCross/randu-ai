@@ -48,6 +48,57 @@ function getConfig(): { headers: HeadersInit } {
   return cachedConfig;
 }
 
+// ============ 退避重试 ============
+
+/**
+ * 带指数退避的请求重试
+ *
+ * 仅在以下情况重试：
+ * - HTTP 429（限流）
+ * - HTTP 5xx（服务端错误）
+ *
+ * 其他错误（4xx 客户端错误、网络错误、超时）不会重试，直接抛出。
+ * 超过最大重试次数后，抛出友好错误："AI服务繁忙，请稍后重试"。
+ *
+ * @param fn           要执行的异步函数（通常包含 fetch + 状态码校验 + JSON 解析）
+ * @param maxRetries   最大重试次数，默认 3
+ * @param initialDelay 初始退避延迟（毫秒），默认 1000
+ *
+ * 重试延迟：initialDelay * 2^attempt，即 1s、2s、4s、8s...
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  initialDelay = 1000,
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      // 判断是否可重试：429 或 5xx
+      const status = error?.response?.status || error?.status;
+      const isRetryable =
+        status === 429 ||
+        (typeof status === "number" && status >= 500 && status < 600);
+      if (!isRetryable || attempt === maxRetries) {
+        // 超出重试次数的友好错误（仅对可重试错误）
+        if (isRetryable && attempt === maxRetries) {
+          throw new Error("AI服务繁忙，请稍后重试");
+        }
+        throw error;
+      }
+      const delay = initialDelay * Math.pow(2, attempt);
+      console.warn(
+        `[Volcengine] 请求失败 (status=${status}), ${delay}ms 后重试 (${attempt + 1}/${maxRetries})`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
 // ============ 豆包文本对话 ============
 
 // 聊天消息类型（OpenAI 兼容）
@@ -104,35 +155,43 @@ export async function chatCompletion(
     throw new Error("未配置豆包模型 ID（VOLC_MODEL_DOUBAO）");
   }
 
-  let res: Response;
-  try {
-    res = await fetch(`${ARK_BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
-        messages: options.messages,
-        temperature: options.temperature ?? 0.7,
-        max_tokens: options.maxTokens,
-        top_p: options.topP,
-      }),
-      signal: AbortSignal.timeout(VOLC_REQUEST_TIMEOUT_MS),
-    });
-  } catch (error) {
-    throw new Error(
-      `调用火山方舟对话接口失败：${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
+  const data = await retryWithBackoff(async () => {
+    let res: Response;
+    try {
+      res = await fetch(`${ARK_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model,
+          messages: options.messages,
+          temperature: options.temperature ?? 0.7,
+          max_tokens: options.maxTokens,
+          top_p: options.topP,
+        }),
+        signal: AbortSignal.timeout(VOLC_REQUEST_TIMEOUT_MS),
+      });
+    } catch (error) {
+      // 网络/超时错误：不可重试（无 HTTP 状态码）
+      throw new Error(
+        `调用火山方舟对话接口失败：${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`火山方舟对话失败（${res.status}）：${errText || res.statusText}`);
-  }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      const error: any = new Error(
+        `火山方舟对话失败（${res.status}）：${errText || res.statusText}`,
+      );
+      // 附加 status 供 retryWithBackoff 判断是否可重试（429 / 5xx）
+      error.status = res.status;
+      throw error;
+    }
 
-  const data = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-    usage?: { total_tokens?: number };
-  };
+    return (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: { total_tokens?: number };
+    };
+  });
 
   const tokensUsed = data.usage?.total_tokens ?? 0;
   // 估算成本：tokens / 1000 * 0.004（豆包定价 4 元/百万 tokens）
@@ -190,35 +249,43 @@ export async function generateImage(
     throw new Error("未配置 Seedream 模型 ID（VOLC_MODEL_SEEDREAM）");
   }
 
-  let res: Response;
-  try {
-    res = await fetch(`${ARK_BASE_URL}/images/generations`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
-        prompt: options.prompt,
-        size: options.size ?? "1024x1024",
-        n: options.n ?? 1,
-        // 返回 URL 形式（而非 base64），便于直接回传给用户
-        response_format: "url",
-      }),
-      signal: AbortSignal.timeout(VOLC_REQUEST_TIMEOUT_MS),
-    });
-  } catch (error) {
-    throw new Error(
-      `调用火山方舟生图接口失败：${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
+  const data = await retryWithBackoff(async () => {
+    let res: Response;
+    try {
+      res = await fetch(`${ARK_BASE_URL}/images/generations`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model,
+          prompt: options.prompt,
+          size: options.size ?? "1024x1024",
+          n: options.n ?? 1,
+          // 返回 URL 形式（而非 base64），便于直接回传给用户
+          response_format: "url",
+        }),
+        signal: AbortSignal.timeout(VOLC_REQUEST_TIMEOUT_MS),
+      });
+    } catch (error) {
+      // 网络/超时错误：不可重试
+      throw new Error(
+        `调用火山方舟生图接口失败：${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`火山方舟生图失败（${res.status}）：${errText || res.statusText}`);
-  }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      const error: any = new Error(
+        `火山方舟生图失败（${res.status}）：${errText || res.statusText}`,
+      );
+      // 附加 status 供 retryWithBackoff 判断是否可重试（429 / 5xx）
+      error.status = res.status;
+      throw error;
+    }
 
-  const data = (await res.json()) as {
-    data?: Array<{ url?: string; b64_json?: string }>;
-  };
+    return (await res.json()) as {
+      data?: Array<{ url?: string; b64_json?: string }>;
+    };
+  });
 
   const urls = (data.data ?? [])
     .map((item) => item.url)
@@ -390,28 +457,35 @@ export async function submitVideoTask(
   // 视频生成任务超时：5 分钟（提交接口本身较快，但仍需保护）
   const VIDEO_SUBMIT_TIMEOUT_MS = 30000;
 
-  let res: Response;
-  try {
-    res = await fetch(`${ARK_BASE_URL}/contents/generations/tasks`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(VIDEO_SUBMIT_TIMEOUT_MS),
-    });
-  } catch (error) {
-    throw new Error(
-      `调用火山方舟视频生成接口失败：${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
+  const data = await retryWithBackoff(async () => {
+    let res: Response;
+    try {
+      res = await fetch(`${ARK_BASE_URL}/contents/generations/tasks`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(VIDEO_SUBMIT_TIMEOUT_MS),
+      });
+    } catch (error) {
+      // 网络/超时错误：不可重试
+      throw new Error(
+        `调用火山方舟视频生成接口失败：${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(
-      `火山方舟视频生成任务提交失败（${res.status}）：${errText || res.statusText}`,
-    );
-  }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      const error: any = new Error(
+        `火山方舟视频生成任务提交失败（${res.status}）：${errText || res.statusText}`,
+      );
+      // 附加 status 供 retryWithBackoff 判断是否可重试（429 / 5xx）
+      error.status = res.status;
+      throw error;
+    }
 
-  const data = (await res.json()) as { id?: string };
+    return (await res.json()) as { id?: string };
+  });
+
   if (!data.id) {
     throw new Error("火山方舟响应中未包含任务 ID");
   }
@@ -437,37 +511,43 @@ export async function getVideoTaskStatus(
   // 查询任务超时：30 秒
   const VIDEO_QUERY_TIMEOUT_MS = 30000;
 
-  let res: Response;
-  try {
-    res = await fetch(
-      `${ARK_BASE_URL}/contents/generations/tasks/${encodeURIComponent(taskId)}`,
-      {
-        method: "GET",
-        headers,
-        signal: AbortSignal.timeout(VIDEO_QUERY_TIMEOUT_MS),
-      },
-    );
-  } catch (error) {
-    throw new Error(
-      `查询火山方舟视频任务失败：${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
+  const data = await retryWithBackoff(async () => {
+    let res: Response;
+    try {
+      res = await fetch(
+        `${ARK_BASE_URL}/contents/generations/tasks/${encodeURIComponent(taskId)}`,
+        {
+          method: "GET",
+          headers,
+          signal: AbortSignal.timeout(VIDEO_QUERY_TIMEOUT_MS),
+        },
+      );
+    } catch (error) {
+      // 网络/超时错误：不可重试
+      throw new Error(
+        `查询火山方舟视频任务失败：${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(
-      `查询视频任务失败（${res.status}）：${errText || res.statusText}`,
-    );
-  }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      const error: any = new Error(
+        `查询视频任务失败（${res.status}）：${errText || res.statusText}`,
+      );
+      // 附加 status 供 retryWithBackoff 判断是否可重试（429 / 5xx）
+      error.status = res.status;
+      throw error;
+    }
 
-  const data = (await res.json()) as {
-    id: string;
-    model?: string;
-    status?: SeedanceTaskStatus | string;
-    error?: { code?: string; message?: string } | null;
-    content?: { video_url?: string; last_frame_url?: string };
-    usage?: { completion_tokens?: number; total_tokens?: number };
-  };
+    return (await res.json()) as {
+      id: string;
+      model?: string;
+      status?: SeedanceTaskStatus | string;
+      error?: { code?: string; message?: string } | null;
+      content?: { video_url?: string; last_frame_url?: string };
+      usage?: { completion_tokens?: number; total_tokens?: number };
+    };
+  });
 
   // 映射为内部统一状态
   const status = mapSeedanceStatus(data.status);

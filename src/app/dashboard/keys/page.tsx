@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import EmptyState from "@/components/ui/EmptyState";
 
 // API Key 类型（对应 GET /api/keys 返回的 keys 元素）
 interface ApiKeyItem {
@@ -684,27 +685,11 @@ export default function KeysPage() {
             </div>
           ) : (
             // 空状态
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <svg
-                  className="h-6 w-6 text-muted-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                  />
-                </svg>
-              </div>
-              <p className="text-sm text-muted-foreground">暂无 API Key</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                创建 Key 后即可通过 X-API-Key 调用对外 API
-              </p>
-            </div>
+            <EmptyState
+              title="暂无API Key"
+              description="创建API Key后即可通过SDK调用AI能力"
+              action={{ label: "创建Key", onClick: () => setShowCreateForm(true) }}
+            />
           )}
         </div>
       </div>

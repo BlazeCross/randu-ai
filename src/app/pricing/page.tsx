@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import PriceCalculator from "@/components/pricing/PriceCalculator";
+import { cx } from "@/lib/cn";
 
 // ===== 类型定义 =====
 
@@ -169,11 +171,6 @@ interface DisplayCard {
   ctaLabel: string;
   // 下单时需要传给 /api/payment/create 的 planName（免费版为 null）
   planName: string | null;
-}
-
-// 简单的 className 拼接工具
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
 }
 
 export default function PricingPage() {
@@ -345,7 +342,7 @@ export default function PricingPage() {
       </section>
 
       {/* ===== 套餐对比卡片 ===== */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <section id="plans" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16 scroll-mt-28">
         {errorMsg && (
           <div className="mx-auto mb-8 max-w-3xl rounded-[var(--radius-sm)] border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {errorMsg}
@@ -469,6 +466,26 @@ export default function PricingPage() {
             支付功能暂未开放，如需订阅请联系客服
           </p>
         )}
+      </section>
+
+      {/* ===== 价格计算器 ===== */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-foreground">
+              价格计算器
+            </span>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              估算你的月度花费
+            </h2>
+            <p className="mt-3 text-sm text-muted-foreground">
+              拖动滑块调整使用量，实时计算预估月费并获得套餐推荐
+            </p>
+          </div>
+          <div className="mx-auto mt-10 max-w-4xl">
+            <PriceCalculator plansAnchor="#plans" />
+          </div>
+        </div>
       </section>
 
       {/* ===== 功能对比表 ===== */}

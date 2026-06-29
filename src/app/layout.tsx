@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -6,6 +7,23 @@ import Navbar from "@/components/layout/Navbar";
 import UserOnboarding from "@/components/common/UserOnboarding";
 import CustomerServiceButton from "@/components/common/CustomerServiceButton";
 import ThemeProvider from "@/components/providers/ThemeProvider";
+import { cx } from "@/lib/cn";
+
+// Inter 字体（next/font 自托管，CSS 变量 --font-sans）
+// 保留中文 fallback 链（DESIGN_RULES_V2.md 红线要求）
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+  fallback: [
+    "'Stack Sans Text'",
+    "'PingFang SC'",
+    "'Microsoft YaHei'",
+    "ui-sans-serif",
+    "sans-serif",
+    "system-ui",
+  ],
+});
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randu.ai";
@@ -44,6 +62,9 @@ export const metadata: Metadata = {
     title: "燃渡AI - AI工作流服务平台",
     description:
       "提供 Coze 工作流执行、Seedance 视频生成、Seedream 文生图、豆包文案生成等 AI 能力，开放 API 供第三方集成。",
+    // TODO: 需要创建 /public/logo-og.png（推荐 1200x630），
+    // 创建后取消下方注释以启用 OG 图片预览：
+    // images: [{ url: "/logo-og.png", width: 1200, height: 630, alt: "燃渡AI" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -91,14 +112,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+    <html lang="zh-CN" className={cx("h-full antialiased", inter.variable)} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col">

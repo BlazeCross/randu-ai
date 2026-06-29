@@ -1,9 +1,5 @@
 import React from "react";
-
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import { cx } from "@/lib/cn";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** 是否启用 hover 交互态（边框高亮 + 微浮起 + 背景晕染） */

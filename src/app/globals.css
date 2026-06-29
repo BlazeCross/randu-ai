@@ -451,11 +451,10 @@ html.dark ::selection {
 /* 展开高度（下拉菜单/手风琴） */
 @keyframes expand {
   from { opacity: 0; max-height: 0; }
-  to { opacity: 1; max-height: 500px; }
+  to { opacity: 1; max-height: 80vh; }
 }
 .animate-expand {
   animation: expand var(--duration-slow) var(--ease-out) both;
-  overflow: hidden;
 }
 
 /* 脉冲光晕（CTA 按钮 focus） */
@@ -544,4 +543,27 @@ html.dark ::selection {
     transform: scale(0.97);
     opacity: 0.8;
   }
+}
+
+/* View Transitions API */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: vt-fade-out 150ms ease-in forwards;
+}
+
+::view-transition-new(root) {
+  animation: vt-fade-in 150ms ease-out forwards;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

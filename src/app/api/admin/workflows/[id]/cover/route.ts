@@ -24,6 +24,12 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
  * - 返回 { url, workflowId }
  *
  * 注意：旧封面图不从 OSS 删除（OSS 不维护引用计数，简化实现）。
+ *
+ * 后续迁移提示（Phase 15 STS 直传）：
+ * 本接口仍走服务端中转上传，因封面上传涉及工作流 ID 校验等业务逻辑，
+ * 短期内不改造为前端 STS 直传。
+ * 通用图片上传组件 ImageUploader 已支持 STS 直传（详见 src/components/upload/ImageUploader.tsx），
+ * 配置 ALIYUN_STS_* 环境变量后即可启用，未配置时自动回退到 /api/upload 服务端中转。
  */
 export const POST = requireAdmin(async (request, { params }) => {
   const { id } = await params!;

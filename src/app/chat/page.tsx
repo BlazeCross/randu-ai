@@ -2,17 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrackPageView } from "@/hooks/useTrack";
 import AppShell from "@/components/layout/AppShell";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
-
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import { cx } from "@/lib/cn";
 
 // 消息类型
 interface ChatMessage {
@@ -858,11 +855,12 @@ export default function ChatPage() {
                               {msg.content}
                             </p>
                             <div className="overflow-hidden rounded-[var(--radius-sm)]">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={msg.imageUrl}
+                              <Image
+                                src={msg.imageUrl as string}
                                 alt="AI 生成图片"
-                                className="max-w-full rounded-[var(--radius-sm)]"
+                                width={1024}
+                                height={1024}
+                                className="max-w-full h-auto rounded-[var(--radius-sm)]"
                               />
                             </div>
                             <a

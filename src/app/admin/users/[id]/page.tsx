@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -639,9 +640,12 @@ export default function AdminUserDetailPage() {
         <h2 className="mb-4 text-sm font-semibold text-foreground">基本信息</h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           {detail.avatar ? (
-            <img
+            <Image
               src={detail.avatar}
               alt={detail.nickname || "用户"}
+              width={64}
+              height={64}
+              unoptimized
               className="h-16 w-16 flex-shrink-0 rounded-full object-cover"
             />
           ) : (

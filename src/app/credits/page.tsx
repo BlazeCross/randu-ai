@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { SkeletonListItem } from "@/components/ui/Skeleton";
+import { cx } from "@/lib/cn";
 
 // ===== 类型定义 =====
 
@@ -148,11 +149,6 @@ const CREDIT_PACKAGES: Array<{
     tag: "85 折优惠",
   },
 ];
-
-// 简单的 className 拼接工具
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
 
 // 格式化日期时间
 function formatDate(dateStr: string): string {

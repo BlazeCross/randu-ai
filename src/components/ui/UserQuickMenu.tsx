@@ -7,11 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Avatar from "./Avatar";
 import Badge from "./Badge";
 import Popover from "./Popover";
-
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import { cx } from "@/lib/cn";
 
 export interface UserQuickMenuProps {
   /** 变体：navbar 横向顶栏 / sidebar 纵向侧栏 / compact 仅头像 */

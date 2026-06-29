@@ -1,9 +1,5 @@
 import React from "react";
-
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import { cx } from "@/lib/cn";
 
 // 标签变体
 type BadgeVariant =

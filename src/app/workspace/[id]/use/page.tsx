@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTaskPolling } from "@/hooks/useTaskPolling";
@@ -772,11 +773,12 @@ export default function WorkflowUsePage() {
                         }
                         if (isImageUrl) {
                           return (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                               src={outputUrl}
                               alt="生成结果"
-                              className="w-full rounded-[var(--radius-sm)] bg-muted"
+                              width={1024}
+                              height={1024}
+                              className="w-full h-auto rounded-[var(--radius-sm)] bg-muted"
                             />
                           );
                         }

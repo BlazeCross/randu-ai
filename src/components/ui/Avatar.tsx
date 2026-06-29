@@ -1,11 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import Image from "next/image";
+import { cx } from "@/lib/cn";
 
 // 头像尺寸
 type AvatarSize = "sm" | "md" | "lg";
@@ -57,18 +54,21 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
       <span
         ref={ref}
         className={cx(
-          "inline-flex flex-shrink-0 overflow-hidden rounded-full",
+          "relative inline-flex flex-shrink-0 overflow-hidden rounded-full",
           AVATAR_SIZES[size],
           className,
         )}
         {...rest}
       >
         {showImage ? (
-          <img
-            src={src}
+          <Image
+            src={src as string}
             alt={name ?? "avatar"}
             onError={() => setImgError(true)}
-            className="h-full w-full object-cover"
+            fill
+            unoptimized
+            sizes="48px"
+            className="object-cover"
           />
         ) : (
           <span

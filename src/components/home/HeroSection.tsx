@@ -1,12 +1,44 @@
-import Link from "next/link";
+"use client";
 
-const stats = [
-  { label: "精选工作流", value: "100+" },
-  { label: "服务用户", value: "10,000+" },
-  { label: "服务可用性", value: "99.9%" },
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import NewBadge from "@/components/ui/NewBadge";
+
+// NEW 轮播条：最新上线的能力 / 工作流
+const newUpdates = [
+  "Seedance 2.0 视频生成已上线",
+  "智能体对话支持多轮上下文",
+  "图文教程新增 10 篇实战案例",
+];
+
+const NEW_INTERVAL = 3000;
+
+// 冷启动引导气泡
+interface Suggestion {
+  label: string;
+  href: string;
+}
+
+const suggestions: Suggestion[] = [
+  { label: "用AI生成产品宣传视频", href: "/workspace" },
+  { label: "一键撰写小红书种草文案", href: "/chat" },
+  { label: "智能体帮你写周报", href: "/chat" },
+  { label: "生成AI艺术海报", href: "/workspace" },
+  { label: "自动翻译多语言文档", href: "/workspace" },
+  { label: "创建自定义工作流", href: "/workspace" },
 ];
 
 export default function HeroSection() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // NEW 轮播自动切换
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % newUpdates.length);
+    }, NEW_INTERVAL);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
       {/* 装饰性背景元素 */}
@@ -27,17 +59,21 @@ export default function HeroSection() {
 
       <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
         <div className="mx-auto max-w-3xl text-center">
-          {/* 顶部标签 */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/80 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-success-500" />
+          {/* NEW 标签轮播条 */}
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-4 py-1.5 text-sm backdrop-blur">
+            <NewBadge size="sm" />
+            <span className="relative h-5 min-w-[200px] overflow-hidden text-left text-muted-foreground sm:min-w-[260px]">
+              <span
+                key={activeIndex}
+                className="block animate-carousel-fade font-medium text-foreground/90"
+              >
+                {newUpdates[activeIndex]}
+              </span>
             </span>
-            AI 工作流服务平台
           </div>
 
           {/* 主标题 */}
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl animate-fade-up stagger-2">
             让 AI 工作流
             <br />
             <span className="bg-gradient-to-r from-primary-600 to-success-500 bg-clip-text text-transparent">
@@ -46,16 +82,16 @@ export default function HeroSection() {
           </h1>
 
           {/* 价值主张 */}
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl animate-fade-up stagger-3">
             百款AI工作流，即开即用，覆盖视频生成、内容创作、数据处理等全场景，
             让AI真正为你的业务创造价值
           </p>
 
           {/* 行动按钮 */}
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row animate-fade-up stagger-4">
             <Link
-              href="/register"
-              className="group inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground transition-all hover:bg-primary-hover"
+              href="/chat"
+              className="group inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground transition-all hover:bg-primary-hover animate-pulse-glow"
             >
               立即体验
               <svg
@@ -73,26 +109,34 @@ export default function HeroSection() {
               </svg>
             </Link>
             <Link
-              href="/workspace"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary hover:text-primary"
+              href="/pricing"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/40 hover:text-primary hover:shadow-[var(--glow-primary-strong)]"
             >
-              浏览工作流
+              查看定价
             </Link>
           </div>
 
-          {/* 数据统计 */}
-          <dl className="mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-4 border-t border-border pt-8 sm:mt-20 sm:gap-8 sm:pt-10">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <dt className="text-xs font-medium text-muted-foreground sm:text-sm">
-                  {stat.label}
-                </dt>
-                <dd className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {stat.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {/* 冷启动引导气泡 */}
+          <div className="mx-auto mt-12 max-w-3xl">
+            <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              试试这些
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              {suggestions.map((s, i) => (
+                <Link
+                  key={s.label}
+                  href={s.href}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-4 py-2 text-sm text-muted-foreground backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-accent/40 hover:text-primary hover:shadow-[var(--shadow-sm)] animate-fade-up"
+                  style={{ animationDelay: `${250 + i * 50}ms` }}
+                >
+                  <span className="text-primary" aria-hidden>
+                    ✦
+                  </span>
+                  {s.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

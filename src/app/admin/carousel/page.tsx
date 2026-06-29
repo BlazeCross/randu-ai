@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
@@ -383,7 +384,7 @@ export default function AdminCarouselPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-full text-left text-sm">
               <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider font-medium text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">缩略图</th>
@@ -399,9 +400,11 @@ export default function AdminCarouselPage() {
                 {slides.map((s) => (
                   <tr key={s.id} className="hover:bg-muted/30 transition-colors duration-100">
                     <td className="px-4 py-3">
-                      <img
+                      <Image
                         src={s.image}
                         alt={s.title}
+                        width={80}
+                        height={40}
                         className="h-10 w-20 flex-shrink-0 rounded object-cover"
                       />
                     </td>
@@ -528,9 +531,11 @@ export default function AdminCarouselPage() {
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     {formData.image ? (
-                      <img
+                      <Image
                         src={formData.image}
                         alt="预览"
+                        width={160}
+                        height={96}
                         className="h-24 w-40 rounded-[var(--radius-sm)] border border-border object-cover"
                       />
                     ) : (

@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import EmptyState from "@/components/ui/EmptyState";
 
 // 历史记录项（对应 /api/history 返回的 items 元素）
 interface HistoryItem {
@@ -266,10 +268,11 @@ export default function HistoryPage() {
                     {/* 缩略图 / 占位 */}
                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-muted">
                       {previewUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={previewUrl}
                           alt="缩略图"
+                          width={48}
+                          height={48}
                           className="h-12 w-12 rounded-[var(--radius-sm)] object-cover"
                         />
                       ) : (
@@ -350,30 +353,11 @@ export default function HistoryPage() {
             </div>
           ) : (
             // 空状态
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <svg
-                  className="h-6 w-6 text-muted-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-              </div>
-              <p className="text-sm text-muted-foreground">暂无任务记录</p>
-              <Link
-                href="/workspace"
-                className="mt-4 text-sm font-medium text-primary hover:text-primary-hover"
-              >
-                去使用工作流 →
-              </Link>
-            </div>
+            <EmptyState
+              title="暂无使用记录"
+              description="开始使用工作流后，这里会显示你的历史记录"
+              action={{ label: "去体验", href: "/workspace" }}
+            />
           )}
         </div>
 
@@ -437,12 +421,13 @@ export default function HistoryPage() {
             {/* Phase 2.8：按 outputType 渲染结果预览 */}
             {detail.outputUrl && detail.status === "completed" ? (
               detail.workflow?.outputType === "image" ? (
-                <div className="mb-4 overflow-hidden rounded-[var(--radius-sm)] bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative mb-4 h-[400px] w-full overflow-hidden rounded-[var(--radius-sm)] bg-muted">
+                  <Image
                     src={detail.outputUrl}
                     alt="生成结果"
-                    className="mx-auto max-h-[400px] w-full object-contain"
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
                   />
                 </div>
               ) : detail.workflow?.outputType === "text" ? (

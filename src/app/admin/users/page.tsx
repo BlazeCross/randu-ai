@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -336,7 +337,7 @@ export default function AdminUsersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-full text-left text-sm">
               <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider font-medium text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">用户</th>
@@ -368,9 +369,12 @@ export default function AdminUsersPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {u.avatar ? (
-                            <img
+                            <Image
                               src={u.avatar}
                               alt={u.nickname || "用户"}
+                              width={36}
+                              height={36}
+                              unoptimized
                               className="h-9 w-9 flex-shrink-0 rounded-full object-cover"
                             />
                           ) : (

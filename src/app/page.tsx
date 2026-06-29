@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import HeroCarousel from "@/components/home/HeroCarousel";
+import HeroSection from "@/components/home/HeroSection";
+import StatsSection from "@/components/home/StatsSection";
 import WorkflowCategories from "@/components/home/WorkflowCategories";
+import ScenarioShowcase from "@/components/home/ScenarioShowcase";
 import AdBanner from "@/components/home/AdBanner";
 import PricingSection from "@/components/home/PricingSection";
+import TestimonialWall from "@/components/home/TestimonialWall";
 import Footer from "@/components/home/Footer";
 import AnnouncementBanner from "@/components/home/AnnouncementBanner";
 import PageViewTracker from "@/components/PageViewTracker";
@@ -61,9 +65,13 @@ export default function Home() {
       <PageViewTracker page="home" />
       <AnnouncementBanner />
       <HeroCarousel />
+      <HeroSection />
+      <StatsSection />
       <WorkflowCategories />
-      <AdBanner />
+      <ScenarioShowcase />
       <PricingSection />
+      <TestimonialWall />
+      <AdBanner />
       <Footer />
     </>
   );

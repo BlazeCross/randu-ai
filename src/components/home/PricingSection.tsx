@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ScrollReveal from "@/components/ui/ScrollReveal";
 
 const plans = [
   {
@@ -54,9 +55,9 @@ export default function PricingSection() {
     <section className="bg-background py-16 sm:py-24">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-8">
         {/* 标题区 */}
-        <div className="mx-auto max-w-2xl text-center">
+        <ScrollReveal className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-            定价方案
+            选择
           </span>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
             选择适合你的套餐
@@ -64,13 +65,17 @@ export default function PricingSection() {
           <p className="mt-4 text-base text-muted-foreground sm:text-lg">
             灵活的定价方案，满足不同规模的使用需求
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* 套餐卡片 */}
         <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-8 sm:mt-16 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <div
+          {plans.map((plan, index) => (
+            <ScrollReveal
               key={plan.name}
+              animation="animate-fade-up"
+              className={`stagger-${index + 1}`}
+            >
+            <div
               className={`relative rounded-[var(--radius)] border bg-card p-6 transition-all sm:p-8 ${
                 plan.highlighted
                   ? "shadow-[0_0_0_1px_var(--primary)] hover:shadow-[0_0_0_1px_var(--primary),var(--shadow-md)] hover:-translate-y-1 scale-[1.01] transition-all duration-300"
@@ -137,6 +142,7 @@ export default function PricingSection() {
                 ))}
               </ul>
             </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // next/image 允许的远程图片域名
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "randu-ai.oss-cn-chengdu.aliyuncs.com" },
+      { protocol: "https", hostname: "ark-content-generation-cn-beijing.tos-cn-beijing.volces.com" },
+      { protocol: "https", hostname: "**.volces.com" },
+      { protocol: "https", hostname: "**.aliyuncs.com" },
+    ],
+  },
 };
 
 export default nextConfig;

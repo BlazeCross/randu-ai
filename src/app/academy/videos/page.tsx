@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -208,11 +209,12 @@ export default function VideosPage() {
                         {/* 缩略图（16:9）+ 播放图标 */}
                         <div className="relative aspect-video w-full overflow-hidden bg-muted">
                           {t.cover ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                               src={t.cover}
                               alt={t.title}
-                              className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
+                              className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
                                 isLocked ? "blur-sm" : ""
                               }`}
                               loading="lazy"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import SchemaBuilder, {
   type InputSchema,
@@ -490,9 +491,11 @@ export default function WorkflowForm({
           {/* 预览 */}
           <div className="flex-shrink-0">
             {formData.coverImage ? (
-              <img
+              <Image
                 src={formData.coverImage}
                 alt="封面预览"
+                width={160}
+                height={96}
                 className="h-24 w-40 rounded-[var(--radius-sm)] border border-border object-cover"
               />
             ) : (

@@ -2,11 +2,31 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cx } from "@/lib/cn";
 
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+// 侧栏快捷导航项（在智能体下方放置作品空间入口）
+const SIDEBAR_NAV_LINKS = [
+  {
+    label: "智能体",
+    href: "/chat",
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
+    label: "作品空间",
+    href: "/artifacts",
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7" />
+        <path d="M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+      </svg>
+    ),
+  },
+] as const;
 
 export interface AppShellProps {
   /** 主内容区 */
@@ -48,22 +68,28 @@ export default function AppShell({
   sidebarHeader,
 }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
+  const pathname = usePathname();
 
   return (
     <div className="flex h-[calc(100vh-48px)] overflow-hidden bg-background">
       {/* 移动端侧栏遮罩 */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-10 bg-foreground/30 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-20 bg-foreground/30 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden
         />
       )}
-      {/* 侧栏 */}
+      {/* 侧栏：移动端为全宽抽屉（max-w-xs），桌面端为 inline 248px */}
       <aside
         className={cx(
-          "flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out relative overflow-hidden",
-          sidebarOpen ? "w-[248px]" : "w-0 overflow-hidden"
+          "flex flex-col bg-sidebar transition-all duration-300 ease-in-out overflow-hidden",
+          // 移动端：fixed 抽屉，从左侧滑入
+          "fixed inset-y-0 left-0 z-30 w-full max-w-xs border-r border-sidebar-border",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          // 桌面端：覆盖为 inline 布局，宽度按展开状态切换
+          "md:relative md:z-auto md:translate-x-0",
+          sidebarOpen ? "md:w-[248px]" : "md:w-0"
         )}
       >
         {/* 装饰性发光圆 */}
@@ -74,6 +100,30 @@ export default function AppShell({
             {sidebarHeader}
           </div>
         )}
+        {/* 快捷导航：智能体 / 作品空间 */}
+        <nav className="flex-none border-b border-sidebar-border p-2">
+          <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            导航
+          </div>
+          {SIDEBAR_NAV_LINKS.map((item) => {
+            const active = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cx(
+                  "flex items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm transition-colors",
+                  active
+                    ? "bg-background font-medium text-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
         {/* 侧栏内容（可滚动） */}
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           {sidebar}

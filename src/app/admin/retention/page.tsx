@@ -179,7 +179,7 @@ export default function AdminRetentionPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
+            <table className="min-w-full border-collapse text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
                   <th className="sticky left-0 z-10 bg-muted/50 px-3 py-2.5 text-left text-xs uppercase tracking-wider font-medium text-muted-foreground">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
@@ -9,16 +10,13 @@ import OnlineCount from "@/components/layout/OnlineCount";
 import NotificationBell from "@/components/layout/NotificationBell";
 import UserQuickMenu from "@/components/ui/UserQuickMenu";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-
-// 简单的 className 拼接工具（过滤 falsy 值）
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import { cx } from "@/lib/cn";
 
 // 主导航链接（教程已下线至功能页按钮，API 文档已迁入个人中心）
 const navLinks = [
   { label: "首页", href: "/" },
   { label: "工作台", href: "/workspace" },
+  { label: "市场", href: "/marketplace" },
   { label: "智能体", href: "/chat" },
   { label: "定价", href: "/pricing" },
 ];
@@ -91,10 +89,11 @@ export default function Navbar() {
             className="flex items-center gap-2"
             onClick={() => setMobileOpen(false)}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/logo.png"
               alt="燃渡AI"
+              width={128}
+              height={128}
               className="h-8 w-auto invert dark:invert-0"
             />
             <span className="hidden text-lg font-bold text-foreground sm:inline">燃渡Ai</span>
@@ -246,7 +245,7 @@ export default function Navbar() {
 
       {/* 移动端展开菜单 */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background md:hidden animate-expand">
+        <div className="max-h-[80vh] overflow-y-auto border-t border-border bg-background md:hidden animate-expand">
           <div className="space-y-1 px-4 py-3">
             {navLinks.map((link) => (
               <Link

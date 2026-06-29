@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 // 微信客服二维码占位图
 const QR_IMAGE_URL =
@@ -79,10 +80,12 @@ export default function CustomerServiceButton() {
           {/* 微信二维码 */}
           <div className="mt-3 flex flex-col items-center">
             <div className="overflow-hidden rounded-[var(--radius-sm)] border border-border bg-background p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={QR_IMAGE_URL}
                 alt="微信客服二维码"
+                width={128}
+                height={128}
+                unoptimized
                 className="h-32 w-32 rounded-[var(--radius-sm)] object-cover"
                 loading="lazy"
               />

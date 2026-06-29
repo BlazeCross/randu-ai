@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
 export type TutorialType = "article" | "video";
@@ -412,9 +413,11 @@ export default function TutorialManager({ type }: TutorialManagerProps) {
                   <tr key={t.id} className="hover:bg-muted/30 transition-colors duration-100">
                     <td className="px-4 py-3">
                       {t.cover ? (
-                        <img
+                        <Image
                           src={t.cover}
                           alt={t.title}
+                          width={64}
+                          height={40}
                           className="h-10 w-16 flex-shrink-0 rounded object-cover"
                         />
                       ) : (
@@ -573,9 +576,11 @@ export default function TutorialManager({ type }: TutorialManagerProps) {
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     {formData.cover ? (
-                      <img
+                      <Image
                         src={formData.cover}
                         alt="预览"
+                        width={160}
+                        height={96}
                         className="h-24 w-40 rounded-[var(--radius-sm)] border border-border object-cover"
                       />
                     ) : (

@@ -2,11 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-
-// 简单的 className 拼接工具
-function cx(...args: Array<string | false | null | undefined>): string {
-  return args.filter(Boolean).join(" ");
-}
+import Image from "next/image";
+import { cx } from "@/lib/cn";
 
 interface Slide {
   id: string;
@@ -199,11 +196,12 @@ export default function HeroCarousel() {
             >
               {/* 背景：优先使用 API 返回的 image，否则使用渐变 */}
               {slide.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={slide.image}
                   alt=""
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  sizes="100vw"
+                  className="object-cover"
                 />
               ) : (
                 <div

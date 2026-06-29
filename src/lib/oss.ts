@@ -6,14 +6,33 @@ import OSS from "ali-oss";
  * 阿里云 OSS 客户端（仅在服务端使用）
  *
  * 通过环境变量配置：
- * - OSS_ACCESS_KEY_ID     访问密钥 ID
- * - OSS_ACCESS_KEY_SECRET 访问密钥 Secret
+ * - OSS_ACCESS_KEY_ID     访问密钥 ID（服务端中转上传使用）
+ * - OSS_ACCESS_KEY_SECRET 访问密钥 Secret（服务端中转上传使用）
  * - OSS_BUCKET            Bucket 名称
  * - OSS_REGION            地域，如 oss-cn-hangzhou
  * - OSS_CDN_DOMAIN        CDN 域名，如 https://cdn.example.com
  *
+ * STS 直传相关环境变量（可选，未配置时回退到服务端中转）：
+ * - ALIYUN_STS_ACCESS_KEY_ID     阿里云 RAM 子账号 AccessKey ID
+ * - ALIYUN_STS_ACCESS_KEY_SECRET 阿里云 RAM 子账号 AccessKey Secret
+ * - ALIYUN_STS_ROLE_ARN          RAM 角色的 ARN（acs:ram::<uid>:role/<roleName>）
+ *
  * 注意：本模块只能在服务端（API Route / Server Component）中导入，
  *       严禁在客户端组件中引用，否则会泄露密钥。
+ */
+
+/*
+ * OSS CORS 配置（需在阿里云控制台手动配置）：
+ * 前端直传（STS 模式）需要 Bucket 配置 CORS 规则，否则浏览器会拦截跨域请求。
+ *
+ * AllowedOrigin:
+ *   - https://randuai.cn
+ *   - http://localhost:3000
+ * AllowedMethod: GET, PUT, POST, HEAD
+ * AllowedHeader: *
+ * ExposeHeader: ETag, x-oss-request-id
+ *
+ * 配置路径：阿里云 OSS 控制台 → Bucket → 权限管理 → 跨域设置 → 创建规则
  */
 
 let clientInstance: OSS | null = null;
@@ -153,4 +172,104 @@ export async function uploadStreamToOss(
   }
 
   return buildCdnUrl(result.name);
+}
+
+// ============ STS 临时凭证（前端直传） ============
+
+// STS 凭证返回结构（与前端 ali-oss SDK 初始化参数对齐）
+export interface STSCredentials {
+  accessKeyId: string;
+  accessKeySecret: string;
+  securityToken: string;
+  // ISO 8601 UTC 过期时间字符串
+  expiration: string;
+  bucket: string;
+  region: string;
+  // CDN 域名（可选，配置了 OSS_CDN_DOMAIN 时返回）
+  // 前端直传后用此域名拼接最终 URL，与服务端中转模式返回的 URL 保持一致
+  cdnDomain?: string;
+}
+
+/**
+ * 获取 OSS STS 临时上传凭证
+ *
+ * 用于前端直传 OSS：客户端调用 /api/oss/sts 获取临时凭证，
+ * 然后用 ali-oss SDK 在浏览器中直接上传文件到 OSS，
+ * 无需经过服务端中转，可显著降低服务端带宽/内存压力。
+ *
+ * 安全模型：
+ * - STS 凭证由阿里云 RAM 子账号签发，权限受 RoleArn + 策略限制
+ * - 凭证有效期 1 小时，过期后前端需重新获取
+ * - 推荐为该 RAM 角色配置仅允许 `oss:PutObject` 到指定前缀的策略
+ *
+ * 向后兼容：
+ * - 若 ALIYUN_STS_* 环境变量未配置，则返回 null
+ * - 调用方（API 路由 / 前端组件）应根据 null 自动回退到服务端中转模式
+ *
+ * 环境变量：
+ * - ALIYUN_STS_ACCESS_KEY_ID     RAM 子账号 AK
+ * - ALIYUN_STS_ACCESS_KEY_SECRET RAM 子账号 SK
+ * - ALIYUN_STS_ROLE_ARN          RAM 角色 ARN
+ *
+ * @returns STS 凭证对象；未配置时返回 null（调用方应回退到服务端中转）
+ */
+export async function getSTSCredentials(): Promise<STSCredentials | null> {
+  const accessKeyId = process.env.ALIYUN_STS_ACCESS_KEY_ID;
+  const accessKeySecret = process.env.ALIYUN_STS_ACCESS_KEY_SECRET;
+  const roleArn = process.env.ALIYUN_STS_ROLE_ARN;
+
+  // STS 未配置：返回 null，由调用方回退到服务端中转模式
+  if (!accessKeyId || !accessKeySecret || !roleArn) {
+    return null;
+  }
+
+  const bucket = process.env.OSS_BUCKET;
+  const region = process.env.OSS_REGION;
+  if (!bucket || !region) {
+    // STS 已配置但 OSS_BUCKET/OSS_REGION 缺失：无法直传，回退
+    console.warn(
+      "[OSS] STS 凭证已配置但 OSS_BUCKET/OSS_REGION 缺失，回退到服务端中转",
+    );
+    return null;
+  }
+
+  // 使用 ali-oss 内置的 STS 类（ali-oss 包内 lib/sts.js 模块）
+  // @types/ali-oss 将 STS 类声明在 OSS 命名空间下，通过 OSS.STS 访问
+  const sts = new OSS.STS({
+    accessKeyId,
+    accessKeySecret,
+  });
+
+  // assumeRole(roleArn, policy, expirationSeconds, session)
+  // - roleArn: RAM 角色 ARN（权限由该角色的授权策略控制）
+  // - policy: 不传，使用角色自身的授权策略
+  // - expirationSeconds: 3600（1 小时有效期）
+  // - session: 'randu-ai-upload'（会话名，用于审计日志识别）
+  const result = await sts.assumeRole(
+    roleArn,
+    undefined,
+    3600,
+    "randu-ai-upload",
+  );
+
+  if (!result?.credentials) {
+    throw new Error("STS assumeRole 返回为空");
+  }
+
+  // CDN 域名（可选）：配置了 OSS_CDN_DOMAIN 时返回，前端直传后用此拼接最终 URL
+  // 去除协议和尾斜杠，统一为 host 形式（如 cdn.example.com）
+  const rawCdnDomain = process.env.OSS_CDN_DOMAIN;
+  const cdnDomain = rawCdnDomain
+    ? rawCdnDomain.replace(/\/+$/, "").replace(/^https?:\/\//, "")
+    : undefined;
+
+  return {
+    accessKeyId: result.credentials.AccessKeyId,
+    accessKeySecret: result.credentials.AccessKeySecret,
+    securityToken: result.credentials.SecurityToken,
+    expiration: result.credentials.Expiration,
+    bucket,
+    region,
+    cdnDomain,
+  };
 }

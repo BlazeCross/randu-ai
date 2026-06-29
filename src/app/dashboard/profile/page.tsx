@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
 // 昵称长度限制（与后端一致）
@@ -231,10 +232,12 @@ export default function ProfilePage() {
             {/* 头像预览 */}
             <div className="relative">
               {user.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={user.avatar}
                   alt="头像"
+                  width={80}
+                  height={80}
+                  unoptimized
                   className="h-20 w-20 rounded-full object-cover ring-2 ring-ring"
                 />
               ) : (

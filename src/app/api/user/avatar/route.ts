@@ -22,6 +22,12 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024;
  * - 校验：文件存在、类型为图片、大小 ≤ 2MB
  * - 流式上传到 OSS，更新 user.avatar 字段
  * - 成功返回 { avatar: url }
+ *
+ * 后续迁移提示（Phase 15 STS 直传）：
+ * 本接口仍走服务端中转上传，因头像上传涉及裁剪/压缩等后处理逻辑，
+ * 短期内不改造为前端 STS 直传。
+ * 通用图片上传组件 ImageUploader 已支持 STS 直传（详见 src/components/upload/ImageUploader.tsx），
+ * 配置 ALIYUN_STS_* 环境变量后即可启用，未配置时自动回退到 /api/upload 服务端中转。
  */
 export const POST = requireAuth(async (request, { userId }) => {
   try {
