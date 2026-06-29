@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 // /academy/videos 为 "use client" 列表页（无详情页路由），
 // 在此 Server Component layout 中注入 ItemList JSON-LD 结构化数据。
 const SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randu.ai";
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randuai.cn";
 
 const itemListJsonLd = {
   "@context": "https://schema.org",

@@ -12,7 +12,7 @@ import AnnouncementBanner from "@/components/home/AnnouncementBanner";
 import PageViewTracker from "@/components/PageViewTracker";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randu.ai";
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randuai.cn";
 
 export const metadata: Metadata = {
   title: "燃渡AI - AI工作流服务平台",

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* 启用基于 class 的暗色模式（html.dark 触发），覆盖 Tailwind v4 默认的 prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
  * 燃渡AI 设计系统 v2.0（基于 Doubao Design Library）
  * 极简 · 冷调 · 技术感 · 平静

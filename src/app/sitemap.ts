@@ -6,7 +6,7 @@ function getBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_APP_URL;
   if (!url) {
     // 兜底：避免构建时抛错
-    return "https://randu.ai";
+    return "https://randuai.cn";
   }
   return url.replace(/\/$/, "");
 }

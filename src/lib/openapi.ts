@@ -17,12 +17,12 @@ export const OPENAPI_SPEC = {
       "燃渡AI 工作流服务平台对外开放的 API，提供 AI 视频生成、文生图、文案生成等能力。所有接口均使用 X-API-Key 鉴权。",
     contact: {
       name: "燃渡AI",
-      url: "https://randu.ai",
+      url: "https://randuai.cn",
     },
   },
   servers: [
     {
-      url: "https://randu.ai",
+      url: "https://randuai.cn",
       description: "生产环境",
     },
   ],
