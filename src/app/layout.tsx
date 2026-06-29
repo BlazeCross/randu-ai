@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -7,23 +6,6 @@ import Navbar from "@/components/layout/Navbar";
 import UserOnboarding from "@/components/common/UserOnboarding";
 import CustomerServiceButton from "@/components/common/CustomerServiceButton";
 import ThemeProvider from "@/components/providers/ThemeProvider";
-import { cx } from "@/lib/cn";
-
-// Inter 字体（next/font 自托管，CSS 变量 --font-sans）
-// 保留中文 fallback 链（DESIGN_RULES_V2.md 红线要求）
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sans",
-  fallback: [
-    "'Stack Sans Text'",
-    "'PingFang SC'",
-    "'Microsoft YaHei'",
-    "ui-sans-serif",
-    "sans-serif",
-    "system-ui",
-  ],
-});
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randuai.cn";
@@ -112,7 +94,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className={cx("h-full antialiased", inter.variable)} suppressHydrationWarning>
+    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
