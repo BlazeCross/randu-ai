@@ -89,9 +89,18 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("登录失败:", error);
+    const errInfo = {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack?.split("\n").slice(0, 5).join(" | ") : undefined,
+      env: {
+        hasJwt: !!process.env.JWT_SECRET,
+        hasDb: !!process.env.DATABASE_URL,
+        nodeEnv: process.env.NODE_ENV,
+      },
+    };
+    console.error("登录失败:", JSON.stringify(errInfo, null, 2));
     return NextResponse.json(
-      { message: "服务器内部错误" },
+      { message: "服务器内部错误", debug: errInfo },
       { status: 500 },
     );
   }
