@@ -749,32 +749,80 @@ export default function WorkflowUsePage() {
 
                   {outputUrl ? (
                     <>
-                      {/* 按 outputType 渲染结果预览 */}
-                      {workflow.outputType === "video" ? (
-                        <video
-                          src={outputUrl}
-                          controls
-                          autoPlay
-                          className="w-full rounded-[var(--radius-sm)] bg-black"
-                        />
-                      ) : workflow.outputType === "image" ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={outputUrl}
-                          alt="生成结果"
-                          className="w-full rounded-[var(--radius-sm)] bg-muted"
-                        />
-                      ) : (
-                        // text 类型：展示在 pre 块中
-                        <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-[var(--radius-sm)] bg-card p-4 text-sm text-foreground">
-                          {outputUrl}
-                        </pre>
-                      )}
+                      {/* 渲染结果预览：优先 outputType，同时自动检测 URL 类型 */}
+                      {(() => {
+                        // 自动检测：判断 URL 是否为视频或图片
+                        const isVideoUrl =
+                          workflow.outputType === "video" ||
+                          /\.mp4(\?|$)/i.test(outputUrl) ||
+                          /\/doubao-seedance/i.test(outputUrl);
+                        const isImageUrl =
+                          workflow.outputType === "image" ||
+                          /\.(png|jpe?g|webp|gif|bmp|svg)(\?|$)/i.test(outputUrl);
+
+                        if (isVideoUrl) {
+                          return (
+                            <video
+                              src={outputUrl}
+                              controls
+                              autoPlay
+                              className="w-full rounded-[var(--radius-sm)] bg-black"
+                            />
+                          );
+                        }
+                        if (isImageUrl) {
+                          return (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={outputUrl}
+                              alt="生成结果"
+                              className="w-full rounded-[var(--radius-sm)] bg-muted"
+                            />
+                          );
+                        }
+                        // 文本类型：展示在 pre 块中
+                        return (
+                          <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-[var(--radius-sm)] bg-card p-4 text-sm text-foreground">
+                            {outputUrl}
+                          </pre>
+                        );
+                      })()}
 
                       {/* 操作按钮 */}
                       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                        {/* 下载结果 */}
-                        {workflow.outputType === "text" ? (
+                        {/* 下载/复制按钮：根据 URL 类型自动选择 */}
+                        {(() => {
+                          const isMediaUrl =
+                            workflow.outputType === "video" ||
+                            workflow.outputType === "image" ||
+                            /\.mp4(\?|$)/i.test(outputUrl) ||
+                            /\/doubao-seedance/i.test(outputUrl) ||
+                            /\.(png|jpe?g|webp|gif|bmp|svg)(\?|$)/i.test(outputUrl);
+                          return isMediaUrl ? (
+                          /* 视频/图片结果：下载链接 */
+                          <a
+                            href={outputUrl}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                          >
+                            <svg
+                              className="mr-2 h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                              />
+                            </svg>
+                            下载结果
+                          </a>
+                          ) : (
                           /* 文本结果：复制按钮 */
                           <button
                             type="button"
@@ -800,29 +848,8 @@ export default function WorkflowUsePage() {
                             </svg>
                             复制结果
                           </button>
-                        ) : (
-                          /* 视频/图片结果：下载链接 */
-                          <a
-                            href={outputUrl}
-                            download
-                            className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
-                          >
-                            <svg
-                              className="mr-2 h-4 w-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                              />
-                            </svg>
-                            {resultDownloadLabel}
-                          </a>
-                        )}
+                          );
+                        })()}
                         {/* 重新生成 */}
                         <button
                           type="button"
