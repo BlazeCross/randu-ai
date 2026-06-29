@@ -251,3 +251,43 @@ model EventLog {
   @@index([event, createdAt])
   @@map("event_logs")
 }
+
+/// 首页轮播图（Phase 2）
+model CarouselSlide {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  image       String
+  link        String?
+  badge       String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([published, sortOrder])
+  @@map("carousel_slides")
+}
+
+/// 图文+视频教程（Phase 2）
+model Tutorial {
+  id          String   @id @default(cuid())
+  type        String // article | video
+  title       String
+  category    String?
+  cover       String?
+  content     String?
+  videoUrl    String?  @map("video_url")
+  excerpt     String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  published   Boolean  @default(false)
+  studyCount  Int      @default(0) @map("study_count")
+  viewCount   Int      @default(0) @map("view_count")
+  accessLevel String   @default("free") @map("access_level") // free | vip
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([published, sortOrder])
+  @@index([type])
+  @@map("tutorials")
+}

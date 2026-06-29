@@ -4,6 +4,63 @@ import { verifyNotifySign, isAlipayConfigured } from "@/lib/alipay";
 import { getPlanByName } from "@/lib/plans";
 
 /**
+ * GET /api/payment/callback - 支付宝同步返回（return_url）
+ *
+ * 用户在支付宝收银台完成支付后，浏览器会跳转到本接口（GET 请求，参数在 query 中）。
+ *
+ * 重要安全提示（红线）：
+ * - 前台同步跳转结果不可信！实际订单状态更新由 POST 异步通知完成。
+ * - 本接口仅负责验签后重定向到前端订单页面，不更新任何数据。
+ * - 前端订单页展示的状态以数据库为准（由 POST 回调更新）。
+ *
+ * 流程：
+ *   1. 从 URL query 读取支付宝返回的参数（含 sign、out_trade_no 等）
+ *   2. 验签（仅在支付宝已配置时进行，防止伪造跳转）
+ *   3. 验签成功：重定向到 /dashboard/orders（携带订单号便于前端定位）
+ *   4. 验签失败/未配置：重定向到 /dashboard/orders（不携带订单号，记录日志）
+ *
+ * 注意：本接口不需要鉴权，由用户浏览器跳转触发。
+ */
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+
+  // 1. 读取 query 参数（支付宝同步返回会将参数拼在 URL 上）
+  const params: Record<string, string> = {};
+  url.searchParams.forEach((value, key) => {
+    params[key] = value;
+  });
+
+  // 2. 验签（仅在支付宝已配置时进行）
+  //    未配置时直接重定向，避免抛错导致用户看到 500 页面
+  let verified = false;
+  if (isAlipayConfigured()) {
+    try {
+      verified = verifyNotifySign(params);
+    } catch (error) {
+      console.error("[GET /api/payment/callback] 验签异常:", error);
+      verified = false;
+    }
+  }
+
+  // 3. 验签失败或支付宝未配置：记录日志，仍重定向到订单页
+  //    订单状态以数据库为准，不受同步返回参数影响
+  if (!verified) {
+    console.warn(
+      "[GET /api/payment/callback] 同步返回验签失败或支付宝未配置",
+    );
+    return NextResponse.redirect(new URL("/dashboard/orders", url.origin));
+  }
+
+  // 4. 验签成功：重定向到订单页，携带订单号便于前端高亮定位
+  const outTradeNo = params.out_trade_no;
+  const redirectUrl = new URL("/dashboard/orders", url.origin);
+  if (outTradeNo) {
+    redirectUrl.searchParams.set("order_no", outTradeNo);
+  }
+  return NextResponse.redirect(redirectUrl);
+}
+
+/**
  * POST /api/payment/callback - 支付宝异步通知回调
  *
  * 支付宝在用户完成支付后会向本接口发送 POST 请求（application/x-www-form-urlencoded）。

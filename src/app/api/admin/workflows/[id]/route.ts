@@ -110,7 +110,7 @@ export const PATCH = requireAdmin(async (request, { params }) => {
     data.name = name;
   }
 
-  if (body.description !== undefined) {
+  if (body.description != null) {
     const description = body.description.trim();
     if (description.length > DESCRIPTION_MAX_LENGTH) {
       return NextResponse.json(

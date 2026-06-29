@@ -14,6 +14,9 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 const PAGE_TITLES: Record<string, string> = {
   "/admin": "数据概览",
   "/admin/workflows": "工作流管理",
+  "/admin/carousel": "轮播图管理",
+  "/admin/tutorials/articles": "图文教程管理",
+  "/admin/tutorials/videos": "视频教程管理",
   "/admin/users": "用户管理",
   "/admin/orders": "订单管理",
   "/admin/cost": "成本核算",

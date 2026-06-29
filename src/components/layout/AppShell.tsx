@@ -50,7 +50,7 @@ export default function AppShell({
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-[calc(100vh-48px)] overflow-hidden bg-background">
       {/* 移动端侧栏遮罩 */}
       {sidebarOpen && (
         <div
@@ -101,7 +101,8 @@ export default function AppShell({
               strokeLinejoin="round"
               aria-hidden
             >
-              <path d="M3 12h18M3 6h18M3 18h18" />
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M9 3v18" />
             </svg>
           </button>
 

@@ -15,13 +15,29 @@ interface Slide {
   title: string;
   highlight?: string;
   description: string;
-  cta: string;
+  cta?: string;
   href: string;
   gradient: string;
+  image?: string | null;
 }
 
-// 轮播图数据：主推功能 / 新版本 / 新教学 / 重大更新
-const slides: Slide[] = [
+// /api/carousel 返回的轮播项
+interface CarouselSlideApi {
+  id: string;
+  title: string;
+  description: string | null;
+  image: string;
+  link: string | null;
+  badge: string | null;
+  sortOrder: number;
+}
+
+interface CarouselResponse {
+  slides: CarouselSlideApi[];
+}
+
+// 默认轮播图数据（API 失败或返回空时回退使用）
+const DEFAULT_SLIDES: Slide[] = [
   {
     id: "platform",
     badge: "AI 工作流服务平台",
@@ -67,6 +83,10 @@ const slides: Slide[] = [
   },
 ];
 
+// 默认渐变（API 数据未提供 image 时使用）
+const DEFAULT_GRADIENT =
+  "radial-gradient(ellipse at 30% 50%, #0065fd 0%, #00266b 60%, #0e1115 100%)";
+
 const AUTO_PLAY_INTERVAL = 5000;
 
 const BADGE_STYLES: Record<string, string> = {
@@ -76,25 +96,68 @@ const BADGE_STYLES: Record<string, string> = {
 };
 
 /**
+ * 将 API 返回的轮播项映射为内部 Slide 结构
+ */
+function mapApiSlide(s: CarouselSlideApi): Slide {
+  return {
+    id: s.id,
+    title: s.title,
+    description: s.description ?? "",
+    href: s.link || "#",
+    badge: s.badge ?? undefined,
+    gradient: DEFAULT_GRADIENT,
+    image: s.image || null,
+    cta: "了解更多",
+  };
+}
+
+/**
  * HeroCarousel 首页轮播图
  *
- * 首页第一个板块，展示主推功能、新版本、新教学信息、重大更新等。
+ * 数据来源：GET /api/carousel（公开接口）
+ * - 接口返回空数组或 fetch 失败时，回退到 DEFAULT_SLIDES
+ * - API 返回数据时，用 image 字段作为背景（无 image 则用默认渐变）
  * - 自动播放（5秒切换），鼠标悬浮暂停
  * - 左右箭头 + 底部圆点导航
- * - 渐变背景 + 内容覆盖层
- * - 点击幻灯片跳转至对应功能页面
  */
 export default function HeroCarousel() {
+  // 初始使用默认数据，避免首屏空白；fetch 完成后替换为 API 数据
+  const [slides, setSlides] = useState<Slide[]>(DEFAULT_SLIDES);
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  // 数据拉取：仅在挂载时请求一次
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/carousel", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("获取轮播图失败");
+        return res.json();
+      })
+      .then((data: CarouselResponse) => {
+        if (cancelled) return;
+        const apiSlides = data.slides || [];
+        // 仅在 API 返回非空数据时替换；否则保留默认数据
+        if (apiSlides.length > 0) {
+          setSlides(apiSlides.map(mapApiSlide));
+          setCurrent(0);
+        }
+      })
+      .catch(() => {
+        // fetch 失败：静默回退到默认数据（已是初始值，无需操作）
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   const prev = useCallback(() => {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   // 自动播放
   useEffect(() => {
@@ -119,8 +182,8 @@ export default function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="平台功能轮播"
     >
-      <div className="relative mx-auto max-w-[1600px] px-4 lg:px-8">
-        <div className="relative h-[320px] overflow-hidden rounded-[var(--radius-lg)] border border-border shadow-[var(--shadow-lg)] sm:h-[420px] lg:h-[500px]">
+      <div className="relative w-full">
+        <div className="relative h-[320px] overflow-hidden border-b border-border shadow-[var(--shadow-lg)] sm:h-[420px] lg:h-[500px]">
           {slides.map((slide, index) => (
             <Link
               key={slide.id}
@@ -134,11 +197,22 @@ export default function HeroCarousel() {
               aria-hidden={index !== current}
               aria-label={`${slide.title} ${slide.highlight ?? ""}`}
             >
-              {/* 渐变背景 */}
-              <div
-                className="absolute inset-0"
-                style={{ background: slide.gradient }}
-              />
+              {/* 背景：优先使用 API 返回的 image，否则使用渐变 */}
+              {slide.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={slide.image}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <div
+                  className="absolute inset-0"
+                  style={{ background: slide.gradient }}
+                />
+              )}
+              {/* 暗色遮罩（保证文字可读性，无论背景是图片还是渐变） */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
               {/* 装饰性网格纹理 */}
               <div
                 className="absolute inset-0 opacity-[0.06]"
@@ -157,8 +231,9 @@ export default function HeroCarousel() {
                 <div className="absolute right-[25%] top-[45%] h-1.5 w-1.5 rounded-full bg-white/10 animate-pulse [animation-delay:2000ms]" />
               </div>
               {/* 内容 */}
-              <div className="relative flex h-full flex-col justify-center px-8 sm:px-12 lg:px-16">
-                <div className="max-w-xl">
+              <div className="relative flex h-full flex-col justify-center">
+                <div className="mx-auto w-full max-w-[1600px] px-6 sm:px-12 lg:px-16">
+                  <div className="max-w-xl">
                   {/* 标签 */}
                   {slide.badge && (
                     <span
@@ -183,24 +258,29 @@ export default function HeroCarousel() {
                     )}
                   </h2>
                   {/* 描述 */}
-                  <p className="mt-4 max-w-lg text-sm text-white/80 sm:text-base lg:text-lg animate-fade-up stagger-3">
-                    {slide.description}
-                  </p>
+                  {slide.description && (
+                    <p className="mt-4 max-w-lg text-sm text-white/80 sm:text-base lg:text-lg animate-fade-up stagger-3">
+                      {slide.description}
+                    </p>
+                  )}
                   {/* CTA 按钮 */}
-                  <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-[var(--shadow-md)] px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-105 hover:shadow-[var(--shadow-lg)] sm:text-base animate-fade-up stagger-4">
-                    {slide.cta}
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </span>
+                  {slide.cta && (
+                    <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-[var(--shadow-md)] px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-105 hover:shadow-[var(--shadow-lg)] sm:text-base animate-fade-up stagger-4">
+                      {slide.cta}
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
                 </div>
               </div>
             </Link>

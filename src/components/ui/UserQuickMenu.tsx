@@ -197,10 +197,22 @@ export default function UserQuickMenu({
         <span className="hidden text-sm font-medium text-foreground sm:inline">
           {name}
         </span>
-        <Badge variant="primary">{plan}</Badge>
-        <span className="hidden text-xs text-muted-foreground md:inline">
+        <Link
+          href="/pricing"
+          onClick={(e) => e.stopPropagation()}
+          className="transition-transform hover:scale-105"
+          title="查看套餐"
+        >
+          <Badge variant="primary">{plan}</Badge>
+        </Link>
+        <Link
+          href="/credits"
+          onClick={(e) => e.stopPropagation()}
+          className="hidden text-xs text-muted-foreground transition-colors hover:text-primary md:inline"
+          title="积分余额"
+        >
           {user.credits} 点
-        </span>
+        </Link>
       </div>
     );
   };

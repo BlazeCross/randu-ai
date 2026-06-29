@@ -8,6 +8,10 @@ import {
 } from "@/lib/alipay";
 import { getPlanByName } from "@/lib/plans";
 
+// 路由段配置：限制最大执行时间 30 秒
+// 支付宝网关调用偶有抖动，30s 足够覆盖正常请求；超时则由平台终止
+export const maxDuration = 30;
+
 // 积分包配置（一次性购买，单位：元）
 // 价格梯度：购买越多越优惠
 interface CreditsPackage {
