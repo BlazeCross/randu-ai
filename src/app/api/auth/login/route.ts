@@ -8,6 +8,32 @@ import {
   ipRateLimitedResponse,
 } from "@/lib/ipRateLimit";
 
+// JWT cookie 有效期（与 JWT exp 一致，7 天）
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 天，单位秒
+
+// 用于时序攻击防护的固定 dummy hash
+const DUMMY_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+
+/**
+ * 构造 httpOnly cookie 字符串
+ * 生产环境启用 Secure（HTTPS），开发环境不启用（HTTP localhost）
+ */
+function buildAuthCookie(token: string, request: Request): string {
+  const isHttps = request.headers.get("x-forwarded-proto") === "https" ||
+                  request.url.startsWith("https://");
+  const parts = [
+    `token=${token}`,
+    "Path=/",
+    `Max-Age=${COOKIE_MAX_AGE}`,
+    "SameSite=Lax",
+    "HttpOnly",
+  ];
+  if (isHttps) {
+    parts.push("Secure");
+  }
+  return parts.join("; ");
+}
+
 // 登录接口请求体
 interface LoginBody {
   account?: string;
@@ -58,8 +84,9 @@ export async function POST(request: Request) {
             where: { OR: [{ email: normalizedAccount }, { phone: normalizedAccount }] },
           });
 
-    // 账号不存在
+    // 账号不存在：执行 dummy bcrypt.compare 消除时序差异
     if (!user) {
+      await bcrypt.compare(password, DUMMY_HASH);
       return NextResponse.json(
         { message: "账号不存在或密码错误" },
         { status: 401 },
@@ -78,7 +105,8 @@ export async function POST(request: Request) {
     // 签发 JWT
     const token = signToken(user.id);
 
-    return NextResponse.json({
+    // 构造响应（同时下发 httpOnly cookie 和 token 给前端）
+    const response = NextResponse.json({
       token,
       user: {
         id: user.id,
@@ -88,19 +116,13 @@ export async function POST(request: Request) {
         isSubscribed: user.isSubscribed,
       },
     });
+    // 设置 httpOnly cookie（服务端管理，防 XSS 窃取）
+    response.headers.set("Set-Cookie", buildAuthCookie(token, request));
+    return response;
   } catch (error) {
-    const errInfo = {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack?.split("\n").slice(0, 5).join(" | ") : undefined,
-      env: {
-        hasJwt: !!process.env.JWT_SECRET,
-        hasDb: !!process.env.DATABASE_URL,
-        nodeEnv: process.env.NODE_ENV,
-      },
-    };
-    console.error("登录失败:", JSON.stringify(errInfo, null, 2));
+    console.error("登录失败:", error);
     return NextResponse.json(
-      { message: "服务器内部错误", debug: errInfo },
+      { message: "服务器内部错误" },
       { status: 500 },
     );
   }

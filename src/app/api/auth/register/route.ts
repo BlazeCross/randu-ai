@@ -9,6 +9,29 @@ import {
   ipRateLimitedResponse,
 } from "@/lib/ipRateLimit";
 
+// JWT cookie 有效期（与 JWT exp 一致，7 天）
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 天，单位秒
+
+/**
+ * 构造 httpOnly cookie 字符串
+ * 生产环境启用 Secure（HTTPS），开发环境不启用（HTTP localhost）
+ */
+function buildAuthCookie(token: string, request: Request): string {
+  const isHttps = request.headers.get("x-forwarded-proto") === "https" ||
+                  request.url.startsWith("https://");
+  const parts = [
+    `token=${token}`,
+    "Path=/",
+    `Max-Age=${COOKIE_MAX_AGE}`,
+    "SameSite=Lax",
+    "HttpOnly",
+  ];
+  if (isHttps) {
+    parts.push("Secure");
+  }
+  return parts.join("; ");
+}
+
 // 注册接口请求体
 interface RegisterBody {
   email?: string;
@@ -192,7 +215,8 @@ export async function POST(request: Request) {
     // 签发 JWT
     const token = signToken(result.id);
 
-    return NextResponse.json(
+    // 构造响应（同时下发 httpOnly cookie 和 token 给前端）
+    const response = NextResponse.json(
       {
         token,
         user: {
@@ -206,6 +230,9 @@ export async function POST(request: Request) {
       },
       { status: 201 },
     );
+    // 设置 httpOnly cookie（服务端管理，防 XSS 窃取）
+    response.headers.set("Set-Cookie", buildAuthCookie(token, request));
+    return response;
   } catch (error) {
     console.error("注册失败:", error);
     return NextResponse.json(

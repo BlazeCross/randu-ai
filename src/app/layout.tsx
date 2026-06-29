@@ -44,9 +44,6 @@ export const metadata: Metadata = {
     title: "燃渡AI - AI工作流服务平台",
     description:
       "提供 Coze 工作流执行、Seedance 视频生成、Seedream 文生图、豆包文案生成等 AI 能力，开放 API 供第三方集成。",
-    // TODO: 需要创建 /public/logo-og.png（推荐 1200x630），
-    // 创建后取消下方注释以启用 OG 图片预览：
-    // images: [{ url: "/logo-og.png", width: 1200, height: 630, alt: "燃渡AI" }],
   },
   twitter: {
     card: "summary_large_image",

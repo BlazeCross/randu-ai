@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
  * Next.js Proxy（原 middleware，Next.js 16 已重命名）
  *
  * 职责：对需要登录的路由统一检查 cookie 中的 JWT（cookie 名：token）。
- * - 若有 token，直接放行（正常请求页面）
+ * - 若 token 验签通过，直接放行（正常请求页面）
  * - 若无 token，重定向到 /login?redirect=<原路径>
  * - admin 路由的 role 检查仍由页面层处理（避免在 proxy 中解析 JWT）
  * - /api 路由不在此拦截（API 有自己的鉴权）
@@ -23,7 +23,7 @@ const PROTECTED_PREFIXES = [
   "/workspace",
 ];
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   // 仅对受保护路由前缀生效（matcher 已限定，这里再保险一次）
@@ -34,12 +34,18 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 从 cookie 读取 JWT（cookie 名：token）
-  // 前端登录时通过 document.cookie 设置，proxy 在服务端可读取
+  // 从 cookie 读取 JWT 并验签
   const token = request.cookies.get("token")?.value;
-  if (token) {
-    // 已登录，放行
-    return NextResponse.next();
+  const secret = process.env.JWT_SECRET;
+  if (token && secret) {
+    try {
+      // 仅验签和检查过期，不查库（性能优先，库查询由 API 层处理）
+      const jwt = await import("jsonwebtoken");
+      jwt.verify(token, secret, { algorithms: ["HS256"] });
+      return NextResponse.next();
+    } catch {
+      // token 无效或过期，继续重定向到登录页
+    }
   }
 
   // 无 token，重定向到登录页并带上原路径（含 query string）

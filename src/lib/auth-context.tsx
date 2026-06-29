@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     // 同步到 cookie，让 middleware/proxy 能检测到登录状态（兼容老用户）
-    document.cookie = `token=${storedToken}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+    document.cookie = `token=${storedToken}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`;
     // 延迟 setToken 到微任务，避免 effect 内同步 setState
     Promise.resolve().then(() => setToken(storedToken));
     fetchUserProfile(storedToken).then((profile) => {
@@ -94,11 +94,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // 登录：保存 token 到 localStorage + cookie 并获取用户信息
+  // 登录：保存 token 到 localStorage 并获取用户信息（httpOnly cookie 由 API 下发）
   const login = useCallback(async (newToken: string) => {
+    // token 已由 API 通过 Set-Cookie httpOnly cookie 自动设置
+    // localStorage 仅作为前端状态备份（API 鉴权优先读 cookie）
     localStorage.setItem(TOKEN_KEY, newToken);
-    // 同步到 cookie，让 middleware/proxy 能检测到登录状态
-    document.cookie = `token=${newToken}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
     setToken(newToken);
     const profile = await fetchUserProfile(newToken);
     setUser(profile);
@@ -107,8 +107,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 登出：清除 localStorage token、cookie 和用户信息
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
-    // 清除 cookie
+    // 清除前端 cookie（兜底）
     document.cookie = "token=; path=/; max-age=0";
+    // 调用登出 API 清除 httpOnly cookie
+    fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     setToken(null);
     setUser(null);
   }, []);

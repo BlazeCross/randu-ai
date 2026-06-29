@@ -18,15 +18,28 @@ interface AuthPayload extends JwtPayload {
 }
 
 /**
- * 从请求头中提取 Bearer token
+ * 从请求中提取 token
+ * 优先从 cookie 读取（httpOnly cookie 鉴权），回退到 Authorization Bearer header（兼容外部 SDK）
  * @param request Next.js Request 对象
  * @returns token 字符串，若不存在或格式错误则返回 null
  */
 function getTokenFromRequest(request: Request): string | null {
+  // 优先从 cookie 读取（httpOnly cookie 鉴权）
+  const cookieHeader = request.headers.get("cookie");
+  if (cookieHeader) {
+    const cookies = Object.fromEntries(
+      cookieHeader.split(";").map((c) => {
+        const [k, ...v] = c.trim().split("=");
+        return [k, v.join("=")];
+      })
+    );
+    if (cookies.token) {
+      return cookies.token;
+    }
+  }
+  // 回退到 Authorization Bearer header（兼容外部 SDK）
   const authHeader = request.headers.get("authorization");
   if (!authHeader) return null;
-
-  // 期望格式：Bearer <token>
   const parts = authHeader.split(" ");
   if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") {
     return null;
@@ -51,7 +64,7 @@ function verifyToken(request: Request): AuthPayload | null {
   }
 
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] });
     if (typeof decoded === "string") return null;
     if (!decoded || typeof decoded.userId !== "string") return null;
     return decoded as AuthPayload;
@@ -72,7 +85,7 @@ export function signToken(userId: string): string {
     throw new Error("JWT_SECRET 未配置");
   }
   // 过期时间 7 天
-  return jwt.sign({ userId }, secret, { expiresIn: "7d" });
+  return jwt.sign({ userId }, secret, { expiresIn: "7d", issuer: "randu-ai", audience: "randu-ai-users" });
 }
 
 /**
@@ -98,6 +111,7 @@ interface RouteContext {
  * 高阶函数：包装需要鉴权的 Route Handler
  * 未通过鉴权时直接返回 401；通过鉴权时将 userId 注入到 handler 参数
  * 同时透传 Next.js 的路由上下文（params），支持动态路由
+ * 通过鉴权后会校验用户封禁状态（带 5 秒内存缓存，降低 DB 压力）
  *
  * @example
  * export const GET = requireAuth(async (request, { userId }) => { ... });
@@ -105,6 +119,10 @@ interface RouteContext {
  *   const { id } = await params;  // 动态路由参数
  * });
  */
+// 用户状态缓存（5 秒 TTL，降低 DB 压力）
+const userStatusCache = new Map<string, { status: string; expiresAt: number }>();
+const USER_STATUS_CACHE_TTL = 5000; // 5 秒
+
 export function requireAuth(
   handler: (
     request: Request,
@@ -115,6 +133,26 @@ export function requireAuth(
     const payload = verifyToken(request);
     if (!payload) {
       return unauthorizedResponse();
+    }
+    // 校验用户封禁状态（带缓存）
+    const now = Date.now();
+    const cached = userStatusCache.get(payload.userId);
+    let userStatus: string;
+    if (cached && cached.expiresAt > now) {
+      userStatus = cached.status;
+    } else {
+      const user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+        select: { status: true },
+      });
+      if (!user) {
+        return unauthorizedResponse("用户不存在");
+      }
+      userStatus = user.status;
+      userStatusCache.set(payload.userId, { status: userStatus, expiresAt: now + USER_STATUS_CACHE_TTL });
+    }
+    if (userStatus === "blocked") {
+      return forbiddenResponse("账号已被封禁，请联系管理员");
     }
     return handler(request, { userId: payload.userId, params: context?.params });
   };

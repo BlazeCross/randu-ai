@@ -133,11 +133,11 @@ export async function ensureInviteCode(userId: string): Promise<string> {
 /**
  * 构建邀请链接
  *
- * 形如：${NEXT_PUBLIC_BASE_URL}/register?ref=${inviteCode}
- * 若未配置 NEXT_PUBLIC_BASE_URL，则返回相对路径 /register?ref=xxx
+ * 形如：${NEXT_PUBLIC_APP_URL}/register?ref=${inviteCode}
+ * 若未配置 NEXT_PUBLIC_APP_URL，则返回相对路径 /register?ref=xxx
  */
 export function buildInviteUrl(inviteCode: string): string {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || "";
+  const base = process.env.NEXT_PUBLIC_APP_URL || "";
   // 拼接，避免出现双斜杠
   const separator = base.endsWith("/") ? "" : "";
   return `${base}${separator}/register?ref=${inviteCode}`;
