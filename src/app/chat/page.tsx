@@ -18,6 +18,8 @@ import AppShell from "@/components/layout/AppShell";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import { cx } from "@/lib/cn";
+import PromptLibrary from "@/components/chat/PromptLibrary";
+import DialogueExporter from "@/components/chat/DialogueExporter";
 
 // 消息类型
 interface ChatMessage {
@@ -621,6 +623,16 @@ export default function ChatPage() {
   );
 
   /**
+   * 处理提示词库选择
+   */
+  const handlePromptSelect = useCallback((content: string) => {
+    setInput((prev) => {
+      const base = prev ? (prev.endsWith(" ") ? prev : prev + " ") : "";
+      return base + content;
+    });
+  }, []);
+
+  /**
    * 新建对话：清空输入，开始新会话（不清空历史）
    */
   const handleClear = () => {
@@ -831,6 +843,10 @@ export default function ChatPage() {
                         day: "2-digit",
                       })}
                     </div>
+                  </div>
+                  {/* 导出按钮（hover 显示） */}
+                  <div className="absolute right-6 top-1 hidden group-hover:block">
+                    <DialogueExporter conversation={conv} />
                   </div>
                   {/* 删除按钮（hover 显示） */}
                   <button
@@ -1248,6 +1264,9 @@ export default function ChatPage() {
                   </svg>
                 )}
               </button>
+
+              {/* 提示词库按钮 */}
+              <PromptLibrary onSelectPrompt={handlePromptSelect} />
 
               <textarea
                 value={input}

@@ -44,9 +44,27 @@ model User {
   actionLogsAsOperator ActionLog[] @relation("ActionLogOperator")
   actionLogsAsTarget   ActionLog[] @relation("ActionLogTarget")
   eventLogs            EventLog[]
+  progresses           UserProgress[]
 
   @@index([inviterId])
   @@map("users")
+}
+
+// 学习进度追踪模型
+// 开发完成后需要执行: npx prisma db push 或执行 SQL 脚本同步到数据库
+model UserProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  pathId    String   // 学习路径 ID，如 "ecommerce-ai-7days"
+  stepId    String   // 教程步骤 ID
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pathId, stepId])
+  @@index([userId, pathId])
+  @@map("user_progresses")
 }
 
 model ApiKey {

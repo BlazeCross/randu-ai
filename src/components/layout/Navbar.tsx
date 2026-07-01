@@ -12,12 +12,11 @@ import UserQuickMenu from "@/components/ui/UserQuickMenu";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { cx } from "@/lib/cn";
 
-// 主导航链接（教程已下线至功能页按钮，API 文档已迁入个人中心）
+// 主导航链接（动词化命名）
 const navLinks = [
-  { label: "首页", href: "/" },
-  { label: "工作台", href: "/workspace" },
-  { label: "市场", href: "/marketplace" },
-  { label: "智能体", href: "/chat" },
+  { label: "探索", href: "/" },
+  { label: "创作", href: "/workspace" },
+  { label: "学习", href: "/academy" },
   { label: "定价", href: "/pricing" },
 ];
 
@@ -69,13 +68,13 @@ export default function Navbar() {
     router.push("/");
   };
 
-  // 导航链接样式
+  // 导航链接样式（琥珀色激活态 + 150ms过渡）
   const navLinkClass = (href: string) =>
     cx(
-      "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+      "rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-150",
       isActive(href)
-        ? "bg-accent text-accent-foreground"
-        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+        ? "text-[#E67E22] relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-5 after:rounded-full after:bg-[#E67E22]"
+        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
     );
 
   return (
@@ -111,18 +110,18 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* 燃渡学院（带悬浮下拉子菜单） */}
+            {/* 学习（带悬浮下拉子菜单） */}
             <div className="group relative">
               <Link
                 href="/academy"
                 className={cx(
-                  "flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-150",
                   isActive("/academy") || isActive("/courses")
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "text-[#E67E22] relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-5 after:rounded-full after:bg-[#E67E22]"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 )}
               >
-                燃渡学院
+                学习
                 <svg
                   className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180"
                   fill="none"
@@ -255,7 +254,7 @@ export default function Navbar() {
                 className={cx(
                   "block rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors",
                   isActive(link.href)
-                    ? "bg-accent text-accent-foreground"
+                    ? "text-[#E67E22]"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
@@ -263,18 +262,18 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* 燃渡学院及子项 */}
+            {/* 学习及子项 */}
             <Link
               href="/academy"
               onClick={() => setMobileOpen(false)}
               className={cx(
                 "block rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors",
                 isActive("/academy") || isActive("/courses")
-                  ? "bg-accent text-accent-foreground"
+                  ? "text-[#E67E22]"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              燃渡学院
+              学习
             </Link>
             <Link
               href="/academy/articles"
@@ -299,7 +298,7 @@ export default function Navbar() {
                   className={cx(
                     "block rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors",
                     isActive("/dashboard")
-                      ? "bg-accent text-accent-foreground"
+                      ? "text-[#E67E22]"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
@@ -318,7 +317,7 @@ export default function Navbar() {
                   className={cx(
                     "block rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors",
                     isActive("/dashboard/notifications")
-                      ? "bg-accent text-accent-foreground"
+                      ? "text-[#E67E22]"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
@@ -331,7 +330,7 @@ export default function Navbar() {
                     className={cx(
                       "block rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors",
                       isActive("/admin")
-                        ? "bg-accent text-accent-foreground"
+                        ? "text-[#E67E22]"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >

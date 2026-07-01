@@ -246,6 +246,18 @@ export default function DashboardPage() {
               API Key 管理
             </Link>
             <Link
+              href="/dashboard/progress"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
+            >
+              学习进度
+            </Link>
+            <Link
+              href="/dashboard/data"
+              className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
+            >
+              数据中心
+            </Link>
+            <Link
               href="/dashboard/api-docs"
               className="text-muted-foreground transition-all duration-200 hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full relative"
             >

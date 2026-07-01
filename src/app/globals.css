@@ -11,108 +11,67 @@
  * ============================================================ */
 
 :root {
-  /* ---- 核心表面 ---- */
-  --background: #ffffff;
-  --foreground: #0e1115;
-  --card: #ffffff;
-  --card-foreground: #0e1115;
-  --popover: #f9f9fa;
-  --popover-foreground: #0e1115;
-
-  /* ---- 语义品牌 ---- */
-  --primary: #0065fd;
-  --primary-foreground: #ffffff;
-  --secondary: #eff1f4;
-  --secondary-foreground: #333942;
-  --muted: #eff1f4;
-  --muted-foreground: #7f8d9f;
-  --accent: #e5e9ff;
-  --accent-foreground: #00266b;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #e7eaef;
-  --input: #e7eaef;
-  --ring: #557fff;
-
-  /* ---- 数据可视化与侧栏 ---- */
-  --chart-1: #557fff;
-  --chart-2: #0065fd;
-  --chart-3: #0057da;
-  --chart-4: #0043ad;
-  --chart-5: #002e7d;
-  --sidebar: #eff1f4;
-  --sidebar-foreground: #0e1115;
-  --sidebar-primary: #0065fd;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #d4daff;
-  --sidebar-accent-foreground: #00266b;
-  --sidebar-border: #e7eaef;
-  --sidebar-ring: #0065fd;
-
-  /* ---- 字体 ---- */
-  --font-sans: "Inter", "Stack Sans Text", "PingFang SC", "Microsoft YaHei", ui-sans-serif, sans-serif, system-ui;
-  --font-serif: "Source Serif 4", serif;
-  --font-mono: "JetBrains Mono", "Courier New", monospace;
-
-  /* ---- 圆角与间距（Doubao token） ---- */
-  --radius: 1.2rem;
-  --radius-sm: 10px;
-  --radius-lg: 14px;
-  --radius-full: 999px;
-  --spacing: 0.24rem;
-
-  /* ---- V2.0 新增：阴影系统（参考 Semi Design 5 级阴影） ---- */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
-
-  /* ---- V2.0 新增：品牌光晕（参考豆包输入框 focus 光晕） ---- */
-  --glow-primary: 0 0 0 3px rgba(0, 101, 253, 0.15);
-  --glow-primary-strong: 0 0 0 4px rgba(0, 101, 253, 0.25), 0 0 20px rgba(0, 101, 253, 0.1);
-
-  /* ---- V2.0 新增：玻璃拟态（参考豆包/火山方舟导航） ---- */
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-blur: 20px;
-
-  /* ---- V2.0 新增：过渡系统（参考扣子 90ms-1800ms 分级） ---- */
-  --duration-instant: 90ms;
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-  --duration-slower: 800ms;
-
-  /* ---- V2.0 新增：缓动曲线（参考 OpenAI 自定义 ease-curve） ---- */
-  --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ease-in: cubic-bezier(0.42, 0, 1, 1);
-  --ease-out: cubic-bezier(0, 0, 0.58, 1);
-  --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  /* ====== 背景色 ====== */
+  --color-bg: #FAF7F2;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F5F0E8;
+  
+  /* ====== 强调色（琥珀色）====== */
+  --color-accent: #E67E22;
+  --color-accent-hover: #D35400;
+  --color-accent-light: #FDF2E9;
+  
+  /* ====== 文字色 ====== */
+  --color-text: #2C2C2C;
+  --color-text-muted: #666666;
+  --color-text-light: #999999;
+  
+  /* ====== 边框色 ====== */
+  --color-border: #E8E0D8;
+  
+  /* ====== 状态色 ====== */
+  --color-success: #27AE60;
+  --color-error: #E74C3C;
+  --color-warning: #F39C12;
+  --color-new: #FF6B35;
+  
+  /* ====== 圆角 ====== */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  /* ====== 间距 ====== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  
+  /* ====== 阴影 ====== */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+  
+  /* ====== 过渡动画 ====== */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-  /* ---- V2.0 新增：微噪点纹理 ---- */
-  --noise-opacity: 0.018;
-
-  /* ---- V2.0 新增：语义色 ---- */
-  --warning: #f59e0b;
-  --warning-foreground: #ffffff;
-
-  /* ---- V2.0 新增：表面层叠 ---- */
-  --surface-elevated: #ffffff;
-  --surface-overlay: rgba(255, 255, 255, 0.85);
-
-  /* ---- 兼容旧组件的中性灰梯度（映射到 Doubao 色系） ---- */
-  --color-neutral-50: #f9fafb;
-  --color-neutral-100: #eff1f4;
-  --color-neutral-200: #e7eaef;
-  --color-neutral-300: #d4dae3;
-  --color-neutral-400: #9aa6b5;
-  --color-neutral-500: #7f8d9f;
-  --color-neutral-600: #4b5563;
-  --color-neutral-700: #333942;
-  --color-neutral-800: #1f2937;
-  --color-neutral-900: #0e1115;
+/* 深色模式 */
+html.dark {
+  --color-bg: #1A1A1A;
+  --color-surface: #2C2C2C;
+  --color-surface-alt: #3D3D3D;
+  --color-text: #E8E0D8;
+  --color-text-muted: #999999;
+  --color-text-light: #666666;
+  --color-border: #3D3D3D;
 }
 
 /* ============================================================
@@ -320,7 +279,7 @@ html.dark .border-neutral-300 {
  * 基础样式
  * ============================================================ */
 body {
-  background: var(--background);
+  background: var(--color-bg);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -517,7 +476,7 @@ html.dark ::selection {
   animation: message-in var(--duration-fast) var(--ease-out) both;
 }
 
-/* ---- 交错入场延迟工具类 ---- */
+/* ---- 交错入场延迟工具类（动画版，用于 ScrollReveal 的 animate-fade-up） ---- */
 .stagger-1 { animation-delay: 50ms; }
 .stagger-2 { animation-delay: 100ms; }
 .stagger-3 { animation-delay: 150ms; }
@@ -569,4 +528,37 @@ html.dark ::selection {
 @keyframes vt-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* ====== 滚动揭示动画 ====== */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 交错淡入延迟（用于 animate-on-scroll） */
+.animate-on-scroll.visible.stagger-1 { transition-delay: 0ms; }
+.animate-on-scroll.visible.stagger-2 { transition-delay: 100ms; }
+.animate-on-scroll.visible.stagger-3 { transition-delay: 200ms; }
+.animate-on-scroll.visible.stagger-4 { transition-delay: 300ms; }
+.animate-on-scroll.visible.stagger-5 { transition-delay: 400ms; }
+.animate-on-scroll.visible.stagger-6 { transition-delay: 500ms; }
+
+/* NEW 标签 */
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-new);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
 }

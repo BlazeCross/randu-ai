@@ -3,12 +3,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import AppShell from "@/components/layout/AppShell";
+import WorkflowDetailActions from "@/components/workflow/WorkflowDetailActions";
 
 // 工作流详情页（服务端组件）
 // 通过 params.id 直接查询数据库获取工作流详情
 
-// 相关推荐数量
-const RELATED_LIMIT = 4;
+// 相关推荐数量（显示 2-3 个）
+const RELATED_LIMIT = 3;
 
 /**
  * 根据工作流 ID 查询详情
@@ -225,26 +226,12 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
             </dl>
           </div>
 
-          {/* 相关推荐 */}
-          {related.length > 0 && (
-            <div className="border-t border-border px-2 pt-2">
-              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                相关推荐
-              </div>
-              <div className="flex flex-col gap-1">
-                {related.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/workflow/${item.id}`}
-                    className="flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <span className="text-lg">{item.icon || "🤖"}</span>
-                    <span className="truncate">{item.name}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* 收藏按钮 + 相关推荐（客户端组件） */}
+          <WorkflowDetailActions
+            workflowId={workflow.id}
+            workflowName={workflow.name}
+            related={related}
+          />
         </div>
       }
     >

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import GradientText from "@/components/ui/GradientText";
 
 interface Stat {
   value: number;
@@ -11,10 +10,10 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { value: 1200, suffix: "+", label: "注册用户" },
-  { value: 30, suffix: "+", label: "工作流" },
+  { value: 10000, suffix: "+", label: "服务学员" },
+  { value: 500, suffix: "+", label: "精选工作流" },
+  { value: 98, suffix: "%", label: "满意度" },
   { value: 50000, suffix: "+", label: "累计生成" },
-  { value: 100, suffix: "+", label: "教程" },
 ];
 
 const DURATION = 1600;
@@ -70,9 +69,9 @@ export default function StatsSection() {
 
   return (
     <section className="relative overflow-hidden border-y border-border bg-background py-16 sm:py-24">
-      {/* 装饰性背景光晕 */}
+      {/* 装饰性背景光晕 - 琥珀色 */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-72 w-[640px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-72 w-[640px] -translate-x-1/2 rounded-full bg-accent/5 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-[1600px] px-6 lg:px-8">
@@ -85,7 +84,7 @@ export default function StatsSection() {
             被众多创作者信赖
           </h2>
           <span
-            className="mt-2 block h-1 w-16 rounded-full bg-gradient-to-r from-primary to-primary-400 mx-auto"
+            className="mt-2 block h-1 w-16 rounded-full bg-accent mx-auto"
             aria-hidden
           />
         </div>
@@ -104,14 +103,12 @@ export default function StatsSection() {
                   : "opacity-0"
               }`}
             >
-              <div className="text-5xl font-bold tracking-tight sm:text-6xl">
-                <GradientText>
-                  <CountUp
-                    target={stat.value}
-                    suffix={stat.suffix}
-                    active={isVisible}
-                  />
-                </GradientText>
+              <div className="text-5xl font-bold tracking-tight text-accent sm:text-6xl">
+                <CountUp
+                  target={stat.value}
+                  suffix={stat.suffix}
+                  active={isVisible}
+                />
               </div>
               <div className="mt-3 text-sm font-medium text-muted-foreground sm:text-base">
                 {stat.label}

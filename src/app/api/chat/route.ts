@@ -8,6 +8,7 @@ import {
   type ChatMessage,
 } from "@/lib/volcengine";
 import { moderateText } from "@/lib/moderation";
+import { checkText, maskBlockedWords } from "@/lib/content-check";
 import { checkAntiAbuse, refundAntiAbuseCredits } from "@/lib/userAntiAbuse";
 
 // 对话积分消耗
@@ -202,7 +203,7 @@ export const POST = requireAuth(async (request, { userId }) => {
 
       const result = await chatCompletion({ messages });
 
-      // 内容审核（输出）
+      // 内容审核（输出）- 第一层：本地敏感词库
       const outputModeration = moderateText(result.content || "");
       if (!outputModeration.passed) {
         // 命中敏感词，不展示，退还积分 + 回滚防刷积分计数
@@ -210,6 +211,37 @@ export const POST = requireAuth(async (request, { userId }) => {
         refundAntiAbuseCredits(userId, creditsCost);
         return NextResponse.json(
           { message: "AI 回复内容审核未通过，已退还积分，请重新提问" },
+          { status: 451 },
+        );
+      }
+
+      // 内容审核（输出）- 第二层：阿里云绿网云端审核
+      const cloudCheck = await checkText(result.content || "");
+      if (!cloudCheck.safe) {
+        // 云端审核未通过，记录过滤日志
+        console.log(`[chat] 云端内容审核未通过 userId=${userId}, reason=${cloudCheck.reason}, blockedWords=${JSON.stringify(cloudCheck.blockedWords || [])}, originalContent=${result.content?.slice(0, 100)}`);
+
+        // 尝试脱敏处理：用 *** 替换敏感词后返回
+        if (cloudCheck.blockedWords && cloudCheck.blockedWords.length > 0) {
+          const maskedContent = maskBlockedWords(result.content || "", cloudCheck.blockedWords);
+          // 确认扣费：累加使用次数
+          await prisma.user.update({
+            where: { id: userId },
+            data: { totalUsed: { increment: 1 } },
+          });
+          return NextResponse.json({
+            role: "assistant" as const,
+            content: maskedContent,
+            type: "text" as const,
+            tokensUsed: result.tokensUsed,
+            creditsCost,
+            moderationWarning: "部分内容已脱敏展示",
+          });
+        }
+
+        // 无可脱敏内容时返回提示
+        return NextResponse.json(
+          { message: "该内容暂不可展示" },
           { status: 451 },
         );
       }
