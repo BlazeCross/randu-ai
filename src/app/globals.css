@@ -4,74 +4,96 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ============================================================
- * 燃渡AI 设计系统 v2.0（基于 Doubao Design Library）
- * 极简 · 冷调 · 技术感 · 平静
+ * 燃渡AI 设计系统 v4.0（科技紫配色）
+ * 主色：Indigo-500 (#6366F1)
+ * 辅助色：Sky-500 (#0EA5E9)
  * 核心原则：边框优先于阴影、紧凑仪表盘密度、单一圆角 token
- * V2.0 新增：分层阴影、品牌光晕、玻璃拟态、过渡分级、微噪点纹理
  * ============================================================ */
 
 :root {
-  /* ====== 背景色 ====== */
-  --color-bg: #FAF7F2;
-  --color-surface: #FFFFFF;
-  --color-surface-alt: #F5F0E8;
+  /* ====== 主色：科技紫 ====== */
+  --color-primary: #6366F1;        /* Indigo-500 */
+  --color-primary-hover: #4F46E5; /* Indigo-600 */
+  --color-primary-light: #EEF2FF; /* Indigo-50，浅色背景 */
   
-  /* ====== 强调色（琥珀色）====== */
-  --color-accent: #E67E22;
-  --color-accent-hover: #D35400;
-  --color-accent-light: #FDF2E9;
+  /* ====== 辅助色：清新蓝 ====== */
+  --color-secondary: #0EA5E9;    /* Sky-500 */
+  --color-secondary-hover: #0284C7;
+  
+  /* ====== 功能色 ====== */
+  --color-success: #10B981;       /* Emerald-500 */
+  --color-warning: #F59E0B;       /* Amber-500 */
+  --color-error: #EF4444;         /* Red-500 */
+  --color-new: #EC4899;           /* Pink-500，用于 NEW 标签 */
+  
+  /* ====== 强调色 ====== */
+  --color-accent: #6366F1;        /* 同主色 */
+  --color-accent-hover: #4F46E5;
+  --color-accent-light: #EEF2FF;
   
   /* ====== 文字色 ====== */
-  --color-text: #2C2C2C;
-  --color-text-muted: #666666;
-  --color-text-light: #999999;
+  --color-text: #111827;
+  --color-text-muted: #6B7280;
+  --color-text-light: #9CA3AF;
+  
+  /* ====== 背景色 ====== */
+  --color-bg: #FAFBFC;           /* 极浅灰白 */
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F9FAFB;
   
   /* ====== 边框色 ====== */
-  --color-border: #E8E0D8;
+  --color-border: #E5E7EB;
   
-  /* ====== 状态色 ====== */
-  --color-success: #27AE60;
-  --color-error: #E74C3C;
-  --color-warning: #F39C12;
-  --color-new: #FF6B35;
+  /* ====== 渐变 ====== */
+  --gradient-hero: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%);
+  --gradient-primary: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  --gradient-card: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
   
   /* ====== 圆角 ====== */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
   
-  /* ====== 间距 ====== */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
+  /* ====== 间距（8px网格） ====== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --space-32: 128px;
   
   /* ====== 阴影 ====== */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-  --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
   
   /* ====== 过渡动画 ====== */
-  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-base: 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* 深色模式 */
 html.dark {
-  --color-bg: #1A1A1A;
-  --color-surface: #2C2C2C;
-  --color-surface-alt: #3D3D3D;
-  --color-text: #E8E0D8;
-  --color-text-muted: #999999;
-  --color-text-light: #666666;
-  --color-border: #3D3D3D;
+  --color-bg: #0F0F14;
+  --color-surface: #1A1A24;
+  --color-surface-alt: #252532;
+  --color-primary: #818CF8;       /* Indigo-400，更亮 */
+  --color-primary-hover: #6366F1; /* Indigo-500 */
+  --color-text: #F9FAFB;
+  --color-text-muted: #9CA3AF;
+  --color-text-light: #6B7280;
+  --color-border: #374151;
+  --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.3);
 }
 
 /* ============================================================
@@ -113,47 +135,59 @@ html.dark {
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 
-  /* V2.0 新增：阴影工具类映射 */
+  /* V4.0 阴影工具类映射 */
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
 
-  /* V2.0 新增：表面 token 映射 */
+  /* V4.0 表面 token 映射 */
   --color-surface-elevated: var(--surface-elevated);
   --color-surface-overlay: var(--surface-overlay);
 
-  /* V2.0 新增：warning 映射 */
+  /* V4.0 warning 映射 */
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
 
-  /* 保留旧 primary-50~900 梯度供现有组件使用 */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #e5e9ff;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #557fff;
-  --color-primary-500: #0065fd;
-  --color-primary-600: #0057da;
-  --color-primary-700: #0043ad;
-  --color-primary-800: #002e7d;
-  --color-primary-900: #00266b;
-  --color-primary-hover: #0057da;
+  /* V4.0 科技紫 primary 梯度 */
+  --color-primary-50: #EEF2FF;
+  --color-primary-100: #E0E7FF;
+  --color-primary-200: #C7D2FE;
+  --color-primary-300: #A5B4FC;
+  --color-primary-400: #818CF8;
+  --color-primary-500: #6366F1;
+  --color-primary-600: #4F46E5;
+  --color-primary-700: #4338CA;
+  --color-primary-800: #3730A3;
+  --color-primary-900: #312E81;
+  --color-primary-hover: #4F46E5;
 
-  /* 保留 success 色系 */
-  --color-success: #10b981;
-  --color-success-50: #ecfdf5;
-  --color-success-100: #d1fae5;
-  --color-success-200: #a7f3d0;
-  --color-success-300: #6ee7b7;
-  --color-success-400: #34d399;
-  --color-success-500: #10b981;
+  /* V4.0 success 色系 */
+  --color-success: #10B981;
+  --color-success-50: #ECFDF5;
+  --color-success-100: #D1FAE5;
+  --color-success-200: #A7F3D0;
+  --color-success-300: #6EE7B7;
+  --color-success-400: #34D399;
+  --color-success-500: #10B981;
   --color-success-600: #059669;
   --color-success-700: #047857;
-  --color-success-800: #065f46;
-  --color-success-900: #064e3b;
+  --color-success-800: #065F46;
+  --color-success-900: #064E3B;
   --color-success-hover: #059669;
+
+  /* V4.0 secondary 清新蓝 */
+  --color-secondary-50: #F0F9FF;
+  --color-secondary-100: #E0F2FE;
+  --color-secondary-200: #BAE6FD;
+  --color-secondary-300: #7DD3FC;
+  --color-secondary-400: #38BDF8;
+  --color-secondary-500: #0EA5E9;
+  --color-secondary-600: #0284C7;
+  --color-secondary-700: #0369A1;
+  --color-secondary-800: #075985;
+  --color-secondary-900: #0C4A6E;
 
   /* 保留中性灰梯度供现有组件使用 */
   --color-neutral-50: var(--color-neutral-50);
@@ -170,84 +204,83 @@ html.dark {
 
 /* ============================================================
  * 暗色模式（手动控制，由 html.dark 类触发）
- * V2.0：优化 4 级表面层级，增强对比度
+ * V4.0：科技紫深色模式
  * ============================================================ */
 html.dark {
-  --background: #0a0d11;
-  --foreground: #e8eaed;
-  --card: #12161c;
-  --card-foreground: #e8eaed;
-  --popover: #1a1f27;
-  --popover-foreground: #e5e5e5;
+  --background: #0F0F14;
+  --foreground: #F9FAFB;
+  --card: #1A1A24;
+  --card-foreground: #F9FAFB;
+  --popover: #252532;
+  --popover-foreground: #F9FAFB;
+  --primary: #818CF8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #252532;
+  --secondary-foreground: #F9FAFB;
+  --muted: #1A1A24;
+  --muted-foreground: #9CA3AF;
+  --accent: #312E81;
+  --accent-foreground: #C7D2FE;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #374151;
+  --input: #374151;
+  --ring: #6366F1;
 
-  --primary: #0065fd;
-  --primary-foreground: #ffffff;
-  --secondary: #22252a;
-  --secondary-foreground: #e5e5e5;
-  --muted: #161a20;
-  --muted-foreground: #9ba8b8;
-  --accent: #00266b;
-  --accent-foreground: #bfdbfe;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #2a303c;
-  --input: #2a303c;
-  --ring: #00266b;
+  --chart-1: #818CF8;
+  --chart-2: #A5B4FC;
+  --chart-3: #6366F1;
+  --chart-4: #4F46E5;
+  --chart-5: #4338CA;
+  --sidebar: #0F0F14;
+  --sidebar-foreground: #F9FAFB;
+  --sidebar-primary: #818CF8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #312E81;
+  --sidebar-accent-foreground: #C7D2FE;
+  --sidebar-border: #374151;
+  --sidebar-ring: #6366F1;
 
-  --chart-1: #60a5fa;
-  --chart-2: #3b82f6;
-  --chart-3: #2563eb;
-  --chart-4: #1d4ed8;
-  --chart-5: #1e40af;
-  --sidebar: #0f1318;
-  --sidebar-foreground: #e5e5e5;
-  --sidebar-primary: #0065fd;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #00266b;
-  --sidebar-accent-foreground: #bfdbfe;
-  --sidebar-border: #252b35;
-  --sidebar-ring: #00266b;
+  /* V4.0 暗色阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 20px 35px rgba(0, 0, 0, 0.5);
 
-  /* V2.0 暗色阴影 */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+  /* V4.0 暗色品牌光晕（科技紫） */
+  --glow-primary: 0 0 0 3px rgba(129, 140, 248, 0.25);
+  --glow-primary-strong: 0 0 0 4px rgba(129, 140, 248, 0.35), 0 0 24px rgba(99, 102, 241, 0.2);
 
-  /* V2.0 暗色品牌光晕 */
-  --glow-primary: 0 0 0 3px rgba(96, 165, 250, 0.2);
-  --glow-primary-strong: 0 0 0 4px rgba(96, 165, 250, 0.3), 0 0 24px rgba(96, 165, 250, 0.15);
+  /* V4.0 暗色玻璃拟态 */
+  --glass-bg: rgba(15, 15, 20, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.06);
 
-  /* V2.0 暗色玻璃拟态 */
-  --glass-bg: rgba(10, 13, 17, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.04);
+  /* V4.0 暗色表面层叠 */
+  --surface-elevated: #252532;
+  --surface-overlay: rgba(15, 15, 20, 0.85);
 
-  /* V2.0 暗色表面层叠 */
-  --surface-elevated: #171b22;
-  --surface-overlay: rgba(14, 17, 21, 0.85);
-
-  /* V2.0 暗色噪点降低 */
-  --noise-opacity: 0.025;
+  /* V4.0 暗色噪点降低 */
+  --noise-opacity: 0.02;
 
   /* 中性灰映射为暗色梯度 */
-  --color-neutral-50: #0a0d11;
-  --color-neutral-100: #161a20;
-  --color-neutral-200: #1f2937;
-  --color-neutral-300: #2a2a2a;
-  --color-neutral-400: #525252;
-  --color-neutral-500: #afbbcb;
-  --color-neutral-600: #d4d4d4;
-  --color-neutral-700: #e5e5e5;
-  --color-neutral-800: #ededed;
-  --color-neutral-900: #f5f5f5;
+  --color-neutral-50: #0F0F14;
+  --color-neutral-100: #1A1A24;
+  --color-neutral-200: #252532;
+  --color-neutral-300: #374151;
+  --color-neutral-400: #6B7280;
+  --color-neutral-500: #9CA3AF;
+  --color-neutral-600: #D1D5DB;
+  --color-neutral-700: #E5E7EB;
+  --color-neutral-800: #F3F4F6;
+  --color-neutral-900: #F9FAFB;
 
-  /* primary 在暗色模式提亮以保持对比度 */
-  --color-primary: #60a5fa;
-  --color-primary-hover: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
+  /* V4.0 primary 在暗色模式使用 Indigo-400 */
+  --color-primary: #818CF8;
+  --color-primary-hover: #A5B4FC;
+  --color-primary-400: #A5B4FC;
+  --color-primary-500: #818CF8;
+  --color-primary-600: #6366F1;
 }
 
 /* 暗色模式：覆盖 bg-white 工具类（现有组件大量使用） */
@@ -255,16 +288,16 @@ html.dark .bg-white {
   background-color: var(--card) !important;
 }
 html.dark .bg-white\/80 {
-  background-color: rgba(18, 22, 28, 0.8) !important;
+  background-color: rgba(26, 26, 36, 0.8) !important;
 }
 html.dark .bg-white\/90 {
-  background-color: rgba(18, 22, 28, 0.9) !important;
+  background-color: rgba(26, 26, 36, 0.9) !important;
 }
 html.dark .bg-white\/95 {
-  background-color: rgba(18, 22, 28, 0.95) !important;
+  background-color: rgba(26, 26, 36, 0.95) !important;
 }
 html.dark .bg-white\/70 {
-  background-color: rgba(18, 22, 28, 0.7) !important;
+  background-color: rgba(26, 26, 36, 0.7) !important;
 }
 
 /* 暗色模式：边框适配 */
@@ -286,7 +319,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* V2.0：微噪点纹理叠加（营造纸质感） */
+/* V4.0：微噪点纹理叠加 */
 body::before {
   content: "";
   position: fixed;
@@ -299,13 +332,13 @@ body::before {
   background-size: 256px 256px;
 }
 
-/* V2.0：全局选中色使用品牌蓝 */
+/* V4.0：全局选中色使用科技紫 */
 ::selection {
-  background-color: rgba(0, 101, 253, 0.2);
+  background-color: rgba(99, 102, 241, 0.2);
   color: inherit;
 }
 html.dark ::selection {
-  background-color: rgba(96, 165, 250, 0.25);
+  background-color: rgba(129, 140, 248, 0.3);
 }
 
 /* 自定义滚动条（Doubao 风格） */
@@ -339,21 +372,41 @@ html.dark ::selection {
 
 /* 淡入动画 */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* 弹窗入场动画 */
+/* 上移淡入 */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 缩放淡入 */
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* 页面入场 */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 骨架屏 shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-fade-in {
+  animation: fade-in var(--transition-base) forwards;
+}
+.animate-slide-up { animation: slide-up var(--transition-slow) forwards; }
 .animate-scale-in {
   animation: scale-in 0.2s ease-out;
 }
+.animate-page-enter { animation: page-enter 300ms ease-out; }
 
 /* 触摸反馈 */
 .tap-feedback {
@@ -445,9 +498,9 @@ html.dark ::selection {
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    var(--muted) 25%,
-    color-mix(in srgb, var(--muted) 70%, var(--foreground) 10%) 50%,
-    var(--muted) 75%
+    var(--color-surface-alt) 25%,
+    var(--color-border) 50%,
+    var(--color-surface-alt) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
@@ -475,18 +528,21 @@ html.dark ::selection {
 .animate-message-in {
   animation: message-in var(--duration-fast) var(--ease-out) both;
 }
+.animate-zoom-in {
+  animation: zoom-in var(--duration-normal) var(--ease-out) both;
+}
+@keyframes zoom-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 /* ---- 交错入场延迟工具类（动画版，用于 ScrollReveal 的 animate-fade-up） ---- */
-.stagger-1 { animation-delay: 50ms; }
+.stagger-1 { animation-delay: 0ms; }
 .stagger-2 { animation-delay: 100ms; }
-.stagger-3 { animation-delay: 150ms; }
-.stagger-4 { animation-delay: 200ms; }
-.stagger-5 { animation-delay: 250ms; }
-.stagger-6 { animation-delay: 300ms; }
-.stagger-7 { animation-delay: 350ms; }
-.stagger-8 { animation-delay: 400ms; }
-.stagger-9 { animation-delay: 450ms; }
-.stagger-10 { animation-delay: 500ms; }
+.stagger-3 { animation-delay: 200ms; }
+.stagger-4 { animation-delay: 300ms; }
+.stagger-5 { animation-delay: 400ms; }
+.stagger-6 { animation-delay: 500ms; }
 
 /* 尊重用户「减少动态效果」的系统偏好 */
 @media (prefers-reduced-motion: reduce) {

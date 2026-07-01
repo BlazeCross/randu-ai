@@ -168,96 +168,146 @@ export default function WorkspacePage() {
         </div>
       }
     >
-      {/* 主体：工作流卡片列表 */}
-      <div className="p-6 lg:p-8">
-        {/* 加载状态：骨架屏 */}
-        {loading ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="animate-shimmer rounded-[var(--radius)] border border-border bg-card p-6"
+      {/* 主体 */}
+      <div className="flex h-full flex-col">
+        {/* 快捷工具栏 */}
+        <div className="flex-none border-b border-border/50 bg-[var(--surface-elevated)]">
+          <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-10">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">快捷入口：</span>
+              <Link
+                href="/chat"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary/10 to-primary-500/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:from-primary/20 hover:to-primary-500/20"
               >
-                <div className="mb-4 h-12 w-12 rounded-[var(--radius-lg)] bg-muted" />
-                <div className="mb-3 h-5 w-2/3 rounded bg-muted" />
-                <div className="mb-2 h-3 w-full rounded bg-muted" />
-                <div className="mb-5 h-3 w-5/6 rounded bg-muted" />
-                <div className="flex gap-3">
-                  <div className="h-8 w-20 rounded-[var(--radius-sm)] bg-muted" />
-                  <div className="h-8 w-16 rounded-[var(--radius-sm)] bg-muted" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          // 错误状态
-          <div className="rounded-[var(--radius)] border border-border bg-card p-8 sm:p-12">
-            <ErrorMessage
-              message={error}
-              onRetry={handleReload}
-              retryText="重新加载"
-            />
-          </div>
-        ) : workflows.length === 0 ? (
-          // 空状态
-          <div className="rounded-[var(--radius)] border border-dashed border-border bg-card p-16 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-3xl">
-              📭
+                <span>💡</span> 智能对话
+              </Link>
+              <Link
+                href="/workspace?category=图像设计"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500/10 to-pink-500/10 px-3 py-1.5 text-xs font-medium text-pink-600 transition-colors hover:from-pink-500/20 hover:to-pink-500/20"
+              >
+                <span>🎨</span> 图片生成
+              </Link>
+              <Link
+                href="/workspace?category=视频生成"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-500/10 px-3 py-1.5 text-xs font-medium text-purple-600 transition-colors hover:from-purple-500/20 hover:to-purple-500/20"
+              >
+                <span>📹</span> 视频生成
+              </Link>
+              <Link
+                href="/workspace?category=自动化运营"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-600 transition-colors hover:from-amber-500/20 hover:to-amber-500/20"
+              >
+                <span>⚡</span> 工作流
+              </Link>
+              <Link
+                href="/workspace?category=内容创作"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600 transition-colors hover:from-emerald-500/20 hover:to-emerald-500/20"
+              >
+                <span>✍️</span> 内容创作
+              </Link>
             </div>
-            <p className="text-base font-medium text-foreground">暂无工作流</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              请尝试更换关键词或分类筛选条件
-            </p>
           </div>
-        ) : (
-          // 工作流卡片网格
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {workflows.map((workflow) => (
-              <article
-                key={workflow.id}
-                className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all duration-300 hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
-              >
-                {/* 图标 */}
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-gradient-to-br from-accent to-primary/8 text-2xl group-hover:scale-110 group-hover:shadow-[var(--shadow-sm)] transition-all duration-300">
-                  {workflow.icon || "🤖"}
-                </div>
+        </div>
 
-                {/* 名称 */}
-                <h3 className="mb-2 text-base font-semibold text-foreground">
-                  {workflow.name}
-                </h3>
-
-                {/* 描述 */}
-                <p className="mb-4 line-clamp-2 flex-1 text-sm leading-6 text-muted-foreground">
-                  {workflow.description || "暂无描述"}
-                </p>
-
-                {/* 分类标签 */}
-                <div className="mb-4">
-                  <span className="inline-flex items-center rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
-                    {workflow.category}
-                  </span>
-                </div>
-
-                {/* 操作按钮 */}
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/workspace/${workflow.id}/use`}
-                    className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 text-white shadow-[var(--shadow-xs)] px-4 py-2 text-sm font-medium transition-colors hover:bg-primary-hover"
-                  >
-                    使用
-                  </Link>
-                  <Link
-                    href={`/workflow/${workflow.id}`}
-                    className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    详情
-                  </Link>
-                </div>
-              </article>
-            ))}
+        {/* 欢迎语区域 */}
+        <div className="flex-none border-b border-border/50 bg-gradient-to-b from-accent/5 to-transparent">
+          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-10">
+            <h1 className="mb-1 text-xl font-semibold text-foreground">欢迎使用燃渡AI工作台</h1>
+            <p className="text-sm text-muted-foreground">选择下方工作流或快捷入口，开始您的 AI 创作之旅</p>
           </div>
-        )}
+        </div>
+
+        {/* 工作流卡片列表 */}
+        <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+          {/* 加载状态：骨架屏 */}
+          {loading ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="animate-shimmer rounded-[var(--radius)] border border-border bg-card p-6"
+                >
+                  <div className="mb-4 h-12 w-12 rounded-[var(--radius-lg)] bg-muted" />
+                  <div className="mb-3 h-5 w-2/3 rounded bg-muted" />
+                  <div className="mb-2 h-3 w-full rounded bg-muted" />
+                  <div className="mb-5 h-3 w-5/6 rounded bg-muted" />
+                  <div className="flex gap-3">
+                    <div className="h-8 w-20 rounded-[var(--radius-sm)] bg-muted" />
+                    <div className="h-8 w-16 rounded-[var(--radius-sm)] bg-muted" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            // 错误状态
+            <div className="rounded-[var(--radius)] border border-border bg-card p-8 sm:p-12">
+              <ErrorMessage
+                message={error}
+                onRetry={handleReload}
+                retryText="重新加载"
+              />
+            </div>
+          ) : workflows.length === 0 ? (
+            // 空状态
+            <div className="rounded-[var(--radius)] border border-dashed border-border bg-card p-16 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-3xl">
+                📭
+              </div>
+              <p className="text-base font-medium text-foreground">暂无工作流</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                请尝试更换关键词或分类筛选条件
+              </p>
+            </div>
+          ) : (
+            // 工作流卡片网格
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {workflows.map((workflow) => (
+                <article
+                  key={workflow.id}
+                  className="group flex flex-col rounded-[var(--radius)] border border-border bg-card p-5 transition-all duration-300 hover:border-[color-mix(in_srgb,var(--primary)_40%,var(--border))] hover:bg-[color-mix(in_srgb,var(--accent)_22%,var(--card))] hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
+                >
+                  {/* 图标 */}
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-gradient-to-br from-accent to-primary/8 text-2xl group-hover:scale-110 group-hover:shadow-[var(--shadow-sm)] transition-all duration-300">
+                    {workflow.icon || "🤖"}
+                  </div>
+
+                  {/* 名称 */}
+                  <h3 className="mb-2 text-base font-semibold text-foreground">
+                    {workflow.name}
+                  </h3>
+
+                  {/* 描述 */}
+                  <p className="mb-4 line-clamp-2 flex-1 text-sm leading-6 text-muted-foreground">
+                    {workflow.description || "暂无描述"}
+                  </p>
+
+                  {/* 分类标签 */}
+                  <div className="mb-4">
+                    <span className="inline-flex items-center rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
+                      {workflow.category}
+                    </span>
+                  </div>
+
+                  {/* 操作按钮 */}
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/workspace/${workflow.id}/use`}
+                      className="inline-flex flex-1 items-center justify-center rounded-[var(--radius-sm)] bg-gradient-to-r from-primary to-primary-500 text-white shadow-[var(--shadow-xs)] px-4 py-2 text-sm font-medium transition-colors hover:bg-primary-hover"
+                    >
+                      使用
+                    </Link>
+                    <Link
+                      href={`/workflow/${workflow.id}`}
+                      className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      详情
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </AppShell>
   );

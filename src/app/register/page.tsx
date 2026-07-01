@@ -232,90 +232,122 @@ function RegisterContent() {
 
           {/* 注册卡片 */}
           <div className="rounded-2xl border border-[#E8E0D8] bg-white p-6 sm:p-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* 邮箱输入框 */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* 基本信息 */}
               <div>
-                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
-                  邮箱 <span className="text-[#999999]">（可选）</span>
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="请输入邮箱"
-                  autoComplete="email"
-                  className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
-                />
-              </div>
+                <h3 className="text-sm font-medium text-[#999999] mb-4">基本信息</h3>
+                <div className="space-y-4">
+                  {/* 用户名输入框 */}
+                  <div>
+                    <label htmlFor="username" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
+                      用户名
+                    </label>
+                    <input
+                      id="username"
+                      type="text"
+                      placeholder="请输入用户名"
+                      autoComplete="nickname"
+                      className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
+                    />
+                  </div>
 
-              {/* 手机号输入框 */}
-              <div>
-                <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
-                  手机号 <span className="text-[#999999]">（可选）</span>
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="请输入手机号"
-                  autoComplete="tel"
-                  className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
-                />
-                <p className="mt-1 text-xs text-[#999999]">邮箱和手机号至少填写一个</p>
-              </div>
-
-              {/* 密码输入框 */}
-              <div>
-                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
-                  密码
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="至少 6 位密码"
-                    autoComplete="new-password"
-                    className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 pr-12 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999999] transition-colors hover:text-[#666666]"
-                    aria-label={showPassword ? "隐藏密码" : "显示密码"}
-                  >
-                    {showPassword ? (
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                      </svg>
-                    ) : (
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    )}
-                  </button>
+                  {/* 手机号输入框 */}
+                  <div>
+                    <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
+                      手机号
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="请输入手机号"
+                      autoComplete="tel"
+                      className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* 确认密码输入框 */}
+              {/* 分隔线 */}
+              <div className="h-px bg-[#E8E0D8]" />
+
+              {/* 账号信息 */}
               <div>
-                <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
-                  确认密码
-                </label>
-                <input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="请再次输入密码"
-                  autoComplete="new-password"
-                  className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
-                />
+                <h3 className="text-sm font-medium text-[#999999] mb-4">账号信息</h3>
+                <div className="space-y-4">
+                  {/* 邮箱输入框 */}
+                  <div>
+                    <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
+                      邮箱 <span className="text-[#999999]">（可选）</span>
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="请输入邮箱"
+                      autoComplete="email"
+                      className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
+                    />
+                    <p className="mt-1 text-xs text-[#999999]">邮箱和手机号至少填写一个</p>
+                  </div>
+
+                  {/* 密码输入框 */}
+                  <div>
+                    <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
+                      密码
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="至少 6 位密码"
+                        autoComplete="new-password"
+                        className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 pr-12 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999999] transition-colors hover:text-[#666666]"
+                        aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                      >
+                        {showPassword ? (
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 确认密码输入框 */}
+                  <div>
+                    <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-[#2C2C2C]">
+                      确认密码
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="请再次输入密码"
+                      autoComplete="new-password"
+                      className="w-full rounded-xl border border-[#E8E0D8] bg-white px-4 py-3 text-[#2C2C2C] placeholder:text-[#999999] focus:border-[#E67E22] focus:outline-none transition-all duration-150"
+                    />
+                  </div>
+                </div>
               </div>
+
+              {/* 分隔线 */}
+              <div className="h-px bg-[#E8E0D8]" />
 
               {/* 邀请码输入框 */}
               <div>
@@ -370,23 +402,30 @@ function RegisterContent() {
                 )}
               </div>
 
+              {/* 分隔线 */}
+              <div className="h-px bg-[#E8E0D8]" />
+
+              {/* 协议同意 */}
+              <div>
+                <h3 className="text-sm font-medium text-[#999999] mb-4">协议同意</h3>
+                {/* 用户协议同意复选框 */}
+                <div className="flex items-start gap-2">
+                  <input type="checkbox" id="agree-terms" className="mt-1 w-4 h-4 accent-[#E67E22]" required />
+                  <label htmlFor="agree-terms" className="text-sm text-[#666666]">
+                    我已阅读并同意
+                    <a href="/terms" className="text-[#E67E22] hover:underline mx-1">《用户协议》</a>
+                    和
+                    <a href="/privacy" className="text-[#E67E22] hover:underline mx-1">《隐私政策》</a>
+                  </label>
+                </div>
+              </div>
+
               {/* 错误提示 */}
               {error && (
                 <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
                   {error}
                 </div>
               )}
-
-              {/* 用户协议同意复选框 */}
-              <div className="flex items-start gap-2">
-                <input type="checkbox" id="agree-terms" className="mt-1 w-4 h-4 accent-[#E67E22]" required />
-                <label htmlFor="agree-terms" className="text-sm text-[#666666]">
-                  我已阅读并同意
-                  <a href="/terms" className="text-[#E67E22] hover:underline mx-1">《用户协议》</a>
-                  和
-                  <a href="/privacy" className="text-[#E67E22] hover:underline mx-1">《隐私政策》</a>
-                </label>
-              </div>
 
               {/* 注册按钮 */}
               <button

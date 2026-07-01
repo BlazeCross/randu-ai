@@ -1,122 +1,67 @@
 "use client";
 
-import Link from "next/link";
-
-// 冷启动引导气泡
-interface Suggestion {
-  label: string;
-  href: string;
-}
-
-const suggestions: Suggestion[] = [
-  { label: "如何用 AI 写爆款文案", href: "/chat" },
-  { label: "电商主图一键生成", href: "/workspace" },
-  { label: "小红书笔记批量创作", href: "/workspace" },
-  { label: "短视频脚本自动化", href: "/workspace" },
-  { label: "私域运营日报生成", href: "/chat" },
-  { label: "AI 学习路径怎么选", href: "/learn" },
-];
-
-export default function HeroSection() {
-  const scrollToFeatures = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const featuresSection = document.getElementById("features");
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+export function HeroSection() {
+  const bubbles = [
+    "如何用AI写爆款文案",
+    "电商主图一键生成",
+    "短视频脚本自动化",
+    "小红书笔记批量创作",
+    "日报周报生成",
+    "AI学习路径怎么选",
+  ];
 
   return (
-    <section className="relative overflow-hidden bg-[var(--color-bg)]">
-      {/* 装饰性几何图形 */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* 左上角圆形装饰 */}
-        <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-[var(--color-accent)]/5 blur-3xl" />
-        {/* 右下角圆形装饰 */}
-        <div className="absolute -bottom-40 -right-20 h-96 w-96 rounded-full bg-[var(--color-accent)]/8 blur-3xl" />
-        {/* 中央上方椭圆 */}
-        <div className="absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-[var(--color-surface-alt)]/50 blur-3xl" />
-        {/* 网格纹理 */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
-        <div className="mx-auto max-w-3xl text-center">
-          {/* 主标题 */}
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl animate-on-scroll">
-            AI 学习 + 工作流
-            <br />
-            <span className="text-[var(--color-accent)]">一站式平台</span>
-          </h1>
-
-          {/* 副标题 */}
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[var(--color-text-muted)] sm:text-xl animate-on-scroll stagger-2">
-            零门槛学 AI，用现成工作流提效
-          </p>
-
-          {/* 行动按钮 */}
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row animate-on-scroll stagger-3">
-            <Link
-              href="/login"
-              className="group inline-flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-accent)] px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] hover:shadow-[var(--shadow-md)] w-full sm:w-auto"
-            >
-              立即开始
-              <svg
-                className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </Link>
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      {/* 渐变背景 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50" />
+      
+      {/* 几何装饰 */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+      
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        {/* 主标题 */}
+        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+          用AI赋能创意<br className="hidden md:block" />让工作更高效
+        </h1>
+        
+        {/* 副标题 */}
+        <p className="mt-6 text-xl text-gray-500 max-w-2xl mx-auto">
+          零门槛学AI，用现成工作流提效。会员免费体验，满意再订阅。
+        </p>
+        
+        {/* CTA 按钮 */}
+        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="/register"
+            className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-full hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+          >
+            免费开始探索
+            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+          <a 
+            href="#features"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-700 font-semibold rounded-full border border-gray-200 hover:border-indigo-300 hover:text-indigo-600 transition-all duration-200"
+          >
+            观看演示视频
+          </a>
+        </div>
+        
+        {/* 冷启动气泡 */}
+        <div className="mt-12 flex flex-wrap justify-center gap-3">
+          {bubbles.map((text) => (
             <a
-              href="#features"
-              onClick={scrollToFeatures}
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-8 py-3.5 text-base font-semibold text-[var(--color-text)] transition-all hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] hover:shadow-[var(--shadow-sm)] w-full sm:w-auto"
+              key={text}
+              href="/workspace"
+              className="px-4 py-2 bg-white/50 backdrop-blur-sm text-gray-600 text-sm rounded-full border border-transparent hover:border-indigo-200 hover:text-indigo-600 transition-all duration-200 cursor-pointer"
             >
-              了解更多
+              {text}
             </a>
-          </div>
-
-          {/* 冷启动引导气泡 */}
-          <div className="mx-auto mt-16 max-w-3xl animate-on-scroll stagger-4">
-            <p className="mb-4 text-xs font-medium uppercase tracking-wider text-[var(--color-text-light)]">
-              试试这些
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
-              {suggestions.map((s, i) => (
-                <Link
-                  key={s.label}
-                  href={s.href}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm text-[var(--color-text-muted)] backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-accent)] hover:shadow-[var(--shadow-sm)]"
-                  style={{ transitionDelay: `${i * 50}ms` }}
-                >
-                  <span className="text-[var(--color-accent)]" aria-hidden>
-                    ✦
-                  </span>
-                  {s.label}
-                </Link>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-
-      {/* 底部渐变分隔 */}
-      <div className="pointer-events-none h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent" />
     </section>
   );
 }

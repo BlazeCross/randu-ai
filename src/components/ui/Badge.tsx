@@ -1,63 +1,71 @@
-import React from "react";
-import { cx } from "@/lib/cn";
+"use client";
 
-// 标签变体
-type BadgeVariant =
-  | "default"
-  | "primary"
-  | "success"
-  | "danger"
-  | "outline"
-  | "gradient";
+import { type HTMLAttributes } from "react";
+import { cx } from "~/lib/cn";
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement> {
-  /** 变体：default 默认灰 / primary 品牌蓝 / success 绿 / danger 红 / outline 描边 / gradient 渐变 */
+type BadgeVariant = "solid" | "subtle" | "outline";
+type BadgeType = "default" | "success" | "warning" | "error" | "info" | "new" | "hot";
+
+interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
-  /** 是否显示圆点前缀 */
-  dot?: boolean;
+  type?: BadgeType;
 }
 
-// 各变体样式
-const BADGE_STYLES: Record<BadgeVariant, string> = {
-  default: "bg-muted text-foreground shadow-[var(--shadow-xs)]",
-  primary: "bg-accent text-accent-foreground shadow-[var(--shadow-xs)]",
-  success: "bg-success/15 text-success",
-  danger: "bg-destructive/15 text-destructive",
-  outline: "border border-border text-foreground",
-  gradient: "bg-gradient-to-r from-primary to-primary-400 text-white shadow-[var(--shadow-xs)]",
+const typeColors = {
+  default: {
+    solid: "bg-gray-500 text-white",
+    subtle: "bg-gray-100 text-gray-700",
+    outline: "border border-gray-300 text-gray-600",
+  },
+  success: {
+    solid: "bg-emerald-500 text-white",
+    subtle: "bg-emerald-50 text-emerald-700",
+    outline: "border border-emerald-300 text-emerald-600",
+  },
+  warning: {
+    solid: "bg-amber-500 text-white",
+    subtle: "bg-amber-50 text-amber-700",
+    outline: "border border-amber-300 text-amber-600",
+  },
+  error: {
+    solid: "bg-red-500 text-white",
+    subtle: "bg-red-50 text-red-700",
+    outline: "border border-red-300 text-red-600",
+  },
+  info: {
+    solid: "bg-sky-500 text-white",
+    subtle: "bg-sky-50 text-sky-700",
+    outline: "border border-sky-300 text-sky-600",
+  },
+  new: {
+    solid: "bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-sm",
+    subtle: "bg-indigo-50 text-indigo-700",
+    outline: "border border-indigo-300 text-indigo-600",
+  },
+  hot: {
+    solid: "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-sm",
+    subtle: "bg-orange-50 text-orange-700",
+    outline: "border border-orange-300 text-orange-600",
+  },
 };
 
-/**
- * Badge 标签
- *
- * 基于 Doubao 设计系统的胶囊标签，用于状态标记与分类。
- * 支持 6 种变体与可选圆点前缀。
- */
-const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  (
-    { variant = "default", dot = false, className, children, ...rest },
-    ref,
-  ) => {
-    return (
-      <span
-        ref={ref}
-        className={cx(
-          "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
-          BADGE_STYLES[variant],
-          className,
-        )}
-        {...rest}
-      >
-        {dot && (
-          <span className="w-1.5 h-1.5 rounded-full bg-current" aria-hidden />
-        )}
-        {children}
-      </span>
-    );
-  },
-);
-
-Badge.displayName = "Badge";
-
-export default Badge;
+export function Badge({ 
+  className = "", 
+  variant = "subtle", 
+  type = "default", 
+  children, 
+  ...props 
+}: BadgeProps) {
+  return (
+    <span
+      className={cx(
+        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+        typeColors[type][variant],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}

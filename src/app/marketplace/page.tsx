@@ -55,8 +55,8 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   效率工具: "from-warning/25 to-chart-2/20",
 };
 
-// 琥珀色选中态
-const AMBER_COLOR = "#E67E22";
+// 主色选中态
+const PRIMARY_COLOR = "#6366F1";
 
 // 模拟使用次数（实际项目中应从 API 获取）
 const MOCK_USAGE_COUNTS: Record<string, number> = {
@@ -267,7 +267,7 @@ export default function MarketplacePage() {
                       ? "text-white shadow-[var(--shadow-sm)]"
                       : "border border-border bg-card text-muted-foreground hover:border-amber-300 hover:text-foreground",
                   )}
-                  style={active ? { backgroundColor: AMBER_COLOR } : undefined}
+                  style={active ? { backgroundColor: PRIMARY_COLOR } : undefined}
                 >
                   {ind}
                 </button>
@@ -290,7 +290,7 @@ export default function MarketplacePage() {
                       ? "text-white shadow-[var(--shadow-sm)]"
                       : "border border-border bg-card text-muted-foreground hover:border-amber-300 hover:text-foreground",
                   )}
-                  style={active ? { backgroundColor: AMBER_COLOR } : undefined}
+                  style={active ? { backgroundColor: PRIMARY_COLOR } : undefined}
                 >
                   {sc}
                 </button>
@@ -356,7 +356,8 @@ export default function MarketplacePage() {
                   key={workflow.id}
                   className={`stagger-${Math.min(idx + 1, 8)}`}
                 >
-                  <GlowCard glow className="group flex h-full flex-col p-0">
+                  <div className="transition-transform duration-300 hover:-translate-y-1">
+                    <GlowCard glow className="group flex h-full flex-col p-0">
                     {/* 封面占位色块 */}
                     <div
                       className={cx(
@@ -428,8 +429,9 @@ export default function MarketplacePage() {
                         使用
                       </div>
                     </Link>
-                  </GlowCard>
-                </ScrollReveal>
+                    </GlowCard>
+                    </div>
+                  </ScrollReveal>
               );
             })}
           </div>

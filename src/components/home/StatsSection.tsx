@@ -1,119 +1,78 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useEffect, useRef, useState } from "react";
 
-interface Stat {
-  value: number;
-  suffix: string;
-  label: string;
-}
-
-const stats: Stat[] = [
-  { value: 10000, suffix: "+", label: "服务学员" },
-  { value: 500, suffix: "+", label: "精选工作流" },
+const stats = [
+  { value: 12847, suffix: "+", label: "已服务学员" },
+  { value: 600, suffix: "+", label: "精选工作流" },
   { value: 98, suffix: "%", label: "满意度" },
   { value: 50000, suffix: "+", label: "累计生成" },
 ];
 
-const DURATION = 1600;
-
-/**
- * 单个数字增长组件
- * 当 active 为 true 时，从 0 增长到 target，使用 ease-out 缓动
- */
-function CountUp({
-  target,
-  suffix,
-  active,
-}: {
-  target: number;
-  suffix: string;
-  active: boolean;
-}) {
-  const [value, setValue] = useState(0);
+function useCountUp(target: number, duration: number = 2000) {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!active) return;
-    let raf = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const progress = Math.min((now - start) / DURATION, 1);
-      // ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.floor(eased * target));
-      if (progress < 1) {
-        raf = requestAnimationFrame(tick);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
       } else {
-        setValue(target);
+        setCount(Math.floor(current));
       }
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [active, target]);
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [hasStarted, target, duration]);
+
+  return { count, ref };
+}
+
+function StatItem({ value, suffix, label }: typeof stats[0]) {
+  const { count, ref } = useCountUp(value);
 
   return (
-    <>
-      {value.toLocaleString()}
-      {suffix}
-    </>
+    <div ref={ref} className="text-center">
+      <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+        {count.toLocaleString()}{suffix}
+      </div>
+      <div className="mt-2 text-gray-500 text-lg">{label}</div>
+    </div>
   );
 }
 
-/**
- * 数据大字号展示区
- * 4 个核心指标，滚动进入视口时数字增长动画
- */
-export default function StatsSection() {
-  const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
-
+export function StatsSection() {
   return (
-    <section className="relative overflow-hidden border-y border-border bg-background py-16 sm:py-24">
-      {/* 装饰性背景光晕 - 琥珀色 */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-72 w-[640px] -translate-x-1/2 rounded-full bg-accent/5 blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto max-w-[1600px] px-6 lg:px-8">
-        {/* 标题区 */}
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-            数据见证
-          </span>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-            被众多创作者信赖
-          </h2>
-          <span
-            className="mt-2 block h-1 w-16 rounded-full bg-accent mx-auto"
-            aria-hidden
-          />
-        </div>
-
-        {/* 数据网格 */}
-        <div
-          ref={ref}
-          className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-8 sm:mt-16 lg:grid-cols-4"
-        >
-          {stats.map((stat, index) => (
-            <div
-              key={stat.label}
-              className={`text-center ${
-                isVisible
-                  ? `animate-count-up stagger-${index + 1}`
-                  : "opacity-0"
-              }`}
-            >
-              <div className="text-5xl font-bold tracking-tight text-accent sm:text-6xl">
-                <CountUp
-                  target={stat.value}
-                  suffix={stat.suffix}
-                  active={isVisible}
-                />
-              </div>
-              <div className="mt-3 text-sm font-medium text-muted-foreground sm:text-base">
-                {stat.label}
-              </div>
-            </div>
+    <section className="py-24 bg-white relative overflow-hidden">
+      {/* 几何装饰 */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-100 rounded-full opacity-50 blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-100 rounded-full opacity-50 blur-3xl" />
+      
+      <div className="relative max-w-5xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat) => (
+            <StatItem key={stat.label} {...stat} />
           ))}
         </div>
       </div>

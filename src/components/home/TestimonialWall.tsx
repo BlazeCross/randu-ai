@@ -1,114 +1,92 @@
 "use client";
 
-import ScrollReveal from "@/components/ui/ScrollReveal";
-
-interface Testimonial {
-  name: string;
-  role: string;
-  avatar: string;
-  content: string;
-}
-
-const testimonials: Testimonial[] = [
+const testimonials = [
   {
     name: "林小棠",
-    role: "自媒体运营",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lin",
-    content:
-      "用燃渡AI写小红书种草文案，效率提升了至少 5 倍，发布内容质量也稳定了很多，现在每天能多产出 3 篇优质笔记。",
+    role: "电商运营主管",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=林小棠",
+    rating: 5,
+    content: "用了燃渡AI之后，我们团队的内容产出效率提升了3倍！尤其是小红书文案生成功能，简直是运营神器。",
   },
   {
-    name: "陈宇航",
-    role: "短视频创作者",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Chen",
-    content:
-      "Seedance 视频生成太香了，输入一段描述就能出宣传视频，省去了大量拍摄和剪辑成本，效果还很专业。",
+    name: "张明",
+    role: "新媒体创业者",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=张明",
+    rating: 5,
+    content: "作为一个AI小白，通过燃渡学院的学习路径，7天就入门了。现在能独立完成短视频脚本和文案创作。",
   },
   {
-    name: "王明哲",
-    role: "创业团队负责人",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Wang",
-    content:
-      "工作流平台帮我们把重复的运营流程自动化了，多语言文档翻译、周报生成都不再占用团队精力，专注做核心业务。",
+    name: "王芳",
+    role: "企业培训经理",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=王芳",
+    rating: 5,
+    content: "企业定制版非常好用，为我们公司定制的工作流让内部审批效率提升显著。客服响应也很及时。",
   },
 ];
 
-/**
- * 学员评价墙 section
- * 2-3 张真实感卡片设计，展示用户评价
- */
-export default function TestimonialsSection() {
+function StarRating({ rating }: { rating: number }) {
   return (
-    <section className="bg-card py-16 sm:py-24">
-      <div className="mx-auto max-w-[1600px] px-6 lg:px-8">
-        {/* 标题区 */}
-        <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-            学员口碑
-          </span>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-            听听他们怎么说
+    <div className="flex gap-0.5">
+      {[...Array(5)].map((_, i) => (
+        <svg
+          key={i}
+          className={`w-4 h-4 ${i < rating ? "text-amber-400" : "text-gray-300"}`}
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+export function TestimonialsSection() {
+  return (
+    <section className="py-24 bg-gray-50">
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+            看看他们怎么说
           </h2>
-          <span
-            className="mt-2 block h-1 w-16 rounded-full bg-accent mx-auto"
-            aria-hidden
-          />
-          <p className="mt-4 text-base text-muted-foreground sm:text-lg">
-            来自不同行业的真实用户反馈
+          <p className="mt-4 text-lg text-gray-500">
+            来自真实用户的好评
           </p>
-        </ScrollReveal>
+        </div>
 
-        {/* 评价卡片网格 */}
-        <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-8 sm:mt-16 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((item, index) => (
-            <ScrollReveal
+            <div
               key={item.name}
-              animation="animate-fade-up"
-              className={`stagger-${index + 1}`}
+              className="relative p-8 bg-white rounded-2xl border border-gray-100 hover:border-indigo-100 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <figure className="flex h-full flex-col rounded-[var(--radius)] border border-border bg-background p-8 shadow-[var(--shadow-sm)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-md)] hover:border-accent/30">
-                {/* 引用装饰 */}
-                <svg
-                  className="mb-4 h-8 w-8 text-accent/40"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden
-                >
-                  <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-2.838 3.995-5.149h-4v-10.7h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-2.838 3.996-5.149h-3.983v-10.7h8.983z" />
-                </svg>
+              {/* 引用装饰 */}
+              <div className="absolute top-6 right-6 text-6xl text-indigo-100 font-serif leading-none">
+                "
+              </div>
 
-                {/* 评价内容 */}
-                <blockquote className="flex-1 text-base leading-relaxed text-muted-foreground">
-                  {item.content}
-                </blockquote>
+              {/* 头像和评分 */}
+              <div className="flex items-center gap-4 mb-4">
+                <img
+                  src={item.avatar}
+                  alt={item.name}
+                  className="w-16 h-16 rounded-full bg-gray-100"
+                />
+                <div>
+                  <div className="font-semibold text-gray-900">{item.name}</div>
+                  <div className="text-sm text-gray-500">{item.role}</div>
+                </div>
+              </div>
 
-                {/* 用户信息 */}
-                <figcaption className="mt-6 flex items-center gap-4 border-t border-border pt-5">
-                  {/* 头像占位 */}
-                  <img
-                    src={item.avatar}
-                    alt={item.name}
-                    className="h-12 w-12 flex-shrink-0 rounded-full bg-muted object-cover"
-                    onError={(e) => {
-                      // Fallback to initials if avatar fails to load
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                  <span className="hidden h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-accent/20 text-sm font-semibold text-accent">
-                    {item.name.slice(0, 1)}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="truncate text-base font-semibold text-foreground">
-                      {item.name}
-                    </div>
-                    <div className="truncate text-sm text-muted-foreground">
-                      {item.role}
-                    </div>
-                  </div>
-                </figcaption>
-              </figure>
-            </ScrollReveal>
+              {/* 评分星星 */}
+              <StarRating rating={item.rating} />
+
+              {/* 评价内容 */}
+              <p className="mt-4 text-gray-600 leading-relaxed">
+                {item.content}
+              </p>
+            </div>
           ))}
         </div>
       </div>

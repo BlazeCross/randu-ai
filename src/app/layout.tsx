@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import UserOnboarding from "@/components/common/UserOnboarding";
 import CustomerServiceButton from "@/components/common/CustomerServiceButton";
 import ThemeProvider from "@/components/providers/ThemeProvider";
+import PageTransition from "@/components/ui/PageTransition";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://randuai.cn";
@@ -100,7 +101,7 @@ export default function RootLayout({
           <AuthProvider>
             <ToastProvider>
               <Navbar />
-              {children}
+              <PageTransition>{children}</PageTransition>
               <UserOnboarding />
               <CustomerServiceButton />
             </ToastProvider>
