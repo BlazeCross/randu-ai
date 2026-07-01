@@ -1,7 +1,7 @@
 "use client";
 
 import { type HTMLAttributes } from "react";
-import { cx } from "~/lib/cn";
+import { cx } from "@/lib/cn";
 
 type BadgeVariant = "solid" | "subtle" | "outline";
 type BadgeType = "default" | "success" | "warning" | "error" | "info" | "new" | "hot";
@@ -49,7 +49,7 @@ const typeColors = {
   },
 };
 
-export function Badge({ 
+function Badge({ 
   className = "", 
   variant = "subtle", 
   type = "default", 
@@ -69,3 +69,6 @@ export function Badge({
     </span>
   );
 }
+
+export default Badge;
+export { Badge };

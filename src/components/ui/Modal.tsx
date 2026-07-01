@@ -2,7 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { cx } from "~/lib/cn";
+import { cx } from "@/lib/cn";
 
 type ModalSize = "sm" | "md" | "lg";
 
