@@ -1,3 +1,5 @@
+"use client";
+
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
 interface Testimonial {
