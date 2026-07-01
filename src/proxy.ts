@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 /**
  * Next.js Proxy（原 middleware，Next.js 16 已重命名）
@@ -11,8 +12,8 @@ import type { NextRequest } from "next/server";
  * - /api 路由不在此拦截（API 有自己的鉴权）
  * - /workflow/[id] 详情/执行路由不在此拦截（由页面层处理）
  *
- * 注意：前端登录时会同步设置 cookie（见 auth-context.tsx 的 login 函数），
- * 因此已登录用户的 cookie 中会有 token，proxy 会放行。
+ * 注意：使用 jose 库而非 jsonwebtoken，因为 proxy 运行在 Edge Runtime，
+ * jsonwebtoken 依赖 Node.js 原生 crypto 模块，在 Edge Runtime 中不可用。
  */
 
 // 受保护的路由前缀（命中其一即需要登录）
@@ -22,6 +23,18 @@ const PROTECTED_PREFIXES = [
   "/chat",
   "/workspace",
 ];
+
+// JWT 密钥的 Uint8Array 缓存（jose 需要 Uint8Array 格式）
+let _secretKey: Uint8Array | null = null;
+
+function getSecretKey(): Uint8Array | null {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return null;
+  if (!_secretKey) {
+    _secretKey = new TextEncoder().encode(secret);
+  }
+  return _secretKey;
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -36,12 +49,16 @@ export async function proxy(request: NextRequest) {
 
   // 从 cookie 读取 JWT 并验签
   const token = request.cookies.get("token")?.value;
-  const secret = process.env.JWT_SECRET;
-  if (token && secret) {
+  const secretKey = getSecretKey();
+  if (token && secretKey) {
     try {
+      // 使用 jose 验证 JWT（兼容 Edge Runtime）
       // 仅验签和检查过期，不查库（性能优先，库查询由 API 层处理）
-      const jwt = await import("jsonwebtoken");
-      jwt.verify(token, secret, { algorithms: ["HS256"] });
+      await jwtVerify(token, secretKey, {
+        algorithms: ["HS256"],
+        issuer: "randu-ai",
+        audience: "randu-ai-users",
+      });
       return NextResponse.next();
     } catch {
       // token 无效或过期，继续重定向到登录页

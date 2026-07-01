@@ -7,10 +7,10 @@
   - [x] SubTask 1.2: 保留 console.error 输出完整错误到服务器日志
   - [x] SubTask 1.3: 构建验证（npx next build）确保无类型错误
 
-- [ ] Task 2: 验证服务器端代码同步与部署
-  - [ ] SubTask 2.1: 确认本地代码已 commit 并 push 到 GitHub
-  - [ ] SubTask 2.2: 提供服务器部署命令（git fetch + reset + docker rebuild）
-  - [ ] SubTask 2.3: 提供清理浏览器缓存的指导
+- [x] Task 2: 验证服务器端代码同步与部署
+  - [x] SubTask 2.1: 确认本地代码已 commit 并 push 到 GitHub
+  - [x] SubTask 2.2: 提供服务器部署命令（git fetch + reset + docker rebuild）
+  - [x] SubTask 2.3: 提供清理浏览器缓存的指导
 
 ## 阶段二：登录系统安全加固（P0 高优先）
 
@@ -63,11 +63,11 @@
   - [x] SubTask 10.2: 确认所有页面正常生成
   - [x] SubTask 10.3: Git commit 并 push
 
-- [ ] Task 11: 部署指导
-  - [ ] SubTask 11.1: 提供服务器部署命令
-  - [ ] SubTask 11.2: 提供 Docker 日志切割配置命令
-  - [ ] SubTask 11.3: 提供磁盘空间排查命令清单
-  - [ ] SubTask 11.4: 提供浏览器缓存清理指导
+- [x] Task 11: 部署指导
+  - [x] SubTask 11.1: 提供服务器部署命令
+  - [x] SubTask 11.2: 提供 Docker 日志切割配置命令
+  - [x] SubTask 11.3: 提供磁盘空间排查命令清单
+  - [x] SubTask 11.4: 提供浏览器缓存清理指导
 
 # Task Dependencies
 - Task 2 依赖 Task 1 完成
