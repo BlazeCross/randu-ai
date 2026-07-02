@@ -62,7 +62,7 @@ function StatItem({ value, suffix, label }: typeof stats[0]) {
   );
 }
 
-export function StatsSection() {
+function StatsSection() {
   return (
     <section className="py-24 bg-white relative overflow-hidden">
       {/* 几何装饰 */}
@@ -79,3 +79,5 @@ export function StatsSection() {
     </section>
   );
 }
+
+export default StatsSection;

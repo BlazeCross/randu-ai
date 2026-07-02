@@ -41,7 +41,7 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export function TestimonialsSection() {
+function TestimonialsSection() {
   return (
     <section className="py-24 bg-gray-50">
       <div className="max-w-5xl mx-auto px-6">
@@ -93,3 +93,5 @@ export function TestimonialsSection() {
     </section>
   );
 }
+
+export default TestimonialsSection;

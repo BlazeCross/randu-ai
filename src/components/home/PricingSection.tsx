@@ -46,7 +46,7 @@ const plans = [
   },
 ];
 
-export function PricingSection() {
+function PricingSection() {
   return (
     <section className="py-24 bg-white" id="pricing">
       <div className="max-w-5xl mx-auto px-6">
@@ -118,3 +118,5 @@ export function PricingSection() {
     </section>
   );
 }
+
+export default PricingSection;

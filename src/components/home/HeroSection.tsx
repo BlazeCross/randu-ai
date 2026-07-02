@@ -1,6 +1,6 @@
 "use client";
 
-export function HeroSection() {
+function HeroSection() {
   const bubbles = [
     "如何用AI写爆款文案",
     "电商主图一键生成",
@@ -65,3 +65,5 @@ export function HeroSection() {
     </section>
   );
 }
+
+export default HeroSection;
