@@ -70,7 +70,7 @@ export default function ScenarioShowcase() {
           {scenarios.map((scenario, index) => (
             <ScrollReveal
               key={scenario.title}
-              animation="animate-fade-up"
+              animation="slide"
               className={`stagger-${index + 1}`}
             >
               <Link

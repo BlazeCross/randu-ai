@@ -57,7 +57,7 @@ export default function WorkflowCategories() {
           {categories.map((category, index) => (
             <ScrollReveal
               key={category.name}
-              animation="animate-fade-up"
+              animation="slide"
               className={`stagger-${index + 1}`}
             >
               <Link
